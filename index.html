@@ -158,6 +158,48 @@ label.chk input{width:20px;height:20px;flex:none}
 .model{margin-top:8px;background:var(--greenbg);border-radius:10px;padding:10px 12px;font-size:15px}.model>div{white-space:pre-line;margin-top:4px}
 textarea{width:100%;padding:12px;font-size:16px;border:1px solid var(--line);border-radius:10px;font-family:inherit;resize:vertical}
 .kw{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:15px}.kw>div{margin-top:4px}.kw .miss{color:#7a4b00}
+/* Exam mode (palette state colours are added from EXAM_COMMON.palette by examCSS) */
+body.examon main{max-width:1120px}
+.xspec{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.xtable th{width:38%;font-size:13px;color:var(--muted)} .xtable td{font-weight:600}
+.xlist{margin:6px 0;padding-left:20px;font-size:15px}.xlist li{margin:5px 0}
+.xlegend{display:grid;grid-template-columns:1fr;gap:8px;margin:8px 0}
+.xlegend>div{display:flex;gap:10px;align-items:center;font-size:14px}
+.xlegend small{display:block;color:var(--muted);font-size:12px}
+.xchip,.xp button{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;width:38px;height:38px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-weight:700;color:#fff;font-size:14px}
+.xchip{width:30px;height:30px;font-size:13px}
+.xs-nta .s-marked,.xs-nta .s-answeredMarked,.xs-paper .s-marked,.xs-paper .s-answeredMarked{border-radius:50%}
+.xs-nta .s-notAnswered{border-radius:8px 8px 50% 50%}
+.xp{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:8px;margin-top:10px}
+.xp button.cur{outline:3px solid var(--navy);outline-offset:2px}
+.xagree{background:var(--sky);border-radius:12px;padding:10px 12px;margin-top:14px}
+.xsrc{font-size:13px;color:var(--muted)}.xsrc a{color:var(--blue);word-break:break-word}
+.xtop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.xclock{font-size:16px;font-weight:800;white-space:nowrap}
+.xopt{display:flex;gap:10px;align-items:flex-start}
+.xopt .rad{flex:none;width:20px;height:20px;border:2px solid #9aa0a6;border-radius:50%;margin-top:2px;position:relative}
+.xopt.sel .rad{border-color:var(--navy)} .xopt.sel .rad::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--navy)}
+.xbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.xbtns.three{grid-template-columns:1fr 1fr 1fr}
+.xbtns .btn{padding:12px 8px;font-size:15px;border-radius:12px}
+.btn.xsave{background:#188038}.btn.xmark{background:#7b1fa2}
+.xbtns .btn.ghost.on{background:#7b1fa2;color:#fff;border-color:#7b1fa2}
+.xfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.xside h3{color:var(--navy);display:flex;justify-content:space-between;align-items:center}
+.xclose{background:none;color:var(--blue);font-weight:700;font-size:14px;padding:4px}
+#palTog{background:var(--sky);color:var(--navy);font-weight:700;font-size:14px;padding:8px 12px;border-radius:999px}
+.xshade{display:none}
+@media(min-width:900px){.xwrap{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:14px;align-items:start}.xside{position:sticky;top:12px}#palTog,.xclose{display:none}.xlegend.side{grid-template-columns:1fr}}
+@media(max-width:899px){.xside{position:fixed;top:0;right:0;bottom:0;width:min(340px,90vw);z-index:45;margin:0;border-radius:16px 0 0 16px;overflow-y:auto;transform:translateX(110%);transition:transform .2s;box-shadow:-6px 0 24px rgba(20,40,75,.25)}
+  .xside.open{transform:none}.xshade.open{display:block;position:fixed;inset:0;background:rgba(20,40,75,.35);z-index:44}}
+.xstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:12px 0}
+.xstat div{background:var(--sky);border-radius:10px;padding:10px;text-align:center}.xstat b{display:block;font-size:20px;color:var(--navy)}.xstat span{font-size:12px;color:var(--muted)}
+.tchips{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+.tchips button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:6px 4px;font-size:12px;font-weight:700;color:var(--ink);text-align:center}
+.tchips button.ok{border-color:var(--green);background:var(--greenbg)}.tchips button.no{border-color:var(--red);background:var(--redbg)}
+.tchips span{display:block;font-weight:500;color:var(--muted)}
+.xrh{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:700;margin-bottom:6px}
+.xscroll{overflow-x:auto}
 </style>
 </head>
 <body>
@@ -758,6 +800,1765 @@ const CHAPTERS = {
   ]
 };
 
+/* ---------------------------------------------------------------------
+   EXAM MODE RULES (from /home/claude/exam/exam-config.js, built from the
+   official exam instructions; see the sources in each course). Edit papers here.
+   --------------------------------------------------------------------- */
+/* ACE POINT · Exam mode configuration (generated by Agent 2 from /home/claude/exam/rules.json, checked 2026-11-02).
+   EXAM_MODES[courseId] = { exam, board, sourceBoard, checked, practice, note?, unconfirmed?, sources:[{title,url,official,checked}],
+     papers:[{ id, title, exam?, board?, nQ, mins, minsPerQ, marking:{correct,wrong,blank}, ui:"nta"|"paper", feedback:"end",
+               calculator, dataBooklet, practice, instructions:[...], simNote, unconfirmed? }] }
+   Paper-level exam/board override the course-level ones (used by jee). Show sources as EXAM_COMMON.sourceLine
+   with {board} = sourceBoard (or paper.board). examPlan(cid, paperId, bankSize) applies the shortage rule. */
+const EXAM_COMMON = {
+  "checked": "2026-11-02",
+  "maxWarnings": 3,
+  "palette": {
+    "nta": [
+      {
+        "key": "notVisited",
+        "label": "Not Visited",
+        "colour": "grey",
+        "hex": "#9aa0a6",
+        "meaning": "You have not opened this question yet."
+      },
+      {
+        "key": "notAnswered",
+        "label": "Not Answered",
+        "colour": "red",
+        "hex": "#d93025",
+        "meaning": "You opened it but have not saved an answer."
+      },
+      {
+        "key": "answered",
+        "label": "Answered",
+        "colour": "green",
+        "hex": "#188038",
+        "meaning": "Your answer is saved and will be marked."
+      },
+      {
+        "key": "marked",
+        "label": "Marked for Review",
+        "colour": "purple",
+        "hex": "#7b1fa2",
+        "meaning": "Flagged to look at again, with no answer. Scores 0 unless you answer it."
+      },
+      {
+        "key": "answeredMarked",
+        "label": "Answered & Marked for Review",
+        "colour": "purple with a green tick",
+        "hex": "#7b1fa2",
+        "tick": "#188038",
+        "meaning": "Answered and flagged. The answer is still marked."
+      }
+    ],
+    "paper": [
+      {
+        "key": "notAnswered",
+        "label": "Not answered",
+        "colour": "grey",
+        "hex": "#9aa0a6",
+        "meaning": "No answer chosen yet."
+      },
+      {
+        "key": "answered",
+        "label": "Answered",
+        "colour": "green",
+        "hex": "#188038",
+        "meaning": "You have chosen an answer."
+      },
+      {
+        "key": "marked",
+        "label": "Flagged",
+        "colour": "purple",
+        "hex": "#7b1fa2",
+        "meaning": "Flagged to come back to, no answer yet."
+      },
+      {
+        "key": "answeredMarked",
+        "label": "Answered & flagged",
+        "colour": "purple with a green tick",
+        "hex": "#7b1fa2",
+        "tick": "#188038",
+        "meaning": "Answered and flagged. The answer is still marked."
+      }
+    ]
+  },
+  "ntaRules": {
+    "saveOnOptionTap": false,
+    "saveOnPaletteJump": false,
+    "markedWithAnswerIsScored": true,
+    "markedWithoutAnswerScores": 0,
+    "oneSharedTimer": true,
+    "autoSubmitAtZero": true,
+    "buttons": [
+      "Save & Next",
+      "Mark for Review & Next",
+      "Clear Response",
+      "Back",
+      "Submit"
+    ]
+  },
+  "paperRules": {
+    "saveOnOptionTap": true,
+    "oneSharedTimer": true,
+    "autoSubmitAtZero": true,
+    "buttons": [
+      "Back",
+      "Next",
+      "Flag",
+      "Clear",
+      "Submit"
+    ]
+  },
+  "shortage": {
+    "minQuestions": 5,
+    "rule": "If the course bank has fewer questions than the paper needs, use all of them and give the same minutes per question (time = questions used × paper minutes ÷ official questions, rounded to the nearest minute, at least 1 minute).",
+    "message": "Shortened paper: this course has {have} questions so far, so you get {have} of {nQ} questions in {mins} minutes, at the same pace as the real exam.",
+    "tooFew": "Not enough questions yet for an exam in this course ({have} so far). Please try again later."
+  },
+  "generalRules": [
+    "Find a quiet place and allow the full time before you start. The timer cannot be paused.",
+    "Turn on Do Not Disturb. The exam runs in fullscreen; leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper.",
+    "Your name is shown faintly on the screen. Screenshots, copying and printing are blocked.",
+    "Keep rough paper and a pen ready. Use a calculator only if the paper's instructions allow it.",
+    "Answers and explanations are shown only after you submit, as in the real exam.",
+    "Your answers are saved as you go, so a dropped connection does not lose your work.",
+    "Do your own work. The result is for your practice and your teacher's feedback."
+  ],
+  "practiceNote": "Practice exam: the real exam for this course is written. This is multiple-choice practice in timed conditions.",
+  "sourceLine": "Based on official instructions from {board}, checked {date}.",
+  "unconfirmedLabel": "Not yet confirmed for 2027"
+};
+
+const EXAM_MODES = {
+  "neet": {
+    "exam": "NEET (UG) 2027",
+    "board": "NTA",
+    "sourceBoard": "NTA (National Testing Agency)",
+    "unconfirmed": "NEET 2027 will be computer-based (announced May 2026), but the 2027 bulletin is not out. We use the latest confirmed pattern (NEET 2026: 180 questions, +4/−1, 180 minutes). Will be updated when the 2027 bulletin is published.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "neet-chem",
+        "title": "NEET · Chemistry (45 MCQs)",
+        "nQ": 45,
+        "mins": 45,
+        "marking": {
+          "correct": 4,
+          "wrong": -1,
+          "blank": 0
+        },
+        "ui": "nta",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "Simulates the 45-question Chemistry part of NEET at the real pace (1 minute per question); Physics and Biology are not included. Will be updated when the 2027 bulletin is published.",
+        "unconfirmed": "Will be updated when the 2027 bulletin is published.",
+        "minsPerQ": 1,
+        "instructions": [
+          "This paper has 45 questions and 45 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options and only one is correct. All questions can be attempted.",
+          "+4 for a correct answer, −1 for a wrong answer, 0 if you leave it blank. Guessing can cost you marks, so answer only when you are fairly sure.",
+          "Tap an option, then tap Save & Next. If you jump to another question from the palette without saving, your choice is not kept, just like the real exam.",
+          "Mark for Review & Next flags a question to look at again. If it has an answer, that answer is still marked. If it has no answer, it scores 0.",
+          "Clear Response removes your answer to the question on screen.",
+          "Palette colours: grey = not visited, red = not answered, green = answered, purple = marked for review, purple with a green tick = answered and marked for review.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "All questions are compulsory. There is no optional section.",
+          "NEET 2027 is expected to be computer-based, so this uses the NTA computer-test screen. Will be updated when the 2027 bulletin is published.",
+          "Answers and solutions are shown only after you submit. The paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "NTA - Information Bulletin NEET (UG) 2026",
+        "url": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/20260208939209382.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "NTA examination calendar (does not yet list NEET 2027)",
+        "url": "https://nta.ac.in/Download/Notice/Notice_20261026114247.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Deccan Herald (secondary): Minister says NEET-UG to be CBT from 2027",
+        "url": "https://www.deccanherald.com/india/neet-ug-to-be-computer-based-from-next-year-education-minister-dharmendra-pradhan-says-neet-to-go-online-mode-from-2027-4003789",
+        "official": false,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Outlook (secondary): NEET 2027 CBT over ~6 days",
+        "url": "https://www.outlookindia.com/national/2027-neet-ug-plan-computer-based-test-to-be-spread-over-6-days-across-more-than-1000-centres",
+        "official": false,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "jee": {
+    "exam": "JEE Main 2027 and JEE Advanced 2027",
+    "board": "NTA / JEE Advanced",
+    "sourceBoard": "NTA (JEE Main) and JEE Advanced (IIT Roorkee 2026)",
+    "unconfirmed": "JEE Advanced 2027 brochure is not out; the 2026 pattern is used. Will be updated when the JEE Advanced 2027 brochure is published.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "jee-main-a",
+        "exam": "JEE Main 2027",
+        "board": "NTA",
+        "title": "JEE Main · Chemistry (Section A MCQs)",
+        "nQ": 20,
+        "mins": 48,
+        "marking": {
+          "correct": 4,
+          "wrong": -1,
+          "blank": 0
+        },
+        "ui": "nta",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "Simulates the 20 single-correct MCQs of Chemistry Section A (48 min, the paper's 2.4 min per question); the 5 integer-answer questions of Section B are coming soon.",
+        "minsPerQ": 2.4,
+        "instructions": [
+          "This paper has 20 questions and 48 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options and only one is correct. All questions can be attempted.",
+          "+4 for a correct answer, −1 for a wrong answer, 0 if you leave it blank. Guessing can cost you marks, so answer only when you are fairly sure.",
+          "Tap an option, then tap Save & Next. If you jump to another question from the palette without saving, your choice is not kept, just like the real exam.",
+          "Mark for Review & Next flags a question to look at again. If it has an answer, that answer is still marked. If it has no answer, it scores 0.",
+          "Clear Response removes your answer to the question on screen.",
+          "Palette colours: grey = not visited, red = not answered, green = answered, purple = marked for review, purple with a green tick = answered and marked for review.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "All 20 questions are compulsory. In the real paper, Section B has 5 integer-answer questions, also +4/−1; they are not in this mock.",
+          "Answers and solutions are shown only after you submit. The paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      },
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "jee-adv",
+        "exam": "JEE Advanced 2027 (2026 pattern)",
+        "board": "JEE Advanced",
+        "title": "JEE Advanced · Chemistry (single-correct MCQs)",
+        "nQ": 8,
+        "mins": 24,
+        "marking": {
+          "correct": 3,
+          "wrong": -1,
+          "blank": 0
+        },
+        "ui": "nta",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "Simulates the 8 single-correct Chemistry questions of JEE Advanced 2026 (Section 1 and the match-list section), all scored +3/−1 here; the real match-list questions score +4/−1, and multiple-correct, numerical and paragraph questions are not included yet. Will be updated when the JEE Advanced 2027 brochure is published.",
+        "unconfirmed": "Will be updated when the JEE Advanced 2027 brochure is published.",
+        "minsPerQ": 3,
+        "instructions": [
+          "This paper has 8 questions and 24 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options and only one is correct. All questions can be attempted.",
+          "+3 for a correct answer, −1 for a wrong answer, 0 if you leave it blank. Guessing can cost you marks, so answer only when you are fairly sure.",
+          "Tap an option, then tap Save & Next. If you jump to another question from the palette without saving, your choice is not kept, just like the real exam.",
+          "Mark for Review & Next flags a question to look at again. If it has an answer, that answer is still marked. If it has no answer, it scores 0.",
+          "Clear Response removes your answer to the question on screen.",
+          "Palette colours: grey = not visited, red = not answered, green = answered, purple = marked for review, purple with a green tick = answered and marked for review.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "The JEE Advanced pattern changes every year. This uses the 2026 pattern; the real instructions are shown on screen on exam day.",
+          "Answers and solutions are shown only after you submit. The paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "NTA - Information Bulletin JEE (Main) 2027",
+        "url": "https://cdnbbsr.s3waas.gov.in/s3f8e59f4b2fe7c5705bf878bbd494ccdf/uploads/2026/10/202610241890224107.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "JEE Main - Information Bulletin page",
+        "url": "https://jeemain.nta.nic.in/document/information-bulletin/",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "NTA exam calendar 2026-27",
+        "url": "https://nta.ac.in/Download/Notice/Notice_20261026114247.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "JEE (Advanced) 2026 Information Brochure (IIT Roorkee)",
+        "url": "https://jeeadv.ac.in/documents/IBEnglish_2026_1.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "JEE (Advanced) 2026 Paper 1 (English)",
+        "url": "https://jeeadv.ac.in/documents/p1_english.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "JEE (Advanced) 2026 Paper 2 (English)",
+        "url": "https://jeeadv.ac.in/documents/p2_english.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "JEE (Advanced) 2026 CBT general guidelines",
+        "url": "https://jeeadv.ac.in/documents/General_Guidelines_for_Candidates.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "cbse12": {
+    "exam": "CBSE Class XII Board Exam 2027 · Chemistry (043)",
+    "board": "CBSE",
+    "sourceBoard": "CBSE",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "cbse12-a",
+        "title": "CBSE Class 12 · Chemistry (Section A objective questions)",
+        "nQ": 16,
+        "mins": 20,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "Simulates Section A (12 MCQs + 4 assertion-reason questions, 1 mark each); the written Sections B to E (2 to 5 marks each) are not included. 20 minutes is a suggested time, as CBSE sets no separate time for Section A.",
+        "unconfirmed": "Pattern taken from the 2026-27 CBSE sample paper (official PDF could not be checked directly).",
+        "minsPerQ": 1.25,
+        "instructions": [
+          "This paper has 16 questions and 20 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "Assertion-reason questions also have four options; pick the one that correctly describes the two statements.",
+          "CBSE gives no separate time for Section A; 20 minutes is our suggested pace.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "CBSE - Chemistry SQP Class XII 2026-27 (official; blocked to automated fetch)",
+        "url": "https://cbseacademic.nic.in/web_material/SQP/ClassXII_2026_27/Chemistry-SQP.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "CBSE - Chemistry Marking Scheme Class XII 2026-27 (official)",
+        "url": "https://cbseacademic.nic.in/web_material/SQP/ClassXII_2026_27/Chemistry-MS.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "CBSE Chemistry curriculum XI-XII 2026-27 (official)",
+        "url": "https://cbseacademic.nic.in/web_material/CurriculumMain27/SecPart2/Chemistry_SecP2_2026-27.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Competishun (secondary): CBSE Class 12 Chemistry SQP 2026-27 breakdown",
+        "url": "https://competishun.com/cbse-chemistry-sample-paper-class-12-solutions/",
+        "official": false,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "cbse11": {
+    "exam": "CBSE Class XI School Exam 2026-27 · Chemistry",
+    "board": "CBSE (school exam)",
+    "sourceBoard": "CBSE",
+    "note": "Class 11 has no board exam; schools follow the Class 12 board paper design.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "cbse11-a",
+        "title": "CBSE Class 11 · Chemistry (Section A objective questions)",
+        "nQ": 16,
+        "mins": 20,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "Simulates Section A (12 MCQs + 4 assertion-reason questions, 1 mark each); the written Sections B to E (2 to 5 marks each) are not included. 20 minutes is a suggested time, as CBSE sets no separate time for Section A.",
+        "unconfirmed": "Pattern taken from the 2026-27 CBSE sample paper (official PDF could not be checked directly).",
+        "minsPerQ": 1.25,
+        "instructions": [
+          "This paper has 16 questions and 20 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "Assertion-reason questions also have four options; pick the one that correctly describes the two statements.",
+          "CBSE gives no separate time for Section A; 20 minutes is our suggested pace.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "CBSE - Chemistry SQP Class XII 2026-27 (official; blocked to automated fetch)",
+        "url": "https://cbseacademic.nic.in/web_material/SQP/ClassXII_2026_27/Chemistry-SQP.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "CBSE - Chemistry Marking Scheme Class XII 2026-27 (official)",
+        "url": "https://cbseacademic.nic.in/web_material/SQP/ClassXII_2026_27/Chemistry-MS.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "CBSE Chemistry curriculum XI-XII 2026-27 (official)",
+        "url": "https://cbseacademic.nic.in/web_material/CurriculumMain27/SecPart2/Chemistry_SecP2_2026-27.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Competishun (secondary): CBSE Class 12 Chemistry SQP 2026-27 breakdown",
+        "url": "https://competishun.com/cbse-chemistry-sample-paper-class-12-solutions/",
+        "official": false,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "cbse10": {
+    "exam": "CBSE Class X Board Exam 2027 · Science (086)",
+    "board": "CBSE",
+    "sourceBoard": "CBSE",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "cbse10-b",
+        "title": "CBSE Class 10 · Science Section B Chemistry (objective questions)",
+        "nQ": 8,
+        "mins": 10,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "Simulates the 8 one-mark objective questions (7 MCQs + 1 assertion-reason) of the Chemistry section; the written Chemistry questions and the Biology and Physics sections are not included. 10 minutes is a suggested time.",
+        "unconfirmed": "Pattern taken from the 2026-27 CBSE sample paper (official PDF could not be checked directly).",
+        "minsPerQ": 1.25,
+        "instructions": [
+          "This paper has 8 questions and 10 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "Assertion-reason questions also have four options; pick the one that correctly describes the two statements.",
+          "CBSE gives no separate time for these questions; 10 minutes is our suggested pace.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "CBSE - Science SQP Class X 2026-27 (official; blocked to automated fetch)",
+        "url": "https://cbseacademic.nic.in/web_material/SQP/ClassX_2026_27/Science-SQP.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "CBSE Science curriculum 2026-27 (official)",
+        "url": "https://cbseacademic.nic.in/web_material/CurriculumMain27/SecPart1/Science_SecP1_2026-27.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Competishun (secondary): CBSE Class 10 Science SQP 2026-27 question-by-question",
+        "url": "https://competishun.com/cbse-class-10-science-sample-paper-with-solutions/",
+        "official": false,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Careers360 (secondary): Science SQP 2026-27 overview, two board exams",
+        "url": "https://school.careers360.com/boards/cbse/cbse-class-10-science-sample-paper-2026-27",
+        "official": false,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "cbse9": {
+    "exam": "CBSE Class IX School Exam 2026-27 · Science",
+    "board": "CBSE (school exam)",
+    "sourceBoard": "CBSE",
+    "note": "Class 9 has no board exam; schools follow the Class 10 board paper design.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "cbse9-b",
+        "title": "CBSE Class 9 · Science Section B Chemistry (objective questions)",
+        "nQ": 8,
+        "mins": 10,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "Simulates the 8 one-mark objective questions (7 MCQs + 1 assertion-reason) of the Chemistry section; the written Chemistry questions and the Biology and Physics sections are not included. 10 minutes is a suggested time.",
+        "unconfirmed": "Pattern taken from the 2026-27 CBSE sample paper (official PDF could not be checked directly).",
+        "minsPerQ": 1.25,
+        "instructions": [
+          "This paper has 8 questions and 10 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "Assertion-reason questions also have four options; pick the one that correctly describes the two statements.",
+          "CBSE gives no separate time for these questions; 10 minutes is our suggested pace.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "CBSE - Science SQP Class X 2026-27 (official; blocked to automated fetch)",
+        "url": "https://cbseacademic.nic.in/web_material/SQP/ClassX_2026_27/Science-SQP.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "CBSE Science curriculum 2026-27 (official)",
+        "url": "https://cbseacademic.nic.in/web_material/CurriculumMain27/SecPart1/Science_SecP1_2026-27.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Competishun (secondary): CBSE Class 10 Science SQP 2026-27 question-by-question",
+        "url": "https://competishun.com/cbse-class-10-science-sample-paper-with-solutions/",
+        "official": false,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Careers360 (secondary): Science SQP 2026-27 overview, two board exams",
+        "url": "https://school.careers360.com/boards/cbse/cbse-class-10-science-sample-paper-2026-27",
+        "official": false,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "ap": {
+    "exam": "AP Chemistry Exam 2027 (6 May 2027)",
+    "board": "College Board",
+    "sourceBoard": "College Board",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "ap-s1",
+        "title": "AP Chemistry · Section I (Multiple Choice)",
+        "nQ": 60,
+        "mins": 90,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Periodic table and equations sheet provided",
+        "simNote": "Simulates Section I (60 MCQs, 90 minutes, 50% of the score); the 7 free-response questions of Section II are not included.",
+        "minsPerQ": 1.5,
+        "instructions": [
+          "This paper has 60 questions and 90 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Periodic table and equations sheet provided. The site does not show it yet, so keep your own copy beside you.",
+          "In the real exam Section I is taken in the Bluebook app, where you can also flag questions and come back to them before time runs out.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "AP Central - AP Chemistry Exam",
+        "url": "https://apcentral.collegeboard.org/courses/ap-chemistry/exam",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "AP Students - AP Chemistry assessment",
+        "url": "https://apstudents.collegeboard.org/courses/ap-chemistry/assessment",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "AP Chemistry CED",
+        "url": "https://apcentral.collegeboard.org/media/pdf/ap-chemistry-course-and-exam-description.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "al-cie": {
+    "exam": "Cambridge International A Level Chemistry 9701 (2027)",
+    "board": "Cambridge International",
+    "sourceBoard": "Cambridge International",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "al-cie-p1",
+        "title": "Cambridge 9701 · Paper 1 Multiple Choice",
+        "nQ": 40,
+        "mins": 75,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Data Booklet (with Periodic Table) provided",
+        "simNote": "Simulates Paper 1 (40 MCQs, 1 h 15 min); the written Papers 2 to 5 are not included.",
+        "minsPerQ": 1.875,
+        "instructions": [
+          "This paper has 40 questions and 75 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Data Booklet (with Periodic Table) provided. The site does not show it yet, so keep your own copy beside you.",
+          "In the real exam you shade answers on an answer sheet in soft pencil; here you just tap.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Cambridge 9701 syllabus 2025-2027",
+        "url": "https://www.cambridgeinternational.org/Images/664563-2025-2027-syllabus.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Cambridge 9701 qualification page",
+        "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-chemistry-9701/",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "as-cie": {
+    "exam": "Cambridge International AS Level Chemistry 9701 (2027)",
+    "board": "Cambridge International",
+    "sourceBoard": "Cambridge International",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "as-cie-p1",
+        "title": "Cambridge 9701 · Paper 1 Multiple Choice",
+        "nQ": 40,
+        "mins": 75,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Data Booklet (with Periodic Table) provided",
+        "simNote": "Simulates Paper 1 (40 MCQs, 1 h 15 min); the written Papers 2 to 5 are not included.",
+        "minsPerQ": 1.875,
+        "instructions": [
+          "This paper has 40 questions and 75 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Data Booklet (with Periodic Table) provided. The site does not show it yet, so keep your own copy beside you.",
+          "In the real exam you shade answers on an answer sheet in soft pencil; here you just tap.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Cambridge 9701 syllabus 2025-2027",
+        "url": "https://www.cambridgeinternational.org/Images/664563-2025-2027-syllabus.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Cambridge 9701 qualification page",
+        "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-chemistry-9701/",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "al-edx": {
+    "exam": "Pearson Edexcel A Level Chemistry 9CH0 (2027)",
+    "board": "Pearson Edexcel",
+    "sourceBoard": "Pearson Edexcel",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "al-edx-mcq",
+        "title": "Edexcel 9CH0 · Paper 1 or 2 multiple-choice items",
+        "nQ": 9,
+        "mins": 11,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Data booklet (with Periodic Table) provided",
+        "simNote": "Real Papers 1 and 2 have about 9 one-mark multiple-choice items mixed in with written questions; this groups them into one timed set (time at the paper's own pace). The written questions and Paper 3 are not included.",
+        "unconfirmed": "The number of MCQ items per paper varies by series (about 10% of marks).",
+        "minsPerQ": 1.222,
+        "instructions": [
+          "This paper has 9 questions and 11 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Data booklet (with Periodic Table) provided. The site does not show it yet, so keep your own copy beside you.",
+          "In the real paper these questions are mixed in with written questions, not in a separate section.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Pearson Edexcel A level Chemistry specification",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/A%20Level/Chemistry/2015/Specification%20and%20sample%20assessments/a-level-chemistry-2015-specification.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Pearson - How Chemistry assessment works at AS and A level",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/A%20Level/Chemistry/2015/support/AS-A-level-Chemistry-assessment-overview.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "as-edx": {
+    "exam": "Pearson Edexcel AS Chemistry 8CH0 (2027)",
+    "board": "Pearson Edexcel",
+    "sourceBoard": "Pearson Edexcel",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "as-edx-mcq",
+        "title": "Edexcel 8CH0 · Paper 1 or 2 multiple-choice items",
+        "nQ": 8,
+        "mins": 9,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Data booklet (with Periodic Table) provided",
+        "simNote": "Real Papers 1 and 2 have about 8 one-mark multiple-choice items mixed in with written questions; this groups them into one timed set (time at the paper's own pace). The written questions are not included.",
+        "unconfirmed": "The number of MCQ items per paper varies by series (about 10% of marks).",
+        "minsPerQ": 1.125,
+        "instructions": [
+          "This paper has 8 questions and 9 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Data booklet (with Periodic Table) provided. The site does not show it yet, so keep your own copy beside you.",
+          "In the real paper these questions are mixed in with written questions, not in a separate section.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Pearson - How Chemistry assessment works at AS and A level",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/A%20Level/Chemistry/2015/support/AS-A-level-Chemistry-assessment-overview.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Pearson Edexcel AS Chemistry specification",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/A%20Level/Chemistry/2015/Specification%20and%20sample%20assessments/as-chemistry-2015-specification.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "al-ial": {
+    "exam": "Pearson Edexcel International A Level Chemistry (2027)",
+    "board": "Pearson Edexcel",
+    "sourceBoard": "Pearson Edexcel",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "al-ial-a",
+        "title": "Edexcel IAL · Section A multiple choice (Units 1, 2, 4 or 5)",
+        "nQ": 20,
+        "mins": 22,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Periodic Table (and Data Booklet in Units 2, 4 and 5) provided",
+        "simNote": "Simulates Section A (multiple choice) of Units 1, 2, 4 or 5; the written Section B and C questions and the practical units are not included. 22 minutes is the unit's own pace.",
+        "unconfirmed": "Pearson does not fix the Section A count; 20 is typical of recent papers.",
+        "minsPerQ": 1.1,
+        "instructions": [
+          "This paper has 20 questions and 22 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Periodic Table (and Data Booklet in Units 2, 4 and 5) provided. The site does not show it yet, so keep your own copy beside you.",
+          "Section A comes first in the real unit paper, followed by written questions.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Pearson Edexcel IAL Chemistry specification (2018)",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/International%20Advanced%20Level/Chemistry/2018/Specification-and-Sample-Assessment/International-A-Level-Chemistry-Spec.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "as-ial": {
+    "exam": "Pearson Edexcel International AS Chemistry (2027)",
+    "board": "Pearson Edexcel",
+    "sourceBoard": "Pearson Edexcel",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "as-ial-a",
+        "title": "Edexcel IAL · Section A multiple choice (Unit 1 or 2)",
+        "nQ": 20,
+        "mins": 22,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Periodic Table (and Data Booklet in Units 2, 4 and 5) provided",
+        "simNote": "Simulates Section A (multiple choice) of Unit 1 or 2; the written Section B and C questions and the practical units are not included. 22 minutes is the unit's own pace.",
+        "unconfirmed": "Pearson does not fix the Section A count; 20 is typical of recent papers.",
+        "minsPerQ": 1.1,
+        "instructions": [
+          "This paper has 20 questions and 22 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Periodic Table (and Data Booklet in Units 2, 4 and 5) provided. The site does not show it yet, so keep your own copy beside you.",
+          "Section A comes first in the real unit paper, followed by written questions.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Pearson Edexcel IAL Chemistry specification (2018)",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/International%20Advanced%20Level/Chemistry/2018/Specification-and-Sample-Assessment/International-A-Level-Chemistry-Spec.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "al-aqa": {
+    "exam": "AQA A-level Chemistry 7405 (June 2027)",
+    "board": "AQA",
+    "sourceBoard": "AQA",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "al-aqa-p3",
+        "title": "AQA 7405 · Paper 3 multiple choice",
+        "nQ": 30,
+        "mins": 40,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Periodic Table / Data Booklet provided",
+        "simNote": "Simulates the 30 multiple-choice questions of Paper 3 (40 minutes, at the paper's own pace); the rest of Paper 3 and Papers 1 and 2 are not included.",
+        "minsPerQ": 1.333,
+        "instructions": [
+          "This paper has 30 questions and 40 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Periodic Table / Data Booklet provided. The site does not show it yet, so keep your own copy beside you.",
+          "AQA sets no separate time for the multiple-choice part; 40 minutes matches the pace of the whole paper.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "AQA AS and A-level Chemistry specification",
+        "url": "https://filestore.aqa.org.uk/resources/chemistry/specifications/AQA-7404-7405-SP-2015.PDF",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "AQA 7405 scheme of assessment",
+        "url": "https://www.aqa.org.uk/subjects/chemistry/a-level/chemistry-7405/specification/scheme-of-assessment",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "as-aqa": {
+    "exam": "AQA AS Chemistry 7404 (June 2027)",
+    "board": "AQA",
+    "sourceBoard": "AQA",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "as-aqa-mcq",
+        "title": "AQA 7404 · Paper 1 or 2 multiple choice",
+        "nQ": 15,
+        "mins": 17,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Periodic Table / Data Booklet provided",
+        "simNote": "Simulates the 15 multiple-choice questions of AS Paper 1 or 2 (17 minutes, at the paper's own pace); the 65 marks of written questions are not included.",
+        "minsPerQ": 1.133,
+        "instructions": [
+          "This paper has 15 questions and 17 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Periodic Table / Data Booklet provided. The site does not show it yet, so keep your own copy beside you.",
+          "AQA sets no separate time for the multiple-choice part; 17 minutes matches the pace of the whole paper.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "AQA AS and A-level Chemistry specification",
+        "url": "https://filestore.aqa.org.uk/resources/chemistry/specifications/AQA-7404-7405-SP-2015.PDF",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "al-ocr": {
+    "exam": "OCR A Level Chemistry A H432 (June 2027)",
+    "board": "OCR",
+    "sourceBoard": "OCR",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "al-ocr-a",
+        "title": "OCR H432 · Paper 1 or 2 Section A",
+        "nQ": 15,
+        "mins": 20,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Data Sheet for Chemistry A provided",
+        "simNote": "Simulates Section A (15 MCQs) of Paper 1 or 2 (20 minutes, at the paper's own pace); Section B and Paper 3 are not included.",
+        "minsPerQ": 1.333,
+        "instructions": [
+          "This paper has 15 questions and 20 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Data Sheet for Chemistry A provided. The site does not show it yet, so keep your own copy beside you.",
+          "OCR sets no separate time for Section A; 20 minutes matches the pace of the whole paper.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "OCR - Exploring our question papers: Chemistry A",
+        "url": "https://www.ocr.org.uk/Images/assessment-story-exploring-our-question-papers-chemistrya.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "as-ocr": {
+    "exam": "OCR AS Level Chemistry A H032 (June 2027)",
+    "board": "OCR",
+    "sourceBoard": "OCR",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "as-ocr-a",
+        "title": "OCR H032 · Paper 1 (Breadth) Section A",
+        "nQ": 20,
+        "mins": 25,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Data Sheet for Chemistry A provided",
+        "simNote": "Simulates Section A (multiple choice) of Paper 1 Breadth in Chemistry; Section B and Paper 2 are not included.",
+        "unconfirmed": "The sample paper has 19 MCQs worth 20 marks; live papers usually have 20.",
+        "minsPerQ": 1.25,
+        "instructions": [
+          "This paper has 20 questions and 25 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Data Sheet for Chemistry A provided. The site does not show it yet, so keep your own copy beside you.",
+          "OCR advises spending no more than 25 minutes on Section A, so that is the time here.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "OCR H032/01 sample question paper",
+        "url": "https://www.ocr.org.uk/Images/171751-unit-h032-01-breadth-in-chemistry-sample-assessment-materials.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "ol-cam": {
+    "exam": "Cambridge O Level Chemistry 5070 (2027)",
+    "board": "Cambridge International",
+    "sourceBoard": "Cambridge International",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "ol-cam-p1",
+        "title": "Cambridge 5070 · Paper 1 Multiple Choice",
+        "nQ": 40,
+        "mins": 60,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Periodic Table printed in the paper",
+        "simNote": "Simulates Paper 1 (40 MCQs, 1 hour); Paper 2 Theory and the practical papers are not included.",
+        "minsPerQ": 1.5,
+        "instructions": [
+          "This paper has 40 questions and 60 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Periodic Table printed in the paper. The site does not show it yet, so keep your own copy beside you.",
+          "In the real exam you shade answers on an answer sheet in soft pencil; here you just tap.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Cambridge O Level Chemistry 5070 syllabus 2026-2028",
+        "url": "https://www.cambridgeinternational.org/Images/697326-2026-2028-syllabus.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Cambridge 5070 page",
+        "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-o-level-chemistry-5070/",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "ig-cie": {
+    "exam": "Cambridge IGCSE Chemistry 0620 (2027)",
+    "board": "Cambridge International",
+    "sourceBoard": "Cambridge International",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "ig-cie-p2",
+        "title": "Cambridge 0620 · Paper 1 / 2 Multiple Choice",
+        "nQ": 40,
+        "mins": 45,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Periodic Table printed in the paper",
+        "simNote": "Simulates the multiple-choice paper (Paper 2 Extended or Paper 1 Core: 40 MCQs, 45 minutes); the theory and practical papers are not included.",
+        "minsPerQ": 1.125,
+        "instructions": [
+          "This paper has 40 questions and 45 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Periodic Table printed in the paper. The site does not show it yet, so keep your own copy beside you.",
+          "In the real exam you shade answers on an answer sheet in soft pencil; here you just tap.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Cambridge IGCSE Chemistry 0620 syllabus 2026-2028",
+        "url": "https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "ig-edx": {
+    "exam": "Pearson Edexcel International GCSE Chemistry 4CH1 (2027)",
+    "board": "Pearson Edexcel",
+    "sourceBoard": "Pearson Edexcel",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": true,
+        "id": "ig-edx-practice",
+        "title": "Edexcel 4CH1 · MCQ practice exam",
+        "nQ": 30,
+        "mins": 30,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": false,
+        "simNote": "The real exam is two written papers (2 h and 1 h 15 min) with no multiple-choice section. This is multiple-choice practice in timed conditions, not a copy of the real paper.",
+        "minsPerQ": 1,
+        "instructions": [
+          "This paper has 30 questions and 30 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). No data booklet or periodic table is given.",
+          "The real 4CH1 papers are written; multiple-choice parts appear only inside longer questions.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Pearson Edexcel International GCSE Chemistry (9-1) specification",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Chemistry/2017/specification-and-sample-assessments/international-gcse-chemistry-2017-specification.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": true
+  },
+  "gc-aqa": {
+    "exam": "AQA GCSE Chemistry 8462 (June 2027)",
+    "board": "AQA",
+    "sourceBoard": "AQA",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": true,
+        "id": "gc-aqa-practice",
+        "title": "AQA 8462 · MCQ practice exam",
+        "nQ": 30,
+        "mins": 30,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": false,
+        "simNote": "The real exam is two written papers (1 h 45 min each, Foundation or Higher) with no multiple-choice section. This is multiple-choice practice in timed conditions, not a copy of the real paper.",
+        "minsPerQ": 1,
+        "instructions": [
+          "This paper has 30 questions and 30 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). No data booklet or periodic table is given.",
+          "The real papers are written; multiple-choice parts appear only inside longer questions.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "AQA 8462 scheme of assessment",
+        "url": "https://www.aqa.org.uk/subjects/chemistry/gcse/chemistry-8462/specification/scheme-of-assessment",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "AQA GCSE Chemistry specification",
+        "url": "https://filestore.aqa.org.uk/resources/chemistry/specifications/AQA-8462-SP-2016.PDF",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": true
+  },
+  "gc-edx": {
+    "exam": "Pearson Edexcel GCSE Chemistry 1CH0 (June 2027)",
+    "board": "Pearson Edexcel",
+    "sourceBoard": "Pearson Edexcel",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": true,
+        "id": "gc-edx-practice",
+        "title": "Edexcel 1CH0 · MCQ practice exam",
+        "nQ": 30,
+        "mins": 30,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": false,
+        "simNote": "The real exam is two written papers (1 h 45 min each, Foundation or Higher) with no multiple-choice section. This is multiple-choice practice in timed conditions, not a copy of the real paper.",
+        "minsPerQ": 1,
+        "instructions": [
+          "This paper has 30 questions and 30 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). No data booklet or periodic table is given.",
+          "The real papers are written; multiple-choice parts appear only inside longer questions.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Pearson Edexcel GCSE Chemistry specification",
+        "url": "https://qualifications.pearson.com/content/dam/pdf/GCSE/Science/2016/Specification/gcse-chemistry-spec.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": true
+  },
+  "gc-ocr": {
+    "exam": "OCR GCSE Chemistry A (Gateway) J248 (June 2027)",
+    "board": "OCR",
+    "sourceBoard": "OCR",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "gc-ocr-a",
+        "title": "OCR J248 · Section A multiple choice",
+        "nQ": 15,
+        "mins": 30,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Data Sheet (with Periodic Table) provided",
+        "simNote": "Simulates Section A (15 MCQs) of any J248 paper; the written Section B is not included.",
+        "minsPerQ": 2,
+        "instructions": [
+          "This paper has 15 questions and 30 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Data Sheet (with Periodic Table) provided. The site does not show it yet, so keep your own copy beside you.",
+          "OCR advises spending no more than 30 minutes on Section A, so that is the time here.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "OCR - Exploring our question papers: Gateway Science",
+        "url": "https://www.ocr.org.uk/Images/462559-exploring-our-question-papers-gateway-science.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "gc-wjec": {
+    "exam": "WJEC GCSE Chemistry (2027)",
+    "board": "WJEC",
+    "sourceBoard": "WJEC",
+    "unconfirmed": "An updated WJEC GCSE Chemistry is taught from September 2026 (first results 2028); its paper structure is not yet confirmed.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": true,
+        "id": "gc-wjec-practice",
+        "title": "WJEC GCSE Chemistry · MCQ practice exam",
+        "nQ": 30,
+        "mins": 30,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": false,
+        "simNote": "The real exam is written (Units 1 and 2, 1 h 45 min each, plus a practical unit) with no multiple-choice section. This is multiple-choice practice in timed conditions, not a copy of the real paper.",
+        "minsPerQ": 1,
+        "instructions": [
+          "This paper has 30 questions and 30 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). No data booklet or periodic table is given.",
+          "The real Unit 1 and Unit 2 papers are written and have no multiple-choice section.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "WJEC GCSE Chemistry specification (from 2016)",
+        "url": "https://www.wjec.co.uk/media/jsin2au2/wjec-gcse-chemistry-spec-from-2016.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "WJEC GCSE Chemistry page",
+        "url": "https://www.wjec.co.uk/qualifications/chemistry-gcse/",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "WJEC GCSE sciences newsletter Sept 2026",
+        "url": "https://www.wjec.co.uk/media/izdhyhay/wjec-gcse-sciences-newsletter-sept-2026.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": true
+  },
+  "ib-hl": {
+    "exam": "IB Diploma Chemistry HL (May 2027)",
+    "board": "IB",
+    "sourceBoard": "International Baccalaureate",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "ib-hl-1a",
+        "title": "IB Chemistry HL · Paper 1A (multiple choice)",
+        "nQ": 40,
+        "mins": 64,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Clean copy of the IB chemistry data booklet allowed",
+        "simNote": "Simulates Paper 1A (40 MCQs); Paper 1B, Paper 2 and the internal assessment are not included. 64 minutes is the pace of the whole Paper 1, as IB sets no separate time for 1A.",
+        "minsPerQ": 1.6,
+        "instructions": [
+          "This paper has 40 questions and 64 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Clean copy of the IB chemistry data booklet allowed. The site does not show it yet, so keep your own copy beside you.",
+          "In the real exam Papers 1A and 1B are taken together in 2 hours; 64 minutes is 1A's share at the paper's pace.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "IB Chemistry HL/SL specimen papers 1A, 1B and 2",
+        "url": "https://www.ibo.org/globalassets/new-structure/programmes/dp/pdfs/chemistry-hl-sl-specimen-papers-1a-2b-2-en.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "IB Chemistry subject brief",
+        "url": "https://www.ibo.org/globalassets/new-structure/recognition/pdfs/dp_sciences_chemistry_subject-brief_jan_2022_e.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "IB Chemistry guide, first assessment 2025 (could not be fetched)",
+        "url": "https://ibo.org/globalassets/new-structure/university-admission/pdfs/subject-guides/chemistry-guide.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "ib-sl": {
+    "exam": "IB Diploma Chemistry SL (May 2027)",
+    "board": "IB",
+    "sourceBoard": "International Baccalaureate",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": false,
+        "id": "ib-sl-1a",
+        "title": "IB Chemistry SL · Paper 1A (multiple choice)",
+        "nQ": 30,
+        "mins": 49,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": "Clean copy of the IB chemistry data booklet allowed",
+        "simNote": "Simulates Paper 1A (30 MCQs); Paper 1B, Paper 2 and the internal assessment are not included. 49 minutes is the pace of the whole Paper 1, as IB sets no separate time for 1A.",
+        "unconfirmed": "The SL 1A question count comes from a secondary source.",
+        "minsPerQ": 1.633,
+        "instructions": [
+          "This paper has 30 questions and 49 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). Real exam: Clean copy of the IB chemistry data booklet allowed. The site does not show it yet, so keep your own copy beside you.",
+          "In the real exam Papers 1A and 1B are taken together in 1 h 30 min; 49 minutes is 1A's share at the paper's pace.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "IB Chemistry subject brief (durations, weights)",
+        "url": "https://www.ibo.org/globalassets/new-structure/recognition/pdfs/dp_sciences_chemistry_subject-brief_jan_2022_e.pdf",
+        "official": true,
+        "checked": "2026-11-02"
+      },
+      {
+        "title": "Clastify (secondary): SL 1A = 30 MCQ, 1B = 25 marks",
+        "url": "https://www.clastify.com/knowledge-hub/post/ib-chemistry-exam-assessment",
+        "official": false,
+        "checked": "2026-11-02"
+      }
+    ],
+    "checked": "2026-11-02",
+    "practice": false
+  },
+  "found": {
+    "exam": "Class 9–10 Foundation Chemistry",
+    "board": "ACE POINT",
+    "sourceBoard": null,
+    "note": "No single official exam; this is an ACE POINT practice format.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": true,
+        "id": "found-practice",
+        "title": "Class 9–10 Foundation Chemistry · MCQ practice exam",
+        "nQ": 30,
+        "mins": 30,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "There is no single official exam for this course; school and foundation tests are mostly written. This is multiple-choice practice in timed conditions, not a copy of the real paper.",
+        "minsPerQ": 1,
+        "instructions": [
+          "This paper has 30 questions and 30 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "No negative marking here, but NEET and JEE take marks away for wrong answers; practise answering carefully.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [],
+    "checked": "2026-11-02",
+    "practice": true
+  },
+  "sci8": {
+    "exam": "Grade 8 Science (UAE)",
+    "board": "School exam",
+    "sourceBoard": null,
+    "note": "No single official exam; this is an ACE POINT practice format.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": true,
+        "id": "sci8-practice",
+        "title": "Grade 8 Science (UAE) · MCQ practice exam",
+        "nQ": 20,
+        "mins": 20,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": false,
+        "dataBooklet": false,
+        "simNote": "There is no single official exam for this course; school tests are set by your school and are mostly written. This is multiple-choice practice in timed conditions, not a copy of the real paper.",
+        "minsPerQ": 1,
+        "instructions": [
+          "This paper has 20 questions and 20 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "No calculator is allowed. Work things out on rough paper. No data booklet or periodic table is given.",
+          "Your school's real test may also have written questions.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [],
+    "checked": "2026-11-02",
+    "practice": true
+  },
+  "math8": {
+    "exam": "Grade 8 Maths (UAE)",
+    "board": "School exam",
+    "sourceBoard": null,
+    "note": "No single official exam; this is an ACE POINT practice format.",
+    "papers": [
+      {
+        "feedback": "end",
+        "practice": true,
+        "id": "math8-practice",
+        "title": "Grade 8 Maths (UAE) · MCQ practice exam",
+        "nQ": 20,
+        "mins": 25,
+        "marking": {
+          "correct": 1,
+          "wrong": 0,
+          "blank": 0
+        },
+        "ui": "paper",
+        "calculator": true,
+        "dataBooklet": false,
+        "simNote": "There is no single official exam for this course; school tests are set by your school and are mostly written. This is multiple-choice practice in timed conditions, not a copy of the real paper.",
+        "minsPerQ": 1.25,
+        "instructions": [
+          "This paper has 20 questions and 25 minutes. One timer runs for the whole paper and it does not pause.",
+          "Every question has four options (A to D). Choose the one best answer.",
+          "1 mark for each correct answer. No marks are taken away for wrong answers, so answer every question.",
+          "Tap an option to choose it, or tap another to change it. Move with Back and Next, or tap a number in the question list.",
+          "Tap Flag to come back to a question later. Clear removes your answer.",
+          "Question list colours: green = answered, grey = not answered yet, purple = flagged, purple with a green tick = answered and flagged.",
+          "You may use a scientific calculator (your own). No data booklet or periodic table is given.",
+          "Your school's real test may also have written questions; slightly more time is given for working.",
+          "Answers and explanations are shown only after you submit. Tap Submit when you finish; the paper submits itself when the timer reaches 0:00.",
+          "The exam runs in fullscreen. Leaving fullscreen, switching apps or tabs, or using split screen gives a warning, and 3 warnings submit your paper."
+        ]
+      }
+    ],
+    "sources": [],
+    "checked": "2026-11-02",
+    "practice": true
+  }
+};
+
+/* Shortage rule: returns {ok, paper, nQ, secs, shortened, msg}. */
+function examPlan(cid, paperId, have) {
+  const c = EXAM_MODES[cid]; if (!c) return null;
+  const p = c.papers.find(x => x.id === paperId) || c.papers[0];
+  if (have < EXAM_COMMON.shortage.minQuestions) return { ok: false, paper: p, msg: EXAM_COMMON.shortage.tooFew.replace("{have}", have) };
+  if (have >= p.nQ) return { ok: true, paper: p, nQ: p.nQ, secs: p.mins * 60, shortened: false, msg: "" };
+  const mins = Math.max(1, Math.round(have * p.mins / p.nQ));
+  return { ok: true, paper: p, nQ: have, secs: mins * 60, shortened: true,
+    msg: EXAM_COMMON.shortage.message.replace(/\{have\}/g, have).replace("{nQ}", p.nQ).replace("{mins}", mins) };
+}
+
 /* =====================================================================
    2. ONLINE ACCOUNTS AND DATA (Firebase)
    ===================================================================== */
@@ -1047,12 +2848,13 @@ function downloadCSV(name, rows){
 /* ---------- Review card (one wrong answer) ---------- */
 function reviewCard(a, i, o = {}){
   const x = a.answers[i]; const q = qOf(a.course, x.id) || {q:"(question removed)", options:["","","",""], answer:0, explain:"", mistakes:{}};
-  const none = a.style === "test" ? "Not answered" : "No answer (time ran out)";
+  const none = x.state === "marked" ? "Not answered (marked for review)" : a.style === "test" ? "Not answered" : "No answer (time ran out)";
   const tag = x.err && ET[x.err] ? `<div class="etag">${ET[x.err].e} ${ET[x.err].n}${x.note ? ` · “${esc(x.note)}”` : ""}</div>` : "";
   let ana = "";
-  if (o.teacher || o.readonly) ana = tag || (a.v ? '<div class="muted small" style="margin-top:6px">Error analysis not done yet</div>' : "");
+  if (x.ok) ana = "";
+  else if (o.teacher || o.readonly) ana = tag || (a.v ? '<div class="muted small" style="margin-top:6px">Error analysis not done yet</div>' : "");
   else if (a.v) ana = anaBox(a.id, i, x);
-  return `<div class="review">
+  return `<div class="review"${o.anchor ? ` id="${o.anchor}"` : ""}>${o.head || ""}
     ${o.ctx ? `<div class="muted small" style="margin-bottom:4px">${o.who ? `<b>${esc(o.who)}</b> · ` : ""}${esc(COURSE[a.course]?.name||"")} · ${esc(chapterOf(a.course, ansCh(a,x))?.name||"")} · ${esc(x.topic)} · ${fmtDay(a.ts)}</div>` : ""}
     <div class="q">${esc(q.q)}</div>
     ${isW(q) ? `<div>Self-check: <b>Didn't get it</b></div>${x.typed ? `<div class="small" style="white-space:pre-line;margin-top:4px">${o.teacher ? "Answer typed" : "You wrote"}: ${esc(x.typed)}</div>` : ""}${x.kwMissing ? `<div class="small" style="color:#7a4b00;margin-top:4px">💡 Missing key points: ${x.kwMissing.map(esc).join(", ")}</div>` : ""}<div class="model"><b>Model answer</b><div>${esc(q.answer)}</div></div>` : `
@@ -1097,7 +2899,7 @@ function header(){
   const db = $("dashBtn"); if (db) db.onclick = () => { location.hash = "#teacher"; go("teacherLock"); };
   $("foot").style.display = VIEW.name === "quiz" ? "none" : "";
 }
-const NEEDS_STUDENT = ["catalogue","pay","home","course","chapter","report","analysis","errors"];
+const NEEDS_STUDENT = ["catalogue","pay","home","course","chapter","report","analysis","errors","examIntro"];
 function render(){
   if (NEEDS_STUDENT.includes(VIEW.name) && !me()) VIEW = {name: AUTH_USER ? (ME && ME.profileMissing ? "profile" : "loading") : "welcome"};
   header(); const app = $("app");
@@ -1283,7 +3085,7 @@ Views.errors = () => { const u = me(); const cid = VIEW.cid || "";
 Views.errors.after = () => { $("bk").onclick = () => go("home"); $("eCourse").onchange = e => go("errors", {cid:e.target.value}); };
 
 /* ---------- Course home ---------- */
-const TABS = [["practice","Practice"],["create","Create a Quiz"],["mistakes","My Mistakes"],["strengths","Strengths & weaknesses"],["history","History"],["more","More"]];
+const TABS = [["practice","Practice"],["create","Create a Quiz"],["exam","Exam mode"],["mistakes","My Mistakes"],["strengths","Strengths & weaknesses"],["history","History"],["more","More"]];
 let CQ = null; // Create a Quiz choices
 Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c = COURSE[VIEW.cid]; const chs = CHAPTERS[VIEW.cid]||[];
   const at = attemptsFor(u, VIEW.cid); const tab = VIEW.tab || "practice";
@@ -1300,6 +3102,8 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
     body = `<div class="grid">${body}</div>`;
   } else if (tab === "create"){
     body = cqHTML(VIEW.cid);
+  } else if (tab === "exam"){
+    body = examTabHTML(VIEW.cid);
   } else if (tab === "mistakes"){
     const ms = mistakesOf(u, VIEW.cid);
     if (!ms.length) body = `<div class="card"><h3>No mistakes to fix 🎉</h3><p class="muted">When you get a question wrong or run out of time, it shows up here. It leaves the list once you answer it right, and comes back if you get it wrong again.</p></div>`;
@@ -1320,11 +3124,13 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
       ${topics.map(t => { const s = ts[t]; return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${strengthTag(s)}</td></tr>`; }).join("")}</table></div>`;
   } else if (tab === "history"){
     body = at.length ? `<div class="card"><table><tr><th>When</th><th>Quiz</th><th>Score</th><th>Level</th></tr>
-      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(attTitle(a))}<div class="muted small">${MODE_NAME[a.mode]||"Adaptive"}${a.topic?" · "+esc(a.topic):""}</div></td><td>${a.right}/${a.total}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}</td><td>${LN[a.maxLevel]||""}</td></tr>`).join("")}</table></div>`
+      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(attTitle(a))}<div class="muted small">${MODE_NAME[a.mode]||"Adaptive"}${a.topic?" · "+esc(a.topic):""}</div></td><td>${a.mode === "exam" ? `${a.score}/${a.maxScore} marks<div class="muted small">${a.right}/${a.total} correct</div>` : `${a.right}/${a.total}`}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}${a.timeUp && a.mode === "exam" ? ' <span class="tag mid">Time up</span>' : ""}</td><td>${a.mode === "exam" ? "" : LN[a.maxLevel]||""}</td></tr>`).join("")}</table></div>`
       : '<p class="muted">No quizzes yet. Start one from Practice.</p>';
   } else {
+    const ex = EXAM_MODES[VIEW.cid];
     body = `<div class="grid two">
-      ${[["📝","Mock exams","Full-length exam-style papers."],["📄","Past papers","Real past papers with solutions."],["📘","Revision notes","ACE POINT notes for every chapter."]]
+      <button class="tile" id="goExam"><div class="t">📝 Exam mode <span class="badge live">New</span></div><div class="d">${ex ? esc(ex.exam) + " · timed papers with the real marking" : "Timed exam-style papers"}</div></button>
+      ${[["📄","Past papers","Real past papers with solutions."],["📘","Revision notes","ACE POINT notes for every chapter."]]
         .map(x => `<div class="tile" style="cursor:default"><div class="t">${x[0]} ${x[1]} <span class="badge soon">Coming soon</span></div><div class="d">${x[2]}</div></div>`).join("")}</div>`;
   }
   return `
@@ -1341,6 +3147,8 @@ Views.course.after = () => {
   if ($("msAll")) $("msAll").onclick = () => startQuiz({cid, mode:"mistakes", list:mlist(), title:"My Mistakes"});
   document.querySelectorAll("[data-msch]").forEach(b => b.onclick = () => startQuiz({cid, chid:b.dataset.msch, mode:"mistakes", list:mlist(b.dataset.msch), title:"My Mistakes · " + chapterOf(cid, b.dataset.msch).name}));
   if (VIEW.tab === "create") cqBind();
+  if ($("goExam")) $("goExam").onclick = () => go("course",{cid, tab:"exam"});
+  document.querySelectorAll("[data-xp]").forEach(b => b.onclick = () => go("examIntro",{cid, pid:b.dataset.xp}));
 };
 
 /* ---------- Create a Quiz ---------- */
@@ -1498,7 +3306,7 @@ function startHomework(id){
    ===================================================================== */
 const SECONDS = 45, MAX_WARN = 3, NEED = {0:5, 1:10};
 const MODE_NAME = {ncert:"NCERT", exemplar:"NCERT Exemplar", pyq:"CBSE PYQs", adaptive:"Adaptive quiz", easy:"All Easy", medium:"All Medium", hard:"All Hard", test:"Chapter test", custom:"Create a Quiz",
-  mistakes:"My Mistakes", revision:"Quick Revision", homework:"Homework"};
+  mistakes:"My Mistakes", revision:"Quick Revision", homework:"Homework", exam:"Exam mode"};
 const CHEERS = [["🎯","Bullseye!","Spot on."],["🚀","Nailed it!","Keep going."],["🧪","Chemistry champ!","That's correct."],["😎","Too easy for you!","Correct answer."],
   ["⚗️","Perfect reaction!","Right answer."],["⭐","Superstar!","Correct."],["🙌","Yes!","Well done."],["🧠","Big brain!","Correct."]];
 const LEVELUP = ["🏆","Level up!","Questions get harder now."];
@@ -1514,19 +3322,21 @@ async function startQuiz(spec){
   const pool = mode === "adaptive" ? ch.qs.filter(q => !topic || q.topic === topic) : [];
   const queue = mode === "adaptive" ? null : (spec.list || []);
   if ((queue && !queue.length) || (!queue && !pool.length)){ toast("No questions here yet."); return; }
-  Q = {id:"q"+Date.now(), cid, chid, topic: topic || null, mode, style, title: spec.title || (ch ? ch.name : ""), hw: spec.hw || null,
+  Q = {id:"q"+Date.now(), cid, chid, topic: topic || null, mode, style, title: spec.title || (ch ? ch.name : ""), hw: spec.hw || null, exam: spec.exam || null,
        pool, queue, fixed: !!queue, total: queue ? queue.length : null,
        level: 0, maxLevel: 0, rs:0, asked:[], used:new Set(), wrong:new Set(),
        warnings:0, incidents:[], cur:null, timerId:null, left:0, limit:0, answered:false, active:true,
        ts:Date.now(), lastInc:0, grace:Date.now()+2000, baseW:window.innerWidth};
-  if (style === "test"){ Q.list = queue; Q.sel = queue.map(() => -1); Q.marked = new Set(); Q.idx = 0; Q.orders = queue.map(() => shuffle([0,1,2,3])); Q.spent = queue.map(() => 0); Q.secs = spec.secs || queue.length * pace(cid); }
+  if (style === "test"){ Q.list = queue; Q.sel = queue.map(() => -1); Q.marked = new Set(); Q.idx = 0; Q.orders = queue.map(() => shuffle([0,1,2,3])); Q.spent = queue.map(() => 0); Q.secs = spec.secs || queue.length * pace(cid);
+    if (Q.exam){ Q.visited = new Set(); Q.pick = -1; } } // exam: Q.sel = answers that count, Q.pick = NTA choice on screen not yet saved
   try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {}
   Q.fsOK = !!document.fullscreenElement; clearInterval(WATCH); WATCH = setInterval(watchdog, 1000);
   Q.baseW = window.innerWidth; Q.grace = Date.now() + 1500;
   VIEW = {name:"quiz"}; header(); $("app").classList.add("quizmode"); wmOn();
   if (style === "test"){
-    $("app").innerHTML = testShell(); bindTest(); Q.deadline = Date.now() + Q.secs*1000; Q.qStart = Date.now();
-    drawTestQ(); tickTest(); Q.timerId = setInterval(tickTest, 1000);
+    if (Q.exam){ document.body.classList.add("examon"); $("app").innerHTML = examShell(); bindExam(); } else { $("app").innerHTML = testShell(); bindTest(); }
+    Q.deadline = Date.now() + Q.secs*1000; Q.qStart = Date.now();
+    Q.exam ? drawExamQ() : drawTestQ(); tickTest(); Q.timerId = setInterval(tickTest, 1000);
   } else {
     $("app").innerHTML = quizShell();
     $("nextBtn").onclick = nextQ;
@@ -1680,7 +3490,8 @@ function bindTest(){
     confirmBox("Submit the test?", (left ? `${left} question${left>1?"s":""} not answered. ` : "All questions answered. ") + (mk ? `${mk} marked for review. ` : "") + "You can't change answers after submitting.", "Submit", () => finishQuiz(false), "Keep working"); };
   $("palette").onclick = e => { const b = e.target.closest("button[data-k]"); if (b) moveTest(+b.dataset.k); };
 }
-function moveTest(k){ if (k < 0 || k >= Q.list.length) return; const now = Date.now(); Q.spent[Q.idx] += (now - Q.qStart)/1000; Q.qStart = now; Q.idx = k; drawTestQ(); window.scrollTo(0,0); }
+function moveTest(k){ if (k < 0 || k >= Q.list.length) return; const now = Date.now(); Q.spent[Q.idx] += (now - Q.qStart)/1000; Q.qStart = now; Q.idx = k;
+  if (Q.exam){ Q.pick = Q.sel[k]; drawExamQ(); } else drawTestQ(); window.scrollTo(0,0); }
 function drawTestQ(){
   const q = Q.list[Q.idx], n = Q.list.length;
   $("palette").innerHTML = Q.list.map((x,k) => `<button data-k="${k}" class="${k===Q.idx?"cur ":""}${Q.sel[k]>=0?"ans ":""}${Q.marked.has(k)?"mark":""}">${k+1}</button>`).join("");
@@ -1696,6 +3507,182 @@ function tickTest(){
   if (!Q || !Q.active) return; const left = Math.max(0, Math.round((Q.deadline - Date.now())/1000)); const el = $("tClock"); if (!el) return;
   el.textContent = `⏱ ${Math.floor(left/60)}:${pad(left%60)} left`; el.classList.toggle("warn", left <= 60);
   if (left <= 0){ Q.timeUp = true; $("confirm").classList.remove("show"); CONF = null; finishQuiz(false); }
+}
+
+/* ---------- Exam mode: full timed papers (uses the test engine above: Q.sel, Q.marked, moveTest, tickTest, makeAtt, finishQuiz) ---------- */
+// Exam questions: every ACE POINT practice MCQ in the course (written-answer questions are left out)
+const examPool = cid => (CHAPTERS[cid]||[]).flatMap(ch => ch.qs.filter(q => !isW(q) && (q.options||[]).length === 4));
+const examPaper = (cid, pid) => (EXAM_MODES[cid]?.papers || []).find(p => p.id === pid) || null;
+const sgn = v => v > 0 ? "+" + v : v < 0 ? "−" + Math.abs(v) : "0";
+const mmss = s => `${Math.floor(s/60)}:${pad(Math.round(s) % 60)}`;
+const fmtChecked = d => new Date(d + "T12:00:00").toLocaleDateString(undefined, {day:"numeric", month:"short", year:"numeric"});
+const markShort = m => `${sgn(m.correct)} / ${sgn(m.wrong)}`;
+const markRows = m => `Correct <b>${sgn(m.correct)}</b> · Wrong <b>${sgn(m.wrong)}</b> · Not answered <b>${sgn(m.blank)}</b>`;
+// Palette colours come from the official legend in EXAM_COMMON.palette
+(function examCSS(){ const st = document.createElement("style");
+  st.textContent = Object.entries(EXAM_COMMON.palette).map(([ui, list]) => list.map(s => `.xs-${ui} .s-${s.key}{background:${s.hex};border-color:${s.hex};color:#fff}`
+    + (s.tick ? `.xs-${ui} .s-${s.key}::after{content:"✓";position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;border-radius:50%;background:${s.tick};color:#fff;font-size:10px;line-height:16px;text-align:center;border:1.5px solid #fff}` : "")).join("")).join("");
+  document.head.appendChild(st); })();
+function legendHTML(ui, counts, side){
+  return `<div class="xlegend xs-${ui}${side ? " side" : ""}">${EXAM_COMMON.palette[ui].map(s => `<div><span class="xchip s-${s.key}">${counts ? counts[s.key] : ""}</span><div>${esc(s.label)}${counts ? "" : `<small>${esc(s.meaning)}</small>`}</div></div>`).join("")}</div>`;
+}
+// Course home → Exam mode tab
+function examTabHTML(cid){
+  const c = EXAM_MODES[cid]; if (!c) return '<div class="card"><p class="muted">Exam mode for this course is coming soon.</p></div>';
+  const have = examPool(cid).length;
+  return `<div class="card"><h2 style="margin-top:0">📝 ${esc(c.exam)}</h2>
+    <p class="muted small">${esc(c.board)}${c.note ? " · " + esc(c.note) : ""}</p>
+    ${c.practice ? `<div class="note">${esc(EXAM_COMMON.practiceNote)}</div>` : ""}
+    ${c.unconfirmed ? `<div class="note"><b>${esc(EXAM_COMMON.unconfirmedLabel)}.</b> ${esc(c.unconfirmed)}</div>` : ""}
+    <p class="muted small">One timer for the whole paper, the real marking (including negative marking) and no answers until you submit. Questions are picked at random from every chapter.</p></div>
+  ${c.papers.map(p => { const pl = examPlan(cid, p.id, have);
+    return `<div class="card"><h3>${esc(p.title)}</h3>${p.exam ? `<div class="muted small">${esc(p.exam)}</div>` : ""}
+      <div class="xspec"><span class="pill">${p.nQ} questions</span><span class="pill">${p.mins} minutes</span><span class="pill">${markShort(p.marking)}${p.marking.blank ? " / " + sgn(p.marking.blank) : ""}</span>${p.calculator ? '<span class="pill">🧮 Calculator</span>' : ""}</div>
+      <p class="small">Marking: ${markRows(p.marking)}</p>
+      <p class="muted small">${esc(p.simNote)}</p>
+      ${p.unconfirmed && !c.unconfirmed ? `<p class="muted small"><b>${esc(EXAM_COMMON.unconfirmedLabel)}:</b> ${esc(p.unconfirmed)}</p>` : ""}
+      ${!pl.ok ? `<button class="tile" disabled style="margin-top:10px"><div class="t">🔒 Opens when more questions are added</div><div class="d">${esc(pl.msg)}</div></button>`
+        : `${pl.shortened ? `<div class="note"><b>Shortened paper: ${pl.nQ} questions, ${pl.secs/60} minutes</b><div>${esc(pl.msg)}</div></div>` : ""}
+        <button class="btn block" data-xp="${esc(p.id)}">Read the instructions and start</button>`}</div>`; }).join("")}`;
+}
+// Instructions screen
+Views.examIntro = () => { const cid = VIEW.cid, c = EXAM_MODES[cid], p = examPaper(cid, VIEW.pid);
+  if (!c || !p) return `<button class="back" id="bk">← Back</button><div class="card"><p class="muted">This paper is not available.</p></div>`;
+  const pl = examPlan(cid, p.id, examPool(cid).length), board = p.board || c.sourceBoard;
+  const nQ = pl.ok ? pl.nQ : p.nQ, mins = pl.ok ? pl.secs/60 : p.mins;
+  const dataB = !p.dataBooklet ? "None given. No data booklet or periodic table." : `Real exam: ${p.dataBooklet}. The site does not show it yet, so keep your own copy beside you.`;
+  return `<button class="back" id="bk">← ${esc(COURSE[cid].name)}</button>
+  <div class="card"><div class="muted small">${esc(p.exam || c.exam)}</div><h1>${esc(p.title)}</h1>
+    ${c.unconfirmed || p.unconfirmed ? `<div class="note"><b>${esc(EXAM_COMMON.unconfirmedLabel)}.</b> ${esc(p.unconfirmed || c.unconfirmed)}</div>` : ""}
+    <table class="xtable">
+      <tr><th>Exam</th><td>${esc(p.exam || c.exam)}</td></tr>
+      <tr><th>Duration</th><td>${mins} minutes${pl.shortened ? ` <span class="muted small">(real paper ${p.mins})</span>` : ""}</td></tr>
+      <tr><th>Questions</th><td>${nQ}${pl.shortened ? ` <span class="muted small">(real paper ${p.nQ})</span>` : ""} · four options, one correct</td></tr>
+      <tr><th>Marking</th><td>${markRows(p.marking)}</td></tr>
+      <tr><th>Calculator</th><td>${p.calculator ? "Allowed (your own scientific calculator)" : "Not allowed"}</td></tr>
+      <tr><th>Data booklet</th><td>${esc(dataB)}</td></tr>
+      <tr><th>Answers</th><td>Shown after you submit</td></tr>
+    </table>
+    ${!pl.ok ? `<div class="note"><b>Opens when more questions are added.</b> ${esc(pl.msg)}</div>` : pl.shortened ? `<div class="note"><b>Shortened paper: ${pl.nQ} questions, ${pl.secs/60} minutes.</b> ${esc(pl.msg)}</div>` : ""}</div>
+  <div class="card"><h2 style="margin-top:0">Instructions for this paper</h2><ol class="xlist">${p.instructions.map(t => `<li>${esc(t)}</li>`).join("")}</ol>
+    <h2>General rules</h2><ul class="xlist">${EXAM_COMMON.generalRules.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>
+  <div class="card"><h2 style="margin-top:0">Question palette</h2><p class="muted small">${p.ui === "nta" ? "The numbers show the state of every question, as on the NTA screen." : "The question list shows which questions you have answered or flagged."}</p>
+    ${legendHTML(p.ui)}</div>
+  <div class="card"><h2 style="margin-top:0">About this mock</h2><p class="small">${esc(p.simNote)}</p>
+    ${c.practice ? `<p class="small">${esc(EXAM_COMMON.practiceNote)}</p>` : ""}
+    <p class="xsrc">${board ? esc(EXAM_COMMON.sourceLine.replace("{board}", board).replace("{date}", fmtChecked(c.checked))) : `ACE POINT practice format (no single official paper), checked ${fmtChecked(c.checked)}.`}</p>
+    ${(c.sources||[]).length ? `<details class="xsrc"><summary>Sources (${c.sources.length})</summary><ul class="xlist">${c.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>${s.official ? "" : " (secondary)"}</li>`).join("")}</ul></details>` : ""}
+    ${pl.ok ? `<label class="chk xagree"><input type="checkbox" id="xAgree"> I have read and understood the instructions</label>
+    <button class="btn block" id="xStart" disabled>Start exam</button>` : ""}</div>`; };
+Views.examIntro.after = () => { const cid = VIEW.cid, pid = VIEW.pid;
+  $("bk").onclick = () => go("course", {cid, tab:"exam"});
+  if ($("xAgree")){ $("xAgree").onchange = () => $("xStart").disabled = !$("xAgree").checked;
+    $("xStart").onclick = () => { if ($("xAgree").checked) startExam(cid, pid); }; } };
+// test = {ui, marking, secs} lets a test run another layout or a short timer on a course that has questions
+function startExam(cid, pid, test = {}){
+  const c = EXAM_MODES[cid], p0 = examPaper(cid, pid); if (!c || !p0) return toast("This paper is not available.");
+  const p = {...p0, ...(test.ui ? {ui:test.ui} : {}), ...(test.marking ? {marking:test.marking} : {})};
+  const pool = examPool(cid), pl = examPlan(cid, pid, pool.length);
+  if (!pl.ok) return toast(pl.msg);
+  const list = shuffle(pickBalanced(pool, pl.nQ, "mixed"));
+  startQuiz({cid, mode:"exam", style:"test", list, secs: test.secs || pl.secs, title: p.title,
+    exam:{course:cid, paper:p.id, name:p.exam || c.exam, ui:p.ui === "nta" ? "nta" : "paper", marking:{...p.marking}, nQ:p.nQ, shortened:pl.shortened}});
+}
+// Palette state of question k (keys match EXAM_COMMON.palette)
+function exState(k){
+  if (Q.exam.ui === "nta" && !Q.visited.has(k)) return "notVisited";
+  const a = Q.sel[k] >= 0, m = Q.marked.has(k);
+  return a && m ? "answeredMarked" : m ? "marked" : a ? "answered" : "notAnswered";
+}
+function exCounts(){ const c = {}; EXAM_COMMON.palette[Q.exam.ui].forEach(s => c[s.key] = 0); Q.list.forEach((q,k) => c[exState(k)]++); return c; }
+function examShell(){ const nta = Q.exam.ui === "nta", u = me() || {};
+  return `<div class="xwrap">
+  <div class="card xmain">
+    <div class="xtop"><div><div class="muted small">${esc(Q.exam.name)}</div><b style="color:var(--navy)">${esc(Q.title)}</b></div><span id="tClock" class="pill xclock">--:--</span></div>
+    <div class="bar" style="margin:12px 0 0"><span id="qnum" class="pill"></span><span class="pill">${markShort(Q.exam.marking)}</span><span id="warnPill" class="pill warn" style="display:none"></span><button id="palTog"></button></div>
+    <div class="qhead" style="margin-top:6px"><div class="muted small">Choose one answer${nta ? ", then tap Save & Next" : ""}</div><button class="flagbtn" id="flagBtn">🚩 Report</button></div>
+    <div id="qtext" class="qtext"></div><div id="opts" role="radiogroup"></div>
+    ${nta ? `<div class="xbtns"><button class="btn xmark" id="xMark">Mark for Review & Next</button><button class="btn xsave" id="xSave">Save & Next</button>
+      <button class="btn ghost" id="xClear">Clear Response</button><button class="btn ghost" id="xBack">← Back</button></div>`
+    : `<div class="xbtns three"><button class="btn ghost" id="xBack">← Back</button><button class="btn ghost" id="xFlag">⚐ Flag</button><button class="btn" id="xNext">Next →</button></div>`}
+    <div class="xfoot"><button class="link" id="${nta ? "xHelp" : "xClear"}">${nta ? "How marking works" : "Clear answer"}</button><button class="btn" id="xSubmit">Submit</button></div>
+  </div>
+  <div class="xshade" id="xShade"></div>
+  <aside class="card xside" id="xSide"><h3>Question palette <button class="xclose" id="xClose">Close ✕</button></h3>
+    <div class="muted small">${esc(u.name || "")}</div><div id="xLegend"></div><div id="palette" class="xp xs-${Q.exam.ui}"></div></aside>
+  </div>`; }
+function bindExam(){ const nta = Q.exam.ui === "nta";
+  const side = on => { $("xSide").classList.toggle("open", on); $("xShade").classList.toggle("open", on); };
+  $("palTog").onclick = () => side(true); $("xClose").onclick = () => side(false); $("xShade").onclick = () => side(false);
+  $("palette").onclick = e => { const b = e.target.closest("button[data-k]"); if (!b) return; side(false); moveTest(+b.dataset.k); }; // jumping does not save (NTA rule)
+  $("xBack").onclick = () => moveTest(Q.idx-1);
+  $("flagBtn").onclick = () => openReport(Q.cid, Q.list[Q.idx].id);
+  $("xSubmit").onclick = examSubmit;
+  const next = () => { if (Q.idx < Q.list.length-1) moveTest(Q.idx+1); else { drawExamQ(); toast("This is the last question. Check the palette, then tap Submit."); } };
+  if (nta){
+    $("xSave").onclick = () => { Q.sel[Q.idx] = Q.pick; Q.marked.delete(Q.idx); saveDraft(); next(); };
+    $("xMark").onclick = () => { Q.sel[Q.idx] = Q.pick; Q.marked.add(Q.idx); saveDraft(); next(); };
+    $("xClear").onclick = () => { Q.pick = -1; Q.sel[Q.idx] = -1; drawExamQ(); saveDraft(); };
+    $("xHelp").onclick = () => { confirmBox("How marking works", "", "OK", null, "Close");
+      $("confText").innerHTML = `${markRows(Q.exam.marking)}.<br>Only answers saved with Save & Next or Mark for Review & Next are marked. Answered & Marked for Review questions are marked; Marked for Review with no answer scores 0.`; };
+  } else {
+    $("xNext").onclick = () => moveTest(Q.idx+1);
+    $("xFlag").onclick = () => { Q.marked.has(Q.idx) ? Q.marked.delete(Q.idx) : Q.marked.add(Q.idx); drawExamQ(); };
+    $("xClear").onclick = () => { Q.sel[Q.idx] = -1; drawExamQ(); saveDraft(); };
+  }
+}
+function drawExamQ(){
+  const q = Q.list[Q.idx], n = Q.list.length, nta = Q.exam.ui === "nta"; if (nta) Q.visited.add(Q.idx);
+  const shown = nta ? Q.pick : Q.sel[Q.idx];
+  $("qnum").textContent = `Question ${Q.idx+1} of ${n}`; $("qtext").textContent = q.q;
+  const box = $("opts"); box.innerHTML = "";
+  Q.orders[Q.idx].forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt xopt" + (shown === i ? " sel" : "");
+    b.setAttribute("role", "radio"); b.setAttribute("aria-checked", shown === i); b.innerHTML = `<span class="rad"></span><b>${"ABCD"[pos]}</b>`;
+    const t = document.createElement("span"); t.textContent = q.options[i]; b.appendChild(t);
+    b.onclick = () => { if (nta) Q.pick = i; else { Q.sel[Q.idx] = i; saveDraft(); } drawExamQ(); }; box.appendChild(b); });
+  const cnt = exCounts(), lab = Object.fromEntries(EXAM_COMMON.palette[Q.exam.ui].map(s => [s.key, s.label]));
+  $("palette").innerHTML = Q.list.map((x,k) => { const s = exState(k); return `<button data-k="${k}" class="s-${s}${k===Q.idx?" cur":""}" aria-label="Question ${k+1}: ${lab[s]}">${k+1}</button>`; }).join("");
+  $("xLegend").innerHTML = legendHTML(Q.exam.ui, cnt, true);
+  $("palTog").textContent = `☰ Palette · ${cnt.answered + cnt.answeredMarked}/${n} answered`;
+  $("xBack").disabled = Q.idx === 0;
+  if (!nta){ $("xNext").disabled = Q.idx === n-1; $("xFlag").textContent = Q.marked.has(Q.idx) ? "⚑ Flagged" : "⚐ Flag"; $("xFlag").classList.toggle("on", Q.marked.has(Q.idx)); }
+}
+function examSubmit(){
+  const cnt = exCounts(), nta = Q.exam.ui === "nta";
+  const unsaved = nta && Q.pick >= 0 && Q.pick !== Q.sel[Q.idx];
+  confirmBox("Submit the exam?", "", "Submit", () => finishQuiz(false), "Keep working");
+  $("confText").innerHTML = `${legendHTML(Q.exam.ui, cnt, true)}
+    ${nta ? `<p class="small">Only saved answers are marked. Answered & Marked for Review questions are marked too.</p>` : ""}
+    ${unsaved ? `<p class="small" style="color:var(--red)">Your choice on question ${Q.idx+1} is not saved, so it will not be marked.</p>` : ""}
+    <p class="small">You can't change answers after submitting.</p>`;
+}
+// Exam report (student and teacher)
+function examReportHTML(att, forTeacher){
+  const A = att.answers, m = att.marking || {correct:1, wrong:0, blank:0};
+  const right = A.filter(x => x.ok).length, wrong = A.filter(x => x.chosen >= 0 && !x.ok).length, blank = A.length - right - wrong;
+  const acc = right + wrong ? Math.round(right/(right+wrong)*100) : 0;
+  const used = att.used ?? A.reduce((s,x) => s + (x.secs||0), 0);
+  const group = key => { const g = {}; A.forEach(x => { const k = key(x); const r = g[k] = g[k] || {n:0, r:0, w:0, b:0, marks:0, secs:0}; r.n++; r.marks += x.marks ?? 0; r.secs += x.secs||0; if (x.ok) r.r++; else if (x.chosen >= 0) r.w++; else r.b++; }); return g; };
+  const table = (g, label, name) => `<div class="xscroll"><table><tr><th>${label}</th><th>Qs</th><th>✅</th><th>❌</th><th>–</th><th>Marks</th><th>Avg time</th></tr>${Object.entries(g).map(([k,v]) =>
+    `<tr><td>${esc(name(k))}</td><td>${v.n}</td><td>${v.r}</td><td>${v.w}</td><td>${v.b}</td><td><b>${v.marks}</b>/${v.n*m.correct}</td><td>${Math.round(v.secs/v.n)} s</td></tr>`).join("")}</table></div>`;
+  const pend = !forTeacher && att.v && A.some(x => !x.ok && !x.err);
+  return `<p class="muted small" style="margin-top:0">${esc(att.examName||"")} · ${fmtDate(att.ts)}</p>
+    <div class="big">${att.score} / ${att.maxScore}</div>
+    <p class="muted">marks · ${att.maxScore ? Math.round(Math.max(0, att.score)/att.maxScore*100) : 0}%${att.shortened ? ` · shortened paper (${A.length} of ${att.nQ} questions)` : ""}</p>
+    ${att.auto?`<p style="color:var(--red);font-weight:600">Submitted automatically after ${MAX_WARN} warnings.</p>`:""}
+    ${att.timeUp?`<p style="color:var(--red);font-weight:600">Time ran out, so the paper was submitted automatically.</p>`:""}
+    ${att.quit?`<p class="muted">Exam ended early.</p>`:""}
+    <div class="xstat"><div><b>${right}</b><span>Correct (${sgn(right*m.correct)})</span></div><div><b>${wrong}</b><span>Wrong (${sgn(wrong*m.wrong)})</span></div><div><b>${blank}</b><span>Unattempted (${sgn(blank*m.blank)})</span></div>
+      <div><b>${acc}%</b><span>Accuracy (of attempted)</span></div><div><b>${mmss(used)}</b><span>Time used${att.secs ? ` of ${mmss(att.secs)}` : ""}</span></div></div>
+    <p class="small">Marking: ${markRows(m)}. Score = ${right} × ${m.correct}${m.wrong ? ` − ${wrong} × ${Math.abs(m.wrong)}` : ""}${m.blank ? ` + ${blank} × ${m.blank}` : ""} = <b>${att.score}</b>.</p>
+    <h2>By chapter</h2>${table(group(x => ansCh(att, x)), "Chapter", k => chapterOf(att.course, k)?.name || k)}
+    <h2>By topic</h2>${table(group(x => x.topic), "Topic", k => k)}
+    <h2>Time per question</h2><p class="muted small">Tap a number to jump to that question. Green = correct, red = wrong, white = not answered.</p>
+    <div class="tchips">${A.map((x,i) => `<button class="${x.ok ? "ok" : x.chosen >= 0 ? "no" : ""}" onclick="document.getElementById('xr${i}').scrollIntoView({behavior:'smooth'})">Q${i+1}<span>${x.secs||0} s</span></button>`).join("")}</div>
+    <h2>Full review</h2>
+    ${pend ? `<div class="banner" id="pendBanner"><b>📝 Error analysis</b><div class="small">For each wrong or unanswered question below, pick why it happened. You can start a new quiz when all are done.</div></div>` : ""}
+    ${A.map((x,i) => reviewCard(att, i, {teacher:forTeacher, anchor:"xr"+i, head:`<div class="xrh"><span>Q${i+1} · ${x.ok ? '<span style="color:var(--green)">✅ Correct</span>' : x.chosen >= 0 ? '<span style="color:var(--red)">❌ Wrong</span>' : '<span class="muted">Not answered</span>'}${x.marked ? " · marked for review" : ""}</span><span>${sgn(x.marks ?? 0)} marks · ${x.secs||0} s</span></div><div class="muted small" style="margin-bottom:4px">${esc(chapterOf(att.course, ansCh(att, x))?.name || "")} · ${esc(x.topic)}</div>`})).join("")}
+    <h2>Focus log</h2>${att.incidents.length ? `<table><tr><th>Time</th><th>Q</th><th>What happened</th></tr>${att.incidents.map(x => `<tr><td>${x.time}</td><td>${x.q}</td><td>${esc(x.reason)}</td></tr>`).join("")}</table>` : '<p class="muted">No warnings. Great focus!</p>'}`;
 }
 
 /* ---------- Anti-cheat ---------- */
@@ -1752,12 +3739,17 @@ function makeAtt(auto, quit, draft){
     const spent = Q.spent.slice(); spent[Q.idx] += (Date.now() - Q.qStart)/1000;
     asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(spent[k]), marked:Q.marked.has(k) || undefined, rushed:(Q.sel[k] >= 0 && spent[k] < minSecs(q)) || undefined}));
   }
+  let ex = {}; // Exam mode: the paper's marking (negative marking included) decides the score
+  if (Q.exam){ const m = Q.exam.marking;
+    asked.forEach((x,k) => { x.state = exState(k); x.marks = x.chosen < 0 ? m.blank : x.ok ? m.correct : m.wrong; });
+    ex = {exam:Q.exam.course, paper:Q.exam.paper, examName:Q.exam.name, ui:Q.exam.ui, marking:m, nQ:Q.exam.nQ, shortened:Q.exam.shortened || undefined,
+          score:asked.reduce((s,x) => s + x.marks, 0), maxScore:asked.length * m.correct, used: Q.deadline ? Math.min(Q.secs, Math.round(Q.secs - (Q.deadline - Date.now())/1000)) : undefined}; }
   const right = asked.filter(a => a.ok).length;
   const maxL = Q.fixed ? Math.max(0, ...asked.map(a => LEVELS.indexOf(a.level))) : Q.maxLevel;
   const chs = [...new Set(asked.map(a => a.ch))];
   return {v:2, id:Q.id, course:Q.cid, chapter: Q.chid || (chs.length === 1 ? chs[0] : null), topic:Q.topic, mode:Q.mode, style:Q.style, title:Q.title, hw:Q.hw || undefined,
           ts:Q.ts, right, total:asked.length, maxLevel:LEVELS[maxL], auto, quit:!!quit, timeUp:!!Q.timeUp, secs: Q.style === "test" ? Q.secs : undefined,
-          open: draft || undefined, rushed: asked.filter(a => a.rushed).length || undefined, answers:asked, incidents:Q.incidents};
+          open: draft || undefined, rushed: asked.filter(a => a.rushed).length || undefined, answers:asked, incidents:Q.incidents, ...ex};
 }
 let DRAFT_T = null;
 function saveDraft(now){
@@ -1771,13 +3763,14 @@ document.addEventListener("visibilitychange", () => { if (document.hidden && Q &
 function finishQuiz(auto, quit){
   if (!Q || !Q.active) return;
   clearTimeout(DRAFT_T);
-  Q.active = false; clearInterval(Q.timerId); clearInterval(WATCH); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); wmOff(); $("rep").classList.remove("show");
+  Q.active = false; clearInterval(Q.timerId); clearInterval(WATCH); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); wmOff(); $("rep").classList.remove("show"); document.body.classList.remove("examon");
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
   const att = makeAtt(auto, quit, false); delete att.open;
   const u = me(); if (u && att.total){ u.attempts.push(att); Store.saveAttempt(att).catch(e => { console.error(e); toast("Couldn't save this result online. Check your internet."); }); }
   VIEW = {name:"report", att}; render(); window.scrollTo(0,0);
 }
 function reportHTML(att, forTeacher){
+  if (att.mode === "exam") return examReportHTML(att, forTeacher);
   const pct = att.total ? Math.round(att.right/att.total*100) : 0;
   const t = {}; att.answers.forEach(a => { t[a.topic] = t[a.topic]||{r:0,n:0}; t[a.topic].n++; if (a.ok) t[a.topic].r++; });
   const wrongIdx = att.answers.map((x,i) => i).filter(i => !att.answers[i].ok);
@@ -1796,15 +3789,15 @@ function reportHTML(att, forTeacher){
     ${wrong || '<p class="muted">Every question right! 🏆</p>'}
     <h2>Focus log</h2>${att.incidents.length ? `<table><tr><th>Time</th><th>Q</th><th>What happened</th></tr>${att.incidents.map(x => `<tr><td>${x.time}</td><td>${x.q}</td><td>${esc(x.reason)}</td></tr>`).join("")}</table>` : '<p class="muted">No warnings. Great focus!</p>'}`;
 }
-Views.report = () => { const a = VIEW.att, u = me(); const pct = a.total ? a.right/a.total : 0;
-  return `<div class="card"><h1>${pct>=.8?"🏆":pct>=.5?"👍":"📚"} Well done, ${esc(u?u.name.split(" ")[0]:"")}!</h1>
+Views.report = () => { const a = VIEW.att, u = me(); const pct = a.mode === "exam" ? (a.maxScore ? a.score/a.maxScore : 0) : a.total ? a.right/a.total : 0;
+  return `<div class="card"><h1>${pct>=.8?"🏆":pct>=.5?"👍":"📚"} ${a.mode === "exam" ? "Exam submitted" : "Well done"}, ${esc(u?u.name.split(" ")[0]:"")}!</h1>
     <p class="muted small">${esc(attTitle(a))} · Saved to your account.</p>${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
-    <div class="row" style="justify-content:flex-start"><button class="btn" id="again">Practise again</button><button class="btn ghost" id="share">Copy result for teacher</button><button class="btn ghost" id="toCourse">Back to course</button></div></div>`; };
+    <div class="row" style="justify-content:flex-start"><button class="btn" id="again">${a.mode === "exam" ? "Back to exam mode" : "Practise again"}</button><button class="btn ghost" id="share">Copy result for teacher</button><button class="btn ghost" id="toCourse">Back to course</button></div></div>`; };
 Views.report.after = () => { const a = VIEW.att;
-  $("again").onclick = () => a.chapter && a.mode !== "custom" ? go("chapter",{cid:a.course, chid:a.chapter, src: SRCNAME[a.mode] ? a.mode : undefined}) : go("course",{cid:a.course, tab: a.mode === "custom" ? "create" : a.mode === "mistakes" ? "mistakes" : "practice"});
+  $("again").onclick = () => a.mode === "exam" ? go("course",{cid:a.course, tab:"exam"}) : a.chapter && a.mode !== "custom" ? go("chapter",{cid:a.course, chid:a.chapter, src: SRCNAME[a.mode] ? a.mode : undefined}) : go("course",{cid:a.course, tab: a.mode === "custom" ? "create" : a.mode === "mistakes" ? "mistakes" : "practice"});
   $("toCourse").onclick = () => go("course",{cid:a.course, tab:"practice"});
   $("share").onclick = async () => { const u = me();
-    const txt = `ACE POINT result\n${u.name} (${u.email})\n${COURSE[a.course].name} · ${attTitle(a)}\nScore: ${a.right}/${a.total} · Highest level: ${LN[a.maxLevel]||""}\nWarnings: ${a.incidents.length}${a.auto?" (auto-submitted)":""}\n${fmtDate(a.ts)}`;
+    const txt = `ACE POINT result\n${u.name} (${u.email})\n${COURSE[a.course].name} · ${attTitle(a)}\n${a.mode === "exam" ? `Exam: ${a.examName||""}\nScore: ${a.score}/${a.maxScore} marks (${a.right} correct, ${a.answers.filter(x => x.chosen >= 0 && !x.ok).length} wrong, ${a.answers.filter(x => x.chosen < 0).length} unattempted)` : `Score: ${a.right}/${a.total} · Highest level: ${LN[a.maxLevel]||""}`}\nWarnings: ${a.incidents.length}${a.auto?" (auto-submitted)":""}\n${fmtDate(a.ts)}`;
     try { await navigator.clipboard.writeText(txt); toast("Copied! Paste it on WhatsApp to your teacher."); } catch(e) { toast("Couldn't copy on this device."); } };
 };
 
@@ -1887,7 +3880,7 @@ Views.tStudent = () => { if (tOnly()) return Views.teacherLock(); const u = Stor
   ${hws.length ? `<h2>Homework</h2><div class="card"><table><tr><th>Homework</th><th>Due</th><th>Status</th></tr>${hws.map(h => `<tr><td>${esc(hwTitle(h))}<div class="muted small">${h.n} questions</div></td><td>${fmtDay(dueTs(h.due))}</td><td>${hwStatusHTML(h, u)}</td></tr>`).join("")}</table></div>` : ""}
   <h2>Error analysis</h2><div class="card">${errorSummaryHTML(rows)}</div>
   <h2>Quizzes</h2>${a.length ? a.slice().reverse().map((x,i) => `<button class="tile" data-i="${a.length-1-i}" style="margin-bottom:8px">
-    <div class="t">${x.right}/${x.total} · ${esc(attTitle(x))}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}${x.rushed?` <span class="badge" style="background:var(--amberbg);color:var(--amber)">${x.rushed} rushed</span>`:""}</div>
+    <div class="t">${x.mode === "exam" ? `${x.score}/${x.maxScore} marks` : `${x.right}/${x.total}`} · ${esc(attTitle(x))}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}${x.rushed?` <span class="badge" style="background:var(--amberbg);color:var(--amber)">${x.rushed} rushed</span>`:""}</div>
     <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]||""}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}` + del; };
 Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
   $("delStu").onclick = () => { const u = Store.getUser(VIEW.uid);
@@ -1901,7 +3894,7 @@ Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
     go("tStudent", {uid:VIEW.uid}); };
   document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{uid:VIEW.uid, i:+t.dataset.i})); };
 Views.tAttempt = () => { if (tOnly()) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const at = u.attempts[VIEW.i];
-  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s quiz</h1><p class="muted">${esc(attTitle(at))} · ${MODE_NAME[at.mode]||"Adaptive quiz"}</p>${reportHTML(at,true)}</div>`; };
+  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s ${at.mode === "exam" ? "exam" : "quiz"}</h1><p class="muted">${esc(attTitle(at))} · ${MODE_NAME[at.mode]||"Adaptive quiz"}</p>${reportHTML(at,true)}</div>`; };
 Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{uid:VIEW.uid}); };
 
 /* ---------- Homework ---------- */
