@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACE POINT Chemistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#00427a; --navy2:#003563; --blue:#00427a; --sky:#e6eef7; --gold:#ffffff; --ink:#1b2333; --muted:#5b6578;
+  --green:#16834a; --greenbg:#e3f5ea; --red:#c0392b; --redbg:#fdeaea; --amber:#b9770e; --amberbg:#fff4dc;
+  --card:#fff; --bg:#f3f6fb; --line:#d9e1ee;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Montserrat,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+header{background:var(--navy);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:20}
+.logo{cursor:pointer;display:flex;align-items:center;gap:10px}
+.logo img{height:52px;display:block}
+.logo small{font-size:11px;font-weight:600;letter-spacing:2px;opacity:.85;border-left:1px solid rgba(255,255,255,.4);padding-left:10px}
+.hdr-right{display:flex;align-items:center;gap:8px;font-size:14px}
+.hdr-right button{background:rgba(255,255,255,.12);color:#fff;padding:6px 10px;font-size:13px}
+main{max-width:760px;margin:0 auto;padding:16px 14px 50px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 2px 6px rgba(20,40,75,.05);margin-bottom:14px}
+h1{font-size:23px;margin:0 0 6px;font-weight:800;color:var(--navy)} h2{font-size:18px;margin:16px 0 8px;font-weight:700;color:var(--navy)} h3{font-size:16px;margin:0 0 4px}
+p{margin:6px 0} .muted{color:var(--muted);font-size:14px} .small{font-size:13px}
+label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+input,select{width:100%;padding:12px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#fff;font-family:inherit}
+input:focus,select:focus{outline:2px solid var(--blue);border-color:transparent}
+.err{color:var(--red);font-size:13px;min-height:18px;margin-top:4px}
+button{font:inherit;cursor:pointer;border:none;border-radius:10px}
+.btn{background:var(--blue);color:#fff;padding:13px 22px;font-weight:700;font-size:16px;border-radius:999px}
+.btn.block{width:100%;margin-top:14px}
+.btn:disabled{background:#9db3d8;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+.btn.gold{background:#fff;color:var(--navy);font-weight:700}
+.link{background:none;color:var(--blue);padding:0;font-weight:600;font-size:14px}
+.back{background:none;color:var(--blue);padding:0 0 10px;font-weight:600;font-size:14px}
+.hero{background:var(--navy);color:#fff;border-radius:20px;padding:30px 22px;margin-bottom:14px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-90px;top:-60px;width:260px;height:260px;border:1.5px solid rgba(255,255,255,.25);border-radius:50%}
+.hero h1{font-size:30px;line-height:1.15;font-weight:800;color:#fff;margin:0 0 10px}
+.hero p{opacity:.92}
+.hero .byline{display:inline-block;background:#fff;color:var(--navy);font-weight:700;border-radius:999px;padding:8px 16px;font-size:14px;margin:6px 0 14px}
+.checks{display:grid;gap:10px;margin-bottom:14px}
+.checks div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--navy);font-weight:700;font-size:15px;display:flex;gap:12px;align-items:center}
+.checks div::before{content:"✓";font-size:18px}
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.feat div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:14px}
+.feat b{display:block;font-size:15px;margin-bottom:2px}
+.steps{display:flex;gap:6px;margin-bottom:12px}
+.steps span{flex:1;height:5px;border-radius:4px;background:var(--line)}
+.steps span.on{background:var(--blue)}
+.note{background:var(--amberbg);color:#6b4a07;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:560px){.grid.two{grid-template-columns:1fr 1fr}}
+.tile{background:#fff;border:2px solid var(--line);border-radius:12px;padding:14px;text-align:left;width:100%;color:var(--ink);display:block}
+.tile:hover:not(:disabled){border-color:var(--blue)}
+.tile:disabled{opacity:.6;cursor:not-allowed}
+.tile .t{font-weight:700;font-size:16px}
+.tile .d{font-size:13px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.badge.live{background:var(--greenbg);color:var(--green)} .badge.soon{background:#eceff4;color:var(--muted)} .badge.own{background:var(--sky);color:var(--blue)}
+.tabs{display:flex;gap:6px;margin:4px 0 12px;overflow-x:auto}
+.tabs button{background:#fff;border:1px solid var(--line);padding:8px 12px;font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.progress{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
+.progress>div{height:100%;background:var(--green)}
+.pill{font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--sky);color:var(--blue)}
+.pill.easy{background:var(--greenbg);color:var(--green)} .pill.medium{background:var(--amberbg);color:var(--amber)} .pill.hard{background:var(--redbg);color:var(--red)} .pill.warn{background:var(--redbg);color:var(--red)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.timer{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:6px}
+.timer>div{height:100%;background:var(--blue);width:100%;transition:width 1s linear}
+.timer.low>div{background:var(--red)}
+.qtext{font-size:18px;font-weight:600;margin:6px 0 14px}
+.opt{display:block;width:100%;text-align:left;padding:13px 14px;margin:8px 0;background:#fff;border:2px solid var(--line);border-radius:10px;font-size:16px;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt b{display:inline-block;width:24px;color:var(--blue)}
+.opt.correct{border-color:var(--green);background:var(--greenbg)} .opt.wrong{border-color:var(--red);background:var(--redbg)}
+.opt:disabled{cursor:default}
+.feedback{margin-top:14px;padding:14px;border-radius:10px;font-size:15px}
+.feedback.good{background:var(--greenbg)} .feedback.bad{background:var(--redbg)}
+.feedback h3{margin:0 0 6px}
+.feedback .mist{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.15)}
+.row{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
+.quizmode{-webkit-user-select:none;user-select:none}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600}
+.big{font-size:40px;font-weight:800;color:var(--navy)}
+.tag{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.tag.ok{background:var(--greenbg);color:var(--green)} .tag.weak{background:var(--redbg);color:var(--red)} .tag.mid{background:var(--amberbg);color:var(--amber)} .tag.na{background:#eceff4;color:var(--muted)}
+.review{border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;font-size:15px}
+.review .q{font-weight:600;margin-bottom:6px}
+.price{font-size:30px;font-weight:800;color:var(--navy)}
+.price s{font-size:18px;color:var(--muted);font-weight:500;margin-left:6px}
+.otp{letter-spacing:10px;text-align:center;font-size:22px;font-weight:700}
+#cheer{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(20,40,75,.35);z-index:50}
+#cheer.show{display:flex}
+#cheer .box{background:#fff;border-radius:18px;padding:22px 28px;text-align:center;animation:pop .35s ease-out;max-width:300px}
+#cheer .emo{font-size:64px;line-height:1}
+#cheer .msg{font-size:20px;font-weight:800;margin-top:8px;color:var(--navy)}
+#cheer .sm{font-size:14px;color:var(--muted);margin-top:4px}
+#cheer .tap{font-size:12px;color:#9aa3b2;margin-top:12px}
+@keyframes pop{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:51;animation:fall 1.8s linear forwards;border-radius:2px}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(120,20,20,.55);z-index:60;padding:16px}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:16px;padding:22px;max-width:380px;text-align:center}
+.modal h3{color:var(--red);margin:0 0 8px;font-size:18px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:70;display:none}
+.toast.show{display:block}
+footer{text-align:center;font-size:12px;color:var(--muted);padding:14px}
+footer button{background:none;color:var(--muted);text-decoration:underline;font-size:12px}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stat div{background:var(--sky);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--navy)}
+.stat span{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" id="logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAAD4CAYAAADSBmv/AAAjR0lEQVR4Xu2dCRh11bjH/0mikkgjhUaUZJ5SpmS63OoaQqKUMfM8ZqYuDUK4JYSEJJIm1G0gQkoZM4ZEiozR9vyOddjfsvbea++1x3Pe3/N8Tz3fd84+e6+93vWO610rZVkmwzBaZSVJm0u6j6R7StpY0l8lfVPSCZLOkNSK4K1kAmwYrYHgbinpDZJ2KbnqRyTtI+nq1F82ATaMdriupEMlPSXycudI2l7S3yI/H+Q6KV82DGPGJpJ+5LRqLPeQ9NzYDxdhGtgw0thZ0hGS1mpwmaskbSbp1w2+O8M0sGE0Z19p5s82EV64kaQ9mv+8CbBhNAF/962SDpa0apML5Hhgyve5EcMw4llN0qcl3S/+K6Vsk3Id84ENI56bSPqSy/G2xbWSNpR0WZMLmg9sGHHcTtK5LQsvIINbxN3Cf2ICbBjV7CTpJEmbVn+0Ees1+pYFsQyjFCqrdpP0CUkbdDhWaza9tmlgwwiziqRnSDpK0uodD9LKTa9vUWjDCPMuSXv1NDiNyylNgA1jRcjrkibasceBuabpb5kAG8a/WV/SiZK27XlQGguw+cCG8U8oqDhvAOEFM6ENoyFEmqmqOkWa/f8QNN7cbxrYWGYQ2CdIOnVA4U3SwCbAxjLzNkmHj2AA/t70HiyIZSwjaN5jXNubMSgx84ENI5J1JB0rabvIz/eBCbBhREDDOdJEt4r4bJ+YCW0YFdzdRZrXqPrgADQW4DHY/4bRNY+UdLo0SuElhdTYhDYBNhYZglX7SfqgpOuN+EEba2CLQhuLyvUlHSRp7wlsm22sgU2AjUVkbUnvlrTrRB7OBNgwHHS3OF7SXSc0IibAhiHNms5xgNi6ExuNxj6wBbGMReGO7niTqQkvNNbAJsDGIrCnpC9LuuFEH8Y0sLGUoIBe7TYkTDUgSx64sQBP9aENgzTRYalnC42Exia0CbAxRW4g6SxJd5jizQcwATaWBnK8F0uzXUWLQmMBtiCWMSXI7V64YMILjX1gE2BjKrAh4WRp1jly0TANbCw0z5H0IXcg9iLSWANbEMsYM8zPAyQ9e+Cmc11jAmwsHGz/O21krW+6wkxoY6GgHPKcJRHexj2hwYJYxti4vaQzpFlt8zLQ2Hw2ATbGxg7uIG2azy0L16Y8qAWxjDGAJbiTpONG3vqmC0wDG5MG4d1X0meXUHjBNLAxaY5w5xMtK0ka2ExoYyiYe2jdPg/SHiOmgY3JQd8qcrxbTe7O28c0sDEptpV0pqTVJ3XX3ZGkgS0PbPQFTdYfKOk8E94VSNLAJsBGXzzN+bw251YkSQNbEMvog4MlPV3Syn382MRI0sAmwEaXsCGBbYCckIAJbfwnpoGNUbKBpI9Kuvco7248mAAbo2NTSV+QtNHo7mx8mAltjAp2E9Ex0tJEcSRpYIsIGm2ymwlvbZI0sAmw0QYEqF4j6UjTvLVJ0sAWhTZS4YSE/d2OIqM+SRrYBNhI4cbuXKKdUy6y5JgGNgZhDdf6ZutBfn1xMA1s9M5qki5ZwBMShiBJA1sQy6jL9pIuN+FtjSQNbAJsxEKk+cmuQAMNbLSDaWCjc9iEsJ+k91or4tZJ6gttUWijilUlfUDSo6o+aDQiSQObABtlsJvom5K2sGHqjCQBNh/YKIKNCN8x4e2cJBPaBNgIsZ2ksyXd0oancywKbbTKLq71zc1bvapRhJnQRiuQJnqKpGMk3bCVKxoxmAAbyeBKHSLpMOtb1TtJAmxRaGMVSadIs5MBjf6xIJbRmA3dQdomvMORpIEtCr283E7SFyXdaXmHYBQkCbCZ0MvJPVykea2RP/5fJF0m6XfS7P9RODeQZvuQ11mQsk4TYCMaBIDjTTgVcIx9mvEHr3A5aIJqny84P5d7Z/HZXdJTXb4awZ4iSQJsJvRy8bIRC+8vpNnBZ/jlD5d0asnh1wj6b13knIYCN5P0jtTDsgfCBNioBI1Fw7nXjVDzUq55L2lWOELd9V8rn2ZFEACE+ZmSNpP0uZrfHxoTYKMUdhOdLGmPkY0TgvpKSXd2JnPSRHb8UNLDJD27wUIwFEnPbUGsxQathh+5+YgeE/OXxu9UfV3UwX1RW4z//G1Jx06gzW2SAJsPvLhsI+kHIxPeKyW9WJq15elCePNgdXAu059G/opNgI3/4P6Szpdm+3nHwhnurKQDpLTqoxp83bkOSULSMUn3Zhp48Xi+pM+M6LH+LOkRknaUdPUA9/UxSR8e4HdjMQE2ZhBpPlDSm6XZaQlDgy/6PkmbSDp+4KDSMyR9f+gBKcAE2Jg1WUfLEH0dQ2Dyu66H1p7SLL87NFRyvb5H070OJsBLzrqSTpD0mBHkeCl3/D+XGiICPCaO6iFw1oQkAR7Dam00h6qlr0lar/klWmFeAknU9+JWrtg+mPTknce2sNh2wiXlLk5YhhZeeLUrgRyr8M75gjQLqo0J64m1hDzBnZCw5sDP/mVplm+mRLNuCeQQkIc+aIgfLsEEeIkg7ffyERyk/TcXMKMRwAUTG382PSQJTcswlo0xH3g6cB4RKaJ9B7xlAi6nSdpN0m8GvI8Ufu76Xd825SItkiTAVsgxDUgTfXxg4WXHz15uP/FUhRdYhB4/oq2HSdaAaeDxwzuiJJCtckNBA4BHSvrjUDfQMoznTyXdouXrNsE08ALD8SY/GVB4KYAgNUQp5KII75xPjGTeJGlgM6HHC7XDF0raYIBbRCsQ7KEM8kwpTUuMFFJfLFBDYxp4waCmGV+TzhJDpInoisGmeDpcTNnXrYKNFbgGQ2MCvEBwkPZrXTli39YRBQ6HSrq7pJMWaEzLYLNFUiVUCySZ0BbEGg8I76ckPbTnW2ICE9ChP/Sve/7toWHTP40FthrwRpIEuO9V3gjDYWKYrg/peYCYPOxg2nIJhXfOW3secx8zoScO/arOlWaFBX32aj7R/ebbR1gf3CefHvj5TYAnDL2hKLC/dY/PQGBqb5caYt/usoPb8K4BB8EEeKLQvBwtSFPyPmCiHCdpCxcku6aPH50I7x7wPs0HnhjEHfaR9ElpVt/cB5RB7iJpZ3d0ibEi35P0o4EGxTTwhEB4OUSbFb+vACInMtAfGl/PCEN9NIvbECmlJA1saaT+4PAtTFgOF+sDUkO7SvrqQBNzalD19qsBupuYBp4A+LmckNCH8LKiv9HlNr9iwhsNgnRM9KfbI0kD92XGLTOkh6gnpsKpa9C2d3Wb/n/f9Y8tIK+Qeh8308AjhZwuwnSeO7+2S/4g6Q2S7uaa3BnNYHPD6c2+2hgT4JHCFjx6RnXdZB3fjRPr0R5JLUqNGe/seRzMhB4ZaF62qnGkR5fQRO7R0qw7peV022NeH90XpoFHBBsSaGy+X4cnJJDqONrVLxN0GVub1KmDRjy8x4cwDTwS6FvFHl6OE+kKig12l/TYAQsPlgEWxr46kJgAj4CNXfeMB3R0L5jLH5F0e0kfstRQ5/zMWTl9kBS3sDRSOuwlZVNAVw3SrnIHYqN1x9ACZlnoa4ODaeABIdJMscSqHdwDvi6HYXP+EdFso1/Yn01Dwa4xAR6IFzuzlhLJtvmGy+m+qEdfzFgR3BaaHXRdH20mdM9cz52vQ+FE28LL8ZwcnXIvp9mNYTmlB7fFNHCP3MilGFiZSRm1BavwWZJu4+qY+4qAGuVQ4Uafsi4xAe6Jm0qzFZljOdqEINWzJG0n6YdtXthohed17MYkmdC2nTAOzuDlOI62m6zTTofOHPQoNsYJLYg4RJ0FtgusEqtj2CDwrZaFl5dG+9idTHgnAfXRXQWzkjSw5YGLoaaZ3Cu7U9ZuaZrxsii1RKNzKoDVME8D6tp/0NGtmg/cAbgWL3RVT23leCn2wFymI+QVHdyz0R1YTFTCdYEJcMuw/e9ASW9p6brkE9/jyiBPaOmaRv8cJc3SfG2TZEJbEGtFGA82JOzQ0lu6XNIdJF3a0vWM4cCC+ozrM9YmpoFbghavF7QkvJhcL3P10Sa8i0MXm/2TNLAFsf7J1tKsN3AbJySc4Q4Ke5OkPy3O3DUknd2yNUVk2zRwIqRzaDrHpoEUaCL3XJcaohDeWDxonvCqlh8rSYBXyrKu0lujZ36QdmqTdczl0yQ9SdIvRv/URipU5OEWUROfCsJ3E0lXNr3QsprQPDdR5vcmnpDAkSV7SXqQCe/SwGFoVNC1hWngmqziapo5GTDlOM+Pu5xu49XTmCxruvOUmUspoIE5G5pNE41YNg28jtv1Q5qoqfBy/Abff0yK6WNMGjqjXNzSEyRp4GUSYFrfcLwJbVibQEHG29zxnESakwbemDyHtPQESfNoWYJYbJCnnrXpbiI6ZLAHGME1DMCC4wC5lPOdMaExwxsL8aJrYAaZHT/s420ivORx93dHpJjwGnkQvjaa9zcW3tkqsuBppKdIs+6CTfxddp9sa9v9jBI2kfT9hvML2I2WlI5aVA1MuxsEl8O06woved19XHWWbbQ3yrjEbQttSpL2hUUU4NUlHSvpqQ1G9Xhpdhwo+WE7ssSIgZ1mTUkW4EUzofFzEd66Z/FeJumVko5ICSgYSwmdSTnyZt0GT08/tLUafO9fLJIG3kzS+TWFF3P5OEmbO62bvCIaSweBztc2fOrk+bYIAoyPeye3m4hCjVhY/YhQ7zzAqezGYoHr1WRTQVJDu0XxgWnzyjavWBhoglsbucIOw0iFw9C+2OAiSy3AaN7Xu0brsaF4yt8o6ni6aV2jRVAK7Ear26RwaU1oWt+8zx1DElNQjp+CsBPcOqehuWMYZVCVRTCrDkspwOyfpKZ5j4iRYmXk9EC0LlFmO57T6Apa47y95sWXzoS+pYs03ztioBBWhBaty6kKhtE1FA/9ssaPLJUAU9ZIq5qbRwwQZvKm0uwEwaSmYYZRAwSShv2xLI0A7+a6ILD5uQyqpzhN4b5uw7Vh9A09xWN929jPFTL2PDD3x+lwh1dUrKBlP+wKMuig30UDbsOIgXO0iNHEsNACTIkarVkPqDhImyM50dCPk2b5OMMYEgKnR0beQLIJPdaTGThIm4AAglkEHTLQtk+z/svGyOAEB5rf0cGyjGQBHqMJzW4iTgQsE15OsN9G0hNNeI0RQgYEy7GKZFdvbALMsZsXuoPAQuAzvE6a1Tx/p2p0DGNAPhnx2427Uc4ZkwDPD9Im1xviXNfahs74aGDDGDNs9j+54gaTC4vGIMDUNBOA+lLBQdoIKweF3UfS18b8xgwjB9YiR+2U+bn4yUkMLcAE0V4kzc5e9WEAOLNoSxeNtoPCjKnBkaSklYpIPrlySAFmEwLb+t4ceDpMC3YMUTJpqSFjqqB9d5dmGZMQpECTGEqA+V0izXsG7p5SNMogU3oNGcZY4MxpDo0PQcA2iSF6YtG3ikoV/yxeOmSwOf+kBvsqDWPMkDU5zzWRmPNjVzlYdw/xCvStgYk0E03OCy8PwBGfaF0S4EkPZBgj5HK3/TUfdX5pG3O9Tw38cBesym9IuEjSCySdOMJBN4y2oXfbK6RZiuklUxHg+UHalEbOSzepQKH38gut/7JhNKfrWmiE91BXrzw/IYHQOScE2mn2hpFIlz7watKs3SabDRBetC5bA+nBbMJrGC3QlQYm0ny0pO3dPXI6IMKbHDY3DOPfdKGBOUibvBfCe4WkZ0p6qAmvYbRP21FoomxElG8s6VS3JfDK9m/bMAxoy4TGx91O0mnO193V+b+GYXRIWyb0s9zREvi9HFlC8MowjI5J1cAcpE2aCB+XTpDsHrI2robREykCTEUV3SI5UmJrO/XAMPqnaRBrfUn7uxrms/q/bcMwoIkG5iTyvd1WwOSueoZhNKeuBibaTIVVcjMuwzDSqSvAhmGMiLbSSIZhDIAJsGFMGBNgw5gwJsCGMWFMgA1jwpgAG8aEMQE2jAljAmwYE8YE2DAmjAmwYUwYE2DDmDAmwIYxYUyADWPCmAAbxoQxATaMCWMCbBgTxgTYMCaMCbBhTBgTYMOYMCbAhjFhTIANY8KYABvGhDEBNowJYwJsGBPGBNgwJowJsGFMGBNgw5gwJsCGMWFMgA1jwpgAG8aEMQE2jAljAmwYE6ZNAb6hpJtNeCyMxeVGklZaxMe7bksPxUJwmKRLJb2opWvGcD1Ja0taQ9Iqkv4m6Q+SfiPpzzEXMJK4saS1JK0qzebANZL+JOkKSX9MunK7PEvShZI+2e5lh2elLMvauIvNJH3Pvbibu5fYBUwSrr+dpJ0l3VPSTaWZIM9hEjGBvi7p05JOd/f218gb2lDSIyI/W8aJkn7UwnXm3FLSgwuux0vkua+U9EtJl0n6eQdCxNjcXtLDJO0oaX23eOa1G4so98F8YAxOkfQtSb8vuPe67OW9b/iQpN+VXOj9kh7q5st36/5gBA+SdCvvc//vFo0560r6H2n2rtriCiHAiX9YBI7M/s1dE68Xuh9+Y8Msyz6W+506/CzLskdkWXb9iHt7XJ0LF/D3LMu2ivitOmO/T837+m2WZS/NsmyNFu5j3SzLPppls+dqwu+yLHtBlmWrJd7LqlmW/dm7Ae5p7Yrrfs595/wsy1ZJvIfQOzs3MCgP8n7nwU0GroJT2/CB7yjpCbkl5YFtLS853irp+24FawK+OeYTGnGPigvcqckPeKCFLm7hOnlYweuAaftGp4nvVeeLOXBLjpX0E0mPcmZyE4iP7C/pZxHjXwbvkXvKg2WFxVUGlgJsI+mzLfvDyBDWUR607A+9v7tFxT024ZI2BPiF3oA8vsUBIvhwjqTnSLpBkyfMgZm3nqQjJH3Vmd4h2hhoTMhrE+/XB3+zCQjPqZL+u+aXt5Vm5iauCj5uKow/z8D4nyRp9QYXXCewiCAoVWYpi9mc+0p6doPfLoLnwI3Lc7VzY/LMF5E2uSQ1iIUPysqcB38YLYaQpMCqhv/E9YogUHK+W+2ucgvHTZw/snWB0LNolWlZFo1U8EHbxvex6nB9Se9xi2HMvRED+LCk1Sp+BAHH1+WaBK9YZJmom7s/IRh/rLTPSdpV0q9qPEjo3fiaLkR+8VtZ0oGSzpV0do3fLoKYjB/hZgFnPubxtXQbXJoqwK8M3DwDRMAgRYAxF48vEF4021ckvVvSMS7qHIKVkWDLkyTtIM0m8RxMXH+A5+RX6zlPlHRJjREvunYKWwS+/ExJ33TvYE1p9pn7SLq3iw7nQXsdIunRFTdBoOzjUmGG4tuSPirpvc48D2k/JjQBLwJOj5W0ZeA3CUSySDy8RrAtZIUgLGVggeTf/RwCbFgZMQtAGaHU6U8DVgEuxOElF9pP0v28f3+npKNLvnNRnSCK/1mCVdcWONnnJAQKVs6y7NiC6xKYeXyDa98iy7Kzc0EYglrXCVznulmWXRr47Y0a/GbK2Prf5V4vD9zXOgX3tX6WZd8NfP6PWTZ7xqJ72zjLsj8UjP1VWZY9p+E47Jdl2dUF1/1gjWtyHZ/DKr6/XUnw7fTIwGbZu3xU4J6OrvFMXJsg7QWB6+xYdZ0UH5i8b1Fy/A4Bxz4WtAp+lw+m1q0lHRV7oRw/dqmnPd3f/aLARyVA4vsqf6lIUfQBlhKuQR4skaLgDamk7QM3homL5guB5UTqI2Q2cz20+0ENHxbtQiAtlMp7nLMYYiBg6oMJXwZpr6J5zhih5VKgDsEnxk3Jw/3dxrsIVmJlGrKpADOQtyt5aoIemK51YYK9NPAlTFLMwroDk4cJ/wE3kT5TcGMbBF42+UuCEkOyUeC+/l4RKEPojgzc9BsKHgQTb+PAv/1A0laJYw/EKoiZcN95UAJlpmWeUICxylW7W8WLI4OC0mhKyD0g2l4HzHwW0DzEFIj+l9JEgBHOMh9pDsnturzFRYrz4GPt5iKiqXAtAhdM1hCbBP4Sf8afdH1zj8AP4pNXRV95Tz5+xBQIxDw38NnfSrp7RJomlvNcytG/bwKV/E4V3KcPC0wZWG1lIDik20IxhhhuWzBn6kD8wgelgfVXShMBZhX1I2qoekoY82ASsLLEgvkaCrAwCU+OvUgkrG4h7hL4y7Mir9klIWvnExE/WPScPkSdfXcIc5dg5K8jfqcO3LevofhtAmNl85EAVij1VBbEwvUgeOdDTUEe5ilR6dDiVkXIKvCvX0VITqpy2zPqCjAmLnm8/MtmNcXHOTgwKOSEY2El84sVWIH27VED3j9ws0S8hyZkGXwx4qZC2sHXfmigkG9L7pgcfNvwTkk9+nlyota+n58HDekXcVA+Webe8Hk/9USN/J1dyWkePveRBvUGfswEa62uqxdKj1VF1xsJ8EMC2pc6V2pNSVH4L+UZAds+BAvCKwL/cJGky9ueQQVwD/5qymSnCH5oQhM7ZrNAqGDh897D4CP66USe+3kdPvSXpJl5nod7CPngc/g3X+FgkpeBAPtFKAg8Y/dfrn48zwMkvbhGIRIa2zd/WVTYTFOHUI4f162SOhqYDQNvDlwRwQVMLT8pj+aIMaMZ5F0C10YztF3RVAQC7K/w/HbdgEQXhEy7qs0ZuDChIpg3eTdIwYsPC2cXRf95QqWmm5YMXijf+o2SzwNzNr/RBdDAaEmCXy8PfB9FQswlBoJ7PshBzOKaJ1RYFDXv6ggwUWV/QvAS0L7AoHzNexoS6BRRVIEJ4d8L/luMn9cW/L6f8Me85JlYDWP/vLatG3KwsIRSFWWWCRr7g4H74H35EwPT1ee0iABZKmw99cHCKyK0iFVpOlwyf15hws/diLcFIuC8c9zBkPvhQ8WZzwUlz1BEaBGNsvxiK7GY2CFzjNU8rwnQxvmXwOR7iTRL25RFckMVNjjxfmCsS9C+IWuhbpOCytB/TZhQoeqwUAkin8MMJCYR0g7k7n0fOLTAkjfvmlD0uKzENWRm+ma4D0LoCzDjNh8D5iS1/AQv2egwh8WCKj985bJ95aG5UZWX9uH+QhFwKt4qiRXgpwcSzaygvoYksMIA5YNR+FjkV8tMglAYvYtyxDJYpKpqf2No22fHBPSjr0xANOx8IvIemUxMhNBYAvuiDw08QEjTUOjSNSENXHTvEBLgqoWGUkmfM72/YBEgCo/bkN8wwwJIBoRNIBRVhGBe+5TN8xC8X9/3Z9GIuk6MAKMBiAT7INS+rY95Qm0uWmAOWpjCj7Ib8v0UiE2BtEVbxeZtbVyfE0ohMaahmEER+GVsHAjFE0LavUqztUHonZfFO0LCUpWuofjHh3SRD2lQqrKoEcjHQUijPdnV3Ydy7hTY+NS1wHguP4VHoI1CnEpiBBgTw5/cdH/ATwqBuZwXYKCEkc0JdeA3+iSUqvmyS/LXgU4gbRITQygDzUL5ZJFQMs6+MLWxfbCKUMCqTPOH8rllOWpM09A7LQrOEdRi3zkuX553uI4ilJn6hAS4rgUWikGQhooqHqoSYEw3v8cVKxF5vCL/lA3g/+ulJtg+hl9RNOAhE6WPSZRnp8ALYsdK3YWnbULFJTEQdCONx7a9ssUQjeHX4bJvumtCEzckJICghDR2WQ4Yd8iPrTB3y8xuotJYPGjeOSwEuIpUw/l+eyi4GKU5c4SCc9FavEqAMZN9E4tVsqiWGPBt0Fz5LhD4FmyVIjAQIrQYNNnw3RRMGL8PFi+7Ks/YNdwXG0N8MAPzQjlvJsfkRONSfMKfmFWca/kCXDdw14RQztfPUc8hwOTPVVyyslQaAUl/DhG1LnPNMOHZOkq8IB8bQPuTbaEPWP77fn6e91DWmytEqNNK9CJQJsDY5q8L2OdEnpkYRTuRmPhU8fhtXNhnWiTAIfOuSVlbU/B7/IHkGYcWYFZ/PzLO+GItRFXqRICg+22GQmmNtvE3AZRpRz7rz7eqVFeRdqxyzbASSZmymOQXAObz2yXt7YKHuJW+lUj8o24MJBSca0UDsxL5N8gK9Xz3p4xQ+xsEmL8PrYChiDMRSVZegmJdEzLXedF9RGPLwGz0742Fpc2WuSEzlBgGUfk2fycP1g6tgPOgTYsCnaENCaFgVJ5QahJFEQpGhSwchJj67PzCQYMCtDMZADZf+IsKbktVgY1PaDcTHUWjKCrkwD8JFSTMG3ix+pT9CflQ/F3IzwQmkZ/3wjoIlVd2Qchc7zuNFQLh9X0/7qsordGEkI/P4vmCJheLgOdhW6c/+dluWBRXCZmZVYtraA7Weacfc22IfOhEwrVDVoqfooohpIGju78UCTBby8rM66b4/bPmsCpSg+qDwPsrdReEIpx1XnZXoAV9AcbHivFtY0Er4Tf7YCp2cZrBYwK5aiw7apOLCDWEq+qlFUoLhnLPZVC85I8NiyrKJrTPuIm16McCkIWoHDCEBJgL7lP6WM1hK2LRokEDO19o8P9e3dFEyhPyt6MDCR0S2ujdhVlLsNKHeeDvPEuFgBwazAftWyaQofdTtc0xlD/nd+pAXQM9xvyNBQR2QzvXqvYm+1BC7AfCqK2oWpz+RUjLviqwQmKT1z2WAkHd3dOgpAMo6gh1UcA3JvhFwcEcNAA+N8Ld9p7gPCFzq24+rwtCEWgEOMaPqwNZAzS7XwnF+6O6DpM39Tepoycd41sUxBqqFEao2KSqDjo0dt+pMygO5gG+L/M/72r51gnjEx18clBLHepoGV1I4wswE5njH3zIBXN8RV2I7lLJMgehxlR+ZMGFnupWtvwL4wGPc8eKEEBoCveCVgmtkqGURt2X0QWhHDBb8dqGRYGFFdMwPyeowqMtD/9FiJv63qRkPlVQDjnv010Evx2qUQ8FQ+fwrkOLclXpZREoECxBOrkUWZC4AXVr90ObIailjl4s/ZvBvPE3F7PSMfhNoIrFL4+jKsjv/zMHs4gthP4DEL0mbcAe1VBCvwoikqSwaBAfIlTt1GS1bhMWrlADuq52aLGwnVDwAPSsovlb3dw8gkTcg3RcaGsjwRoOHiuDKG1ovpS1m2EO+1q7yUb7PFRpseG/iCYCHFIctU70yAswD+2XQCJIdA1s2tSNsjX/u/gzoRzdHJquhcx1XiIVXvTxpQlZzMYDyvUQXIICFKWHghiMgd+Pl5dBfSxjEvsnZt9zHRBgdsPk4X3UesE1wX0panZOUAtf8ICIwCKBHvpB867oaxzqy0y6BT+yKu3CDiVfgNlqVxbIQ/v6Cz3vs7LHVAVPC/jDc7h23esn11LPzSUmMWFzP3+LGRnTuqUITDNqg/Majt8kRYW5HAIzDZ8IIfc147xhOAl1GpHxUphU+ZP48ONY2YhC0gQt/yJDhRk8sz/BGA/M9mhTJtd1sS1YoEKdMqqCNykgFDRa59lD2h9LhvQSExntiUnK4sjE5V4RHLqaUINctkhT7EAUt7JtasEpGizwZe8mVAPNb1UVcVTBfRPUYhH1FwiCT1WLkU+o4q1eo3nXOPq2gabS12TZ7ES11AblnAroN4CnwXjVSXWcOHd8SfP4unCKHY3L/edZr+6FCnh/C2OVv7ebBX6HU/5S30fM9xn7Y1oaF58zsmzWeD7mPvjMmYH7qJqXewe+wwmasb9Z9Tl+3z8l8QsNrh861fC+da6DpuFPqFUO7Uoo5k+FYnq/wx5ar6x9CuB7s2WO0s269aUhCDCEOv21VfdbdgRGE0IaLEZjtQFjT1sZdqK1pfGJ5pLhQIPFpuiYm6EcfVW6JrT1sKrwow7IBVZg3gpokiUJPVuthngMELlZP4mOD/iaOk9UAuZVyG/L7/goAnOaHSJsVGcDRd06U2CQmYQMesiXr1pIYuA3OHGvTULVR3ULEVLAnCbmgJ/2vgaN2vJjz8FqBLGorS/b8+tDEMwvieT7VQtAaKdTmwIMLG4opzlVDeZD+ALMs9WqccdvYWBZTfLg1xRFJJvARPD3yeJ34tPG+JmsSvhmaG4axpOKIsVSVimEX0zqiy4UvPAi/4Rr+89fFwa+zsSMgUXHv6+qJm5dQByD/dwEpsitMvahPtJ5SPGwrRTribRIXd8wD7uA8vXgKISqYhb6Uvljl5KCLAILEWuASrG6WQsi+qTQ8qCwqvLbK8ChSoV3N2IQXII8pAr47/wFE6QgmEBFF9q2baEy/gmakQoiJiELMVFiNDaCy7ijRVIDRlOBRY3m/5T89j7fpirAhjEm2CdMsUfv/AO63LCbFuOWiwAAAABJRU5ErkJggg==" alt="ACE POINT"><small>CHEMISTRY</small></div>
+  <div class="hdr-right" id="hdrRight"></div>
+</header>
+<main id="app"></main>
+<footer id="foot">ACE POINT Chemistry · By Gunjan, IIT Madras alumna · Testing version · <button id="teacherLink">Teacher login</button></footer>
+
+<div id="cheer"><div class="box"><div class="emo"></div><div class="msg"></div><div class="sm"></div><div class="tap">Tap to continue</div></div></div>
+<div id="warn" class="modal"><div class="box">
+  <h3>Warning <span id="warnCount">1</span> of 3</h3>
+  <p id="warnText">You left the quiz screen.</p>
+  <p class="muted">Stay on this screen until you finish. At 3 warnings the quiz submits itself.</p>
+  <button id="warnBtn" class="btn" style="margin-top:10px">Back to the quiz</button>
+</div></div>
+<div id="confirm" class="modal" style="background:rgba(20,40,75,.5)"><div class="box">
+  <h3 style="color:var(--navy)" id="confTitle">Leave the quiz?</h3>
+  <p class="muted" id="confText">Your answers so far will be saved as a finished quiz.</p>
+  <div class="row" style="justify-content:center"><button class="btn ghost" id="confNo">Stay</button><button class="btn" id="confYes">Leave</button></div>
+</div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* =====================================================================
+   1. CONTENT: courses, chapters, questions
+   ===================================================================== */
+const CATALOGUE = [
+  {group:"Indian exams", courses:[
+    {id:"neet",  name:"NEET Chemistry", desc:"Class 11 and 12, NCERT-based", status:"soon"},
+    {id:"jee",   name:"JEE Chemistry", desc:"JEE Main and Advanced", status:"soon"},
+    {id:"cbse",  name:"CBSE Chemistry", desc:"Class 11 and 12 boards", status:"soon"},
+    {id:"found", name:"Class 9–10 Chemistry (Foundation)", desc:"NCERT Class 9–10, foundation for NEET and JEE", status:"live"}
+  ]},
+  {group:"US", courses:[
+    {id:"ap", name:"AP Chemistry", desc:"College Board", status:"soon"}
+  ]},
+  {group:"A Level", courses:[
+    {id:"al-cie",name:"A Level Chemistry · CIE",desc:"Cambridge International",status:"soon"},
+    {id:"al-edx",name:"A Level Chemistry · Edexcel",desc:"Pearson Edexcel",status:"soon"},
+    {id:"al-ial",name:"International A Level · Edexcel",desc:"Pearson Edexcel IAL",status:"soon"},
+    {id:"al-aqa",name:"A Level Chemistry · AQA",desc:"AQA",status:"soon"},
+    {id:"al-ocr",name:"A Level Chemistry · OCR",desc:"OCR",status:"soon"}
+  ]},
+  {group:"AS Level", courses:[
+    {id:"as-cie",name:"AS Chemistry · CIE",desc:"Cambridge International",status:"soon"},
+    {id:"as-edx",name:"AS Chemistry · Edexcel",desc:"Pearson Edexcel",status:"soon"},
+    {id:"as-ial",name:"International AS · Edexcel",desc:"Pearson Edexcel IAS",status:"soon"},
+    {id:"as-aqa",name:"AS Chemistry · AQA",desc:"AQA",status:"soon"},
+    {id:"as-ocr",name:"AS Chemistry · OCR",desc:"OCR",status:"soon"}
+  ]},
+  {group:"O Level and IGCSE", courses:[
+    {id:"ol-cam",name:"O Level Chemistry · Cambridge",desc:"Cambridge O Level",status:"soon"},
+    {id:"ig-cie",name:"IGCSE Chemistry · CIE",desc:"Cambridge IGCSE",status:"soon"},
+    {id:"ig-edx",name:"IGCSE Chemistry · Edexcel",desc:"Pearson Edexcel International GCSE",status:"soon"}
+  ]},
+  {group:"GCSE", courses:[
+    {id:"gc-aqa",name:"GCSE Chemistry · AQA",desc:"AQA",status:"soon"},
+    {id:"gc-edx",name:"GCSE Chemistry · Edexcel",desc:"Pearson Edexcel",status:"soon"},
+    {id:"gc-ocr",name:"GCSE Chemistry · OCR Gateway",desc:"OCR",status:"soon"},
+    {id:"gc-wjec",name:"GCSE Chemistry · WJEC",desc:"WJEC",status:"soon"}
+  ]},
+  {group:"IB", courses:[
+    {id:"ib-hl",name:"IB Chemistry HL",desc:"Diploma Programme",status:"soon"},
+    {id:"ib-sl",name:"IB Chemistry SL",desc:"Diploma Programme",status:"soon"}
+  ]},
+  {group:"ACE POINT class practice", courses:[
+    {id:"class8",name:"Class 8 Practice",desc:"Sets made for ACE POINT classes",status:"live"}
+  ]}
+];
+const COURSE = {}; CATALOGUE.forEach(g => g.courses.forEach(c => COURSE[c.id] = {...c, group:g.group}));
+const PRICE = {default:{now:0, later:"Price to be announced"}};
+
+// Chapters per course. Each chapter: id, name, topics, questions.
+const CHAPTERS = {
+  "class8": [{id:"maps", name:"Maps: Latitudes and Longitudes",
+              topics:["Latitudes","Longitudes","Heat Zones","Longitude and Time"], qs:[
+  // ---------- EASY ----------
+  {id:"E1",level:"easy",topic:"Latitudes",q:"Which line of latitude is at 0°?",
+   options:["Tropic of Cancer","Equator","Prime Meridian","Arctic Circle"],answer:1,
+   explain:"The Equator is the 0° line of latitude. It divides the Earth into the Northern and Southern Hemispheres.",
+   mistakes:{0:"The Tropic of Cancer is at 23½°N, not 0°. You mixed up the major parallels.",
+             2:"The Prime Meridian is 0° longitude, not latitude. Latitude lines run east–west; longitude lines run north–south.",
+             3:"The Arctic Circle is at 66½°N, far from 0°."}},
+  {id:"E2",level:"easy",topic:"Longitudes",q:"Which line is 0° longitude?",
+   options:["Equator","International Date Line","Prime Meridian","Tropic of Capricorn"],answer:2,
+   explain:"The Prime Meridian is 0° longitude. It passes through Greenwich, near London.",
+   mistakes:{0:"The Equator is 0° latitude. Remember: latitude is the 'ladder' going up and down the globe; longitude is the 'long' lines from pole to pole.",
+             1:"The International Date Line is roughly at 180° longitude, on the opposite side of the Earth.",
+             3:"The Tropic of Capricorn is a line of latitude at 23½°S."}},
+  {id:"E3",level:"easy",topic:"Latitudes",q:"Lines of latitude are also called:",
+   options:["Meridians","Parallels","Contours","Isobars"],answer:1,
+   explain:"Lines of latitude are called parallels because they run parallel to the Equator and never meet.",
+   mistakes:{0:"Meridians are lines of longitude, not latitude.",
+             2:"Contours join places of equal height on a map. They are not latitude lines.",
+             3:"Isobars join places of equal air pressure on weather maps."}},
+  {id:"E4",level:"easy",topic:"Longitudes",q:"Lines of longitude are also called:",
+   options:["Parallels","Meridians","Tropics","Circles"],answer:1,
+   explain:"Lines of longitude are called meridians. They run from the North Pole to the South Pole.",
+   mistakes:{0:"Parallels are lines of latitude.",
+             2:"The Tropics (of Cancer and Capricorn) are two special lines of latitude.",
+             3:"Polar circles are lines of latitude, and 'circles' is not the name for longitude lines."}},
+  {id:"E5",level:"easy",topic:"Latitudes",q:"What is the latitude of the North Pole?",
+   options:["0°","90°N","180°","66½°N"],answer:1,
+   explain:"Latitude goes from 0° at the Equator to 90° at each pole. So the North Pole is 90°N.",
+   mistakes:{0:"0° is the Equator, the middle of the Earth, not the pole.",
+             2:"180° is a longitude value. Latitude never goes above 90°.",
+             3:"66½°N is the Arctic Circle, which is near the pole but not the pole itself."}},
+  {id:"E6",level:"easy",topic:"Latitudes",q:"The Tropic of Cancer is at:",
+   options:["23½°N","23½°S","66½°N","0°"],answer:0,
+   explain:"The Tropic of Cancer is at 23½° north of the Equator. It passes through the middle of India.",
+   mistakes:{1:"23½°S is the Tropic of Capricorn, in the Southern Hemisphere. Tip: Cancer is in the North.",
+             2:"66½°N is the Arctic Circle.",
+             3:"0° is the Equator."}},
+  {id:"E7",level:"easy",topic:"Latitudes",q:"The Equator divides the Earth into:",
+   options:["Eastern and Western Hemispheres","Northern and Southern Hemispheres","Arctic and Antarctic regions","Torrid and Frigid Zones"],answer:1,
+   explain:"The Equator runs east–west around the middle of the Earth, so it splits it into a northern half and a southern half.",
+   mistakes:{0:"The Prime Meridian (with the 180° line) divides the Earth into Eastern and Western Hemispheres.",
+             2:"Arctic and Antarctic regions are near the poles; the Equator does not separate them directly.",
+             3:"Heat zones are made by the Tropics and Polar Circles, not by the Equator."}},
+  {id:"E8",level:"easy",topic:"Longitudes",q:"The Prime Meridian passes through:",
+   options:["Greenwich, near London","New Delhi","Paris","Tokyo"],answer:0,
+   explain:"The Prime Meridian passes through the Royal Observatory at Greenwich, near London, UK.",
+   mistakes:{1:"New Delhi is at about 77°E, not 0°.",
+             2:"Paris was once used by France for its own meridian, but the world agreed on Greenwich.",
+             3:"Tokyo is around 140°E, far from 0°."}},
+  {id:"E9",level:"easy",topic:"Longitudes",q:"If meridians are drawn at every 1°, how many meridians are there in total?",
+   options:["180","90","360","181"],answer:2,
+   explain:"There are 180 meridians east and 180 west of Greenwich. The 0° and 180° lines are counted once each, so the total is 360.",
+   mistakes:{0:"180 is only the number on one side (east or west). Add both sides.",
+             1:"90 is the highest value of latitude, not the number of meridians.",
+             3:"181 is close to the count used for parallels including the poles. Meridians go all the way round: 360."}},
+  {id:"E10",level:"easy",topic:"Heat Zones",q:"Which heat zone gets the most heat from the Sun?",
+   options:["Frigid Zone","Temperate Zone","Torrid Zone","Polar Zone"],answer:2,
+   explain:"The Torrid Zone, between the Tropic of Cancer and the Tropic of Capricorn, gets the Sun overhead at least once a year, so it is the hottest.",
+   mistakes:{0:"'Frigid' means very cold. This zone is near the poles.",
+             1:"'Temperate' means moderate. These zones get slanting rays, so they are not the hottest.",
+             3:"Polar areas are the coldest; the Sun's rays fall at a very low angle there."}},
+
+  // ---------- MEDIUM ----------
+  {id:"M1",time:60,level:"medium",topic:"Longitude and Time",q:"Two places are 15° of longitude apart. What is the time difference between them?",
+   options:["15 minutes","30 minutes","1 hour","4 hours"],answer:2,
+   explain:"The Earth turns 1° every 4 minutes. So 15° × 4 minutes = 60 minutes = 1 hour.",
+   mistakes:{0:"You took 1° = 1 minute. It is 1° = 4 minutes.",
+             1:"Check the multiplication: 15 × 4 = 60 minutes, not 30.",
+             3:"You used '4' as hours. It is 4 minutes per degree."}},
+  {id:"M2",level:"medium",topic:"Heat Zones",q:"The Torrid Zone lies between:",
+   options:["The Equator and the Tropic of Cancer","The Tropic of Cancer and the Tropic of Capricorn","The Tropic of Cancer and the Arctic Circle","The Arctic Circle and the North Pole"],answer:1,
+   explain:"The Torrid Zone stretches from the Tropic of Cancer (23½°N) to the Tropic of Capricorn (23½°S), with the Equator in its middle.",
+   mistakes:{0:"That is only the northern half of the Torrid Zone. It also goes south to the Tropic of Capricorn.",
+             2:"That is the North Temperate Zone.",
+             3:"That is the North Frigid Zone."}},
+  {id:"M3",level:"medium",topic:"Latitudes",q:"The Arctic Circle is at:",
+   options:["23½°N","66½°S","66½°N","90°N"],answer:2,
+   explain:"The Arctic Circle is at 66½° north of the Equator. The Antarctic Circle is at 66½°S.",
+   mistakes:{0:"23½°N is the Tropic of Cancer.",
+             1:"66½°S is the Antarctic Circle, in the south. 'Arctic' is the north.",
+             3:"90°N is the North Pole itself."}},
+  {id:"M4",time:60,level:"medium",topic:"Longitude and Time",q:"The Earth rotates 360° in 24 hours. How long does it take to turn through 1°?",
+   options:["1 minute","4 minutes","15 minutes","1 hour"],answer:1,
+   explain:"24 hours = 1440 minutes. 1440 ÷ 360 = 4 minutes for every 1°.",
+   mistakes:{0:"1 minute per degree would mean a day lasts only 6 hours.",
+             2:"15 is the number of degrees covered in 1 hour, not minutes per degree.",
+             3:"1 hour is the time for 15°, not 1°."}},
+  {id:"M5",level:"medium",topic:"Longitude and Time",q:"India's Standard Meridian is:",
+   options:["0°","77°E","82½°E","23½°N"],answer:2,
+   explain:"Indian Standard Time is based on the 82½°E meridian, which passes near Mirzapur in Uttar Pradesh.",
+   mistakes:{0:"0° is the Prime Meridian at Greenwich.",
+             1:"77°E passes near Delhi, but IST is not based on Delhi.",
+             3:"23½°N is a latitude (the Tropic of Cancer), not a meridian."}},
+  {id:"M6",time:60,level:"medium",topic:"Longitude and Time",q:"Indian Standard Time (IST) is ahead of Greenwich Mean Time (GMT) by:",
+   options:["5 hours 30 minutes","4 hours 30 minutes","6 hours","5 hours"],answer:0,
+   explain:"82½ × 4 minutes = 330 minutes = 5 hours 30 minutes. India is east of Greenwich, so IST is ahead.",
+   mistakes:{1:"Check the calculation: 82.5 × 4 = 330 minutes, which is 5 h 30 min.",
+             2:"6 hours would be 90°E, not 82½°E.",
+             3:"5 hours is 75°E. You dropped the extra 7½°, which adds 30 minutes."}},
+  {id:"M7",level:"medium",topic:"Longitude and Time",q:"Compared with Greenwich, the local time at a place east of the Prime Meridian is:",
+   options:["Behind","Ahead","The same","It depends on the latitude"],answer:1,
+   explain:"The Earth rotates from west to east, so places to the east see the Sun first. Their time is ahead of Greenwich.",
+   mistakes:{0:"'Behind' is for places west of Greenwich.",
+             2:"Only places on the same meridian share the same local time.",
+             3:"Time depends on longitude, not latitude."}},
+  {id:"M8",level:"medium",topic:"Heat Zones",q:"The North Frigid Zone lies between:",
+   options:["The Equator and the Tropic of Cancer","The Tropic of Cancer and the Arctic Circle","The Arctic Circle and the North Pole","The Tropic of Capricorn and the Antarctic Circle"],answer:2,
+   explain:"The North Frigid Zone is the very cold area from the Arctic Circle (66½°N) up to the North Pole (90°N).",
+   mistakes:{0:"That is part of the Torrid Zone, the hottest area.",
+             1:"That is the North Temperate Zone.",
+             3:"That is the South Temperate Zone."}},
+  {id:"M9",level:"medium",topic:"Longitudes",q:"Which lines are all equal in length?",
+   options:["Parallels of latitude","Meridians of longitude","The Tropics and the Equator","The Polar Circles and the Equator"],answer:1,
+   explain:"Every meridian runs from the North Pole to the South Pole, so all meridians are the same length. Parallels get smaller towards the poles.",
+   mistakes:{0:"Parallels get shorter as you move from the Equator to the poles.",
+             2:"The Tropics are shorter circles than the Equator.",
+             3:"The Polar Circles are much smaller than the Equator."}},
+  {id:"M10",level:"medium",topic:"Heat Zones",q:"The North Temperate Zone lies between:",
+   options:["The Tropic of Cancer and the Arctic Circle","The Equator and the Arctic Circle","The Tropic of Capricorn and the Antarctic Circle","The Arctic Circle and the North Pole"],answer:0,
+   explain:"The North Temperate Zone runs from the Tropic of Cancer (23½°N) to the Arctic Circle (66½°N). It has moderate temperatures.",
+   mistakes:{1:"That would include part of the Torrid Zone too. The Temperate Zone starts at the Tropic of Cancer.",
+             2:"That is the South Temperate Zone.",
+             3:"That is the North Frigid Zone."}},
+
+  // ---------- HARD ----------
+  {id:"H1",time:60,level:"hard",topic:"Longitude and Time",q:"When it is 12 noon at Greenwich, what is the local time at a place at 82½°E?",
+   options:["6:30 AM","5:30 PM","3:30 PM","5:30 AM"],answer:1,
+   explain:"82½ × 4 = 330 minutes = 5 h 30 min. East is ahead, so add: 12 noon + 5:30 = 5:30 PM.",
+   mistakes:{0:"You subtracted the time. Places east of Greenwich are ahead, so add.",
+             2:"Check the minutes: 82.5 × 4 = 330 minutes, not 210.",
+             3:"You got 5:30 but wrote AM. 12 noon + 5 h 30 min is in the evening, so PM."}},
+  {id:"H2",time:60,level:"hard",topic:"Longitude and Time",q:"When it is 12 noon at Greenwich, what is the local time at a place at 60°W?",
+   options:["4:00 PM","8:00 AM","8:00 PM","4:00 AM"],answer:1,
+   explain:"60 × 4 = 240 minutes = 4 hours. West is behind, so subtract: 12 noon − 4 h = 8:00 AM.",
+   mistakes:{0:"You added the time. Places west of Greenwich are behind, so subtract.",
+             2:"8 is right, but 12 noon minus 4 hours is morning, so AM.",
+             3:"You subtracted 8 hours instead of 4. Check 60 × 4 = 240 minutes = 4 hours."}},
+  {id:"H3",time:60,level:"hard",topic:"Longitude and Time",q:"What is the time difference between a place at 30°E and a place at 45°W?",
+   options:["1 hour","5 hours","3 hours","2 hours"],answer:1,
+   explain:"They are on opposite sides of Greenwich, so add the degrees: 30 + 45 = 75°. 75 × 4 = 300 minutes = 5 hours.",
+   mistakes:{0:"You subtracted (45 − 30 = 15°). When one place is east and the other is west, add the degrees.",
+             2:"3 hours is only the 45°W part (45 × 4 = 180 min). Add the 30°E part too.",
+             3:"2 hours is only the 30°E part. Add both sides: 75° in total."}},
+  {id:"H4",time:60,level:"hard",topic:"Longitude and Time",q:"The local time at a place is 2:00 PM when it is 12 noon at Greenwich. What is its longitude?",
+   options:["30°W","30°E","60°E","120°E"],answer:1,
+   explain:"It is 2 hours ahead = 120 minutes. 120 ÷ 4 = 30°. Ahead means east, so 30°E.",
+   mistakes:{0:"The number is right but the side is wrong. Ahead of Greenwich means east.",
+             2:"You may have used 2 minutes per degree. It is 4 minutes per degree: 120 ÷ 4 = 30.",
+             3:"120 is the minutes, not the degrees. Divide by 4."}},
+  {id:"H5",time:60,level:"hard",topic:"Longitude and Time",q:"A ship's local time is 9:00 AM when it is 12 noon at Greenwich. Where is the ship?",
+   options:["45°E","45°W","3°W","90°W"],answer:1,
+   explain:"The ship is 3 hours behind = 180 minutes. 180 ÷ 4 = 45°. Behind means west, so 45°W.",
+   mistakes:{0:"The number is right but behind Greenwich means west, not east.",
+             2:"3 is the hours. Change to minutes (180) and divide by 4.",
+             3:"You may have used 2 minutes per degree. Use 4: 180 ÷ 4 = 45."}},
+  {id:"H6",level:"hard",topic:"Latitudes",q:"Where on Earth is the point 0° latitude, 0° longitude?",
+   options:["In London","In the Atlantic Ocean, in the Gulf of Guinea","In the Indian Ocean","At the North Pole"],answer:1,
+   explain:"The Equator and the Prime Meridian cross in the Atlantic Ocean, south of Ghana, in the Gulf of Guinea.",
+   mistakes:{0:"London is on 0° longitude, but its latitude is about 51°N, not 0°.",
+             2:"The Indian Ocean is east of Africa; 0° longitude is west of it.",
+             3:"The North Pole is 90°N. All meridians meet there, but it is not on the Equator."}},
+  {id:"H7",level:"hard",topic:"Longitude and Time",q:"Which of these places in India sees the sunrise first?",
+   options:["Gujarat","Arunachal Pradesh","Delhi","Kerala"],answer:1,
+   explain:"The Earth turns from west to east, so the easternmost part of India, Arunachal Pradesh, sees the Sun first.",
+   mistakes:{0:"Gujarat is in the far west of India, so it sees the sunrise last.",
+             2:"Delhi is in the north, but sunrise order depends on east–west position, not north–south.",
+             3:"Kerala is in the south-west. Sunrise depends on how far east a place is."}},
+  {id:"H8",time:60,level:"hard",topic:"Longitude and Time",q:"India stretches from about 68°E to 97°E. About how much does local time differ between its east and west ends?",
+   options:["About 30 minutes","About 2 hours","About 5 hours 30 minutes","About 4 hours"],answer:1,
+   explain:"97 − 68 ≈ 29°, and 29 × 4 ≈ 116 minutes, which is about 2 hours. That is why India uses one Standard Time.",
+   mistakes:{0:"You may have used 1 minute per degree. Use 4 minutes per degree.",
+             2:"5 h 30 min is the gap between IST and GMT, not across India.",
+             3:"Check the degrees: 97 − 68 ≈ 29°, not 60°."}},
+  {id:"H9",time:60,level:"hard",topic:"Latitudes",q:"How many degrees of latitude are there between the Tropic of Cancer and the Arctic Circle?",
+   options:["43°","90°","23½°","66½°"],answer:0,
+   explain:"Arctic Circle (66½°N) − Tropic of Cancer (23½°N) = 43°.",
+   mistakes:{1:"90° is the distance from the Equator to the pole.",
+             2:"23½° is the latitude of the Tropic of Cancer itself, not the gap.",
+             3:"66½° is the latitude of the Arctic Circle itself. Subtract the Tropic's 23½°."}},
+  {id:"H10",level:"hard",topic:"Longitude and Time",q:"Two places lie on the same meridian, one in the north and one in the south. Which is true?",
+   options:["They have the same local time","They have the same latitude","They have the same season","They have the same temperature"],answer:0,
+   explain:"Local time depends on longitude. Places on the same meridian have the same longitude, so the Sun is overhead at noon for both at the same moment.",
+   mistakes:{1:"Same meridian means same longitude, not same latitude. One is north and one is south.",
+             2:"Northern and Southern Hemispheres have opposite seasons.",
+             3:"Temperature depends mostly on latitude, which is different for these two places."}}
+]}],
+  "found":  [{id:"atoms", name:"Atoms and Molecules (Class 9)",
+              topics:["Laws of Chemical Combination","Symbols and Formulae","Atomic and Molecular Mass","Mole Concept"], qs:[
+  // EASY
+  {id:"A1",level:"easy",topic:"Laws of Chemical Combination",q:"Who gave the law of conservation of mass?",
+   options:["John Dalton","Antoine Lavoisier","Joseph Proust","Amedeo Avogadro"],answer:1,
+   explain:"Antoine Lavoisier showed that mass is neither created nor destroyed in a chemical reaction.",
+   mistakes:{0:"Dalton gave the atomic theory, which explained the laws, but did not state this one.",
+             2:"Proust gave the law of constant proportions.",
+             3:"Avogadro is linked to the number of particles in a mole."}},
+  {id:"A2",level:"easy",topic:"Laws of Chemical Combination",q:"Who gave the law of constant proportions?",
+   options:["Joseph Proust","Antoine Lavoisier","John Dalton","J.J. Thomson"],answer:0,
+   explain:"Joseph Proust stated that a compound always contains the same elements in the same fixed ratio by mass.",
+   mistakes:{1:"Lavoisier gave the law of conservation of mass.",
+             2:"Dalton's atomic theory explained this law but did not first state it.",
+             3:"Thomson discovered the electron."}},
+  {id:"A3",level:"easy",topic:"Symbols and Formulae",q:"What is the symbol of sodium?",
+   options:["S","So","Na","Sd"],answer:2,
+   explain:"Sodium's symbol Na comes from its Latin name, natrium.",
+   mistakes:{0:"S is sulphur.",1:"So is not a symbol. Some symbols come from Latin names, not English ones.",
+             3:"Sd is not a symbol. Learn the Latin-based ones: Na, K, Fe, Cu, Ag, Au."}},
+  {id:"A4",level:"easy",topic:"Atomic and Molecular Mass",q:"One atomic mass unit (u) is equal to:",
+   options:["The mass of one hydrogen atom","1/12 of the mass of one carbon-12 atom","1/16 of the mass of one oxygen atom","The mass of one electron"],answer:1,
+   explain:"Today, 1 u is defined as exactly 1/12 of the mass of one carbon-12 atom.",
+   mistakes:{0:"Hydrogen was used in early work, but the standard is carbon-12.",
+             2:"Oxygen was an older standard. It was replaced by carbon-12.",
+             3:"An electron is far lighter than 1 u."}},
+  {id:"A5",level:"easy",topic:"Mole Concept",q:"What is the value of the Avogadro constant?",
+   options:["6.022 × 10²³ per mole","6.022 × 10²² per mole","3.011 × 10²³ per mole","1.66 × 10⁻²⁴ per mole"],answer:0,
+   explain:"One mole of any substance contains 6.022 × 10²³ particles.",
+   mistakes:{1:"Check the power of ten. It is 10²³, not 10²².",
+             2:"3.011 × 10²³ is half a mole of particles.",
+             3:"1.66 × 10⁻²⁴ g is the mass of 1 u, not the Avogadro constant."}},
+  // MEDIUM
+  {id:"A6",level:"medium",time:60,topic:"Atomic and Molecular Mass",q:"What is the molecular mass of water, H₂O? (H = 1 u, O = 16 u)",
+   options:["17 u","18 u","34 u","16 u"],answer:1,
+   explain:"H₂O has 2 hydrogen atoms and 1 oxygen atom: (2 × 1) + 16 = 18 u.",
+   mistakes:{0:"You counted only one hydrogen atom. The 2 in H₂O means two.",
+             2:"You doubled oxygen as well. The 2 applies only to hydrogen.",
+             3:"16 u is only the oxygen atom. Add the two hydrogens."}},
+  {id:"A7",level:"medium",topic:"Symbols and Formulae",q:"Aluminium forms Al³⁺ ions and oxygen forms O²⁻ ions. What is the formula of aluminium oxide?",
+   options:["AlO","Al₃O₂","Al₂O₃","AlO₃"],answer:2,
+   explain:"Criss-cross the valencies: Al gets oxygen's 2 and O gets aluminium's 3, giving Al₂O₃. Check: 2 × (+3) = +6 and 3 × (−2) = −6.",
+   mistakes:{0:"AlO would leave the charges unbalanced (+3 and −2).",
+             1:"You wrote the valencies on their own elements. Cross them over.",
+             3:"The total charge would be +3 and −6, which is not balanced."}},
+  {id:"A8",level:"medium",topic:"Symbols and Formulae",q:"How many atoms are there in one molecule of sulphuric acid, H₂SO₄?",
+   options:["3","6","7","4"],answer:2,
+   explain:"H₂SO₄ has 2 H + 1 S + 4 O = 7 atoms.",
+   mistakes:{0:"3 is the number of different elements, not atoms.",
+             1:"You may have missed the sulphur atom. Count every atom: 2 + 1 + 4.",
+             3:"4 is only the oxygen atoms."}},
+  {id:"A9",level:"medium",time:60,topic:"Atomic and Molecular Mass",q:"What is the formula unit mass of CaCl₂? (Ca = 40 u, Cl = 35.5 u)",
+   options:["75.5 u","111 u","146.5 u","80 u"],answer:1,
+   explain:"CaCl₂ has 1 Ca and 2 Cl: 40 + (2 × 35.5) = 40 + 71 = 111 u.",
+   mistakes:{0:"You took only one chlorine. The 2 in CaCl₂ means two chlorine atoms.",
+             2:"You used three chlorine atoms. There are two.",
+             3:"You doubled calcium instead of chlorine. The subscript 2 belongs to Cl."}},
+  {id:"A10",level:"medium",time:60,topic:"Mole Concept",q:"How many moles are there in 36 g of water? (Molar mass of water = 18 g/mol)",
+   options:["1 mol","2 mol","0.5 mol","18 mol"],answer:1,
+   explain:"Moles = mass ÷ molar mass = 36 ÷ 18 = 2 mol.",
+   mistakes:{0:"1 mol of water is 18 g. You have twice that.",
+             2:"You divided the wrong way round (18 ÷ 36). Use mass ÷ molar mass.",
+             3:"18 is the molar mass, not the number of moles."}},
+  // HARD
+  {id:"A11",level:"hard",time:60,topic:"Mole Concept",q:"How many molecules are there in 9 g of water? (Molar mass = 18 g/mol, Nₐ = 6.022 × 10²³)",
+   options:["6.022 × 10²³","3.011 × 10²³","1.204 × 10²⁴","5.420 × 10²⁴"],answer:1,
+   explain:"Moles = 9 ÷ 18 = 0.5 mol. Molecules = 0.5 × 6.022 × 10²³ = 3.011 × 10²³.",
+   mistakes:{0:"That is one full mole. 9 g of water is only half a mole.",
+             2:"You multiplied by 2 instead of dividing. 9 g is less than 18 g, so it is less than a mole.",
+             3:"You multiplied the mass (9) by Nₐ. First change grams into moles."}},
+  {id:"A12",level:"hard",time:60,topic:"Mole Concept",q:"What is the mass of 0.5 mol of nitrogen gas, N₂? (N = 14 u)",
+   options:["7 g","14 g","28 g","56 g"],answer:1,
+   explain:"Molar mass of N₂ = 2 × 14 = 28 g/mol. Mass = 0.5 × 28 = 14 g.",
+   mistakes:{0:"You used 14 for N₂. Nitrogen gas is N₂, so its molar mass is 28 g/mol.",
+             2:"28 g is one full mole. You need half a mole.",
+             3:"You multiplied by 2 instead of 0.5."}},
+  {id:"A13",level:"hard",time:60,topic:"Mole Concept",q:"How many oxygen atoms are there in 0.5 mol of oxygen gas, O₂? (Nₐ = 6.022 × 10²³)",
+   options:["3.011 × 10²³","6.022 × 10²³","1.204 × 10²⁴","1.506 × 10²³"],answer:1,
+   explain:"0.5 mol O₂ = 0.5 × 6.022 × 10²³ = 3.011 × 10²³ molecules. Each molecule has 2 atoms, so atoms = 6.022 × 10²³.",
+   mistakes:{0:"That is the number of molecules. Each O₂ molecule has 2 atoms, so double it.",
+             2:"You forgot the 0.5. That would be 1 mol of O₂.",
+             3:"You halved instead of doubling for the 2 atoms."}},
+  {id:"A14",level:"hard",time:60,topic:"Laws of Chemical Combination",q:"In water, what is the ratio by mass of hydrogen to oxygen? (H = 1 u, O = 16 u)",
+   options:["1 : 8","2 : 1","1 : 16","8 : 1"],answer:0,
+   explain:"Water has 2 H (2 × 1 = 2) and 1 O (16). The ratio 2 : 16 simplifies to 1 : 8.",
+   mistakes:{1:"2 : 1 is the ratio of atoms, not of mass.",
+             2:"You used only one hydrogen atom. Water has two.",
+             3:"The ratio is the right numbers but reversed. The question asks hydrogen first."}},
+  {id:"A15",level:"hard",time:60,topic:"Laws of Chemical Combination",q:"3 g of carbon burns in 8 g of oxygen to give 11 g of carbon dioxide. What mass of carbon dioxide forms when 3 g of carbon burns in 50 g of oxygen?",
+   options:["11 g","53 g","50 g","58 g"],answer:0,
+   explain:"Carbon and oxygen always combine in a fixed ratio (3 : 8). 3 g of carbon uses only 8 g of oxygen, so 11 g of CO₂ forms and the extra 42 g of oxygen is left over.",
+   mistakes:{1:"You added all the oxygen. Only 8 g can react with 3 g of carbon.",
+             2:"50 g is just the oxygen given. Most of it does not react.",
+             3:"You added 3 + 50 + a bit extra. Use the fixed 3 : 8 ratio."}}
+  ]}]
+};
+
+/* =====================================================================
+   2. STORAGE  (swap this block for Firebase later; nothing else changes)
+   ===================================================================== */
+const Store = (() => {
+  const KEY = "acepoint_v1"; let mem = null;
+  function load(){ if (mem) return mem;
+    try { mem = JSON.parse(localStorage.getItem(KEY)) || null; } catch(e) {}
+    mem = mem || {users:{}, session:null, teacherPass:null}; return mem; }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch(e) {} }
+  return {
+    getUser: email => load().users[email] || null,
+    allUsers: () => Object.values(load().users),
+    saveUser: u => { load().users[u.email] = u; save(); },
+    session: () => load().session,
+    setSession: email => { load().session = email; save(); },
+    teacherPass: () => load().teacherPass,
+    setTeacherPass: p => { load().teacherPass = p; save(); }
+  };
+})();
+
+/* =====================================================================
+   3. HELPERS
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LEVELS = ["easy","medium","hard"], LN = {easy:"Easy",medium:"Medium",hard:"Hard"};
+const me = () => { const e = Store.session(); return e ? Store.getUser(e) : null; };
+function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove("show"), 2500); }
+function chapterOf(cid, chid){ return (CHAPTERS[cid]||[]).find(c => c.id === chid); }
+function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid); }
+function topicStats(attempts){
+  const t = {}; attempts.forEach(a => a.answers.forEach(x => { t[x.topic] = t[x.topic] || {r:0,n:0}; t[x.topic].n++; if (x.ok) t[x.topic].r++; })); return t;
+}
+function strengthTag(st){
+  if (!st || st.n < 10) return `<span class="tag na">${st ? 10 - st.n : 10} more to unlock</span>`;
+  const p = st.r/st.n; return p >= .75 ? '<span class="tag ok">Strong</span>' : p >= .5 ? '<span class="tag mid">Okay</span>' : '<span class="tag weak">Needs work</span>';
+}
+function quickTag(r,n){ const p = n ? r/n : 0; return p >= .75 ? '<span class="tag ok">Strong</span>' : p >= .5 ? '<span class="tag mid">Okay</span>' : '<span class="tag weak">Needs work</span>'; }
+function fmtDate(ts){ const d = new Date(ts); return d.toLocaleDateString(undefined,{day:"numeric",month:"short"}) + ", " + d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}); }
+
+/* =====================================================================
+   4. ROUTER / VIEWS
+   ===================================================================== */
+let VIEW = {name:"welcome"};
+function go(name, params={}){
+  if (Q && Q.active && name !== "report") return;
+  VIEW = {name, ...params}; render(); window.scrollTo(0,0);
+}
+function header(){
+  const u = me(); const h = $("hdrRight");
+  if (u && VIEW.name !== "quiz") h.innerHTML = `<span>Hi, ${esc(u.name.split(" ")[0])}</span><button id="logoutBtn">Log out</button>`;
+  else h.innerHTML = "";
+  const lb = $("logoutBtn"); if (lb) lb.onclick = () => { Store.setSession(null); go("welcome"); };
+  $("foot").style.display = VIEW.name === "quiz" ? "none" : "";
+}
+function render(){
+  header(); const app = $("app");
+  const V = Views[VIEW.name] || Views.welcome; app.innerHTML = V(); if (V.after) V.after();
+}
+$("logo").onclick = () => { if (Q && Q.active) return; go(me() ? "home" : "welcome"); };
+$("teacherLink").onclick = () => go("teacherLock");
+
+const Views = {};
+
+/* ---------- Welcome ---------- */
+Views.welcome = () => `
+  <div class="hero">
+    <h1>Adaptive Chemistry Practice for Every Exam</h1>
+    <div class="byline">By Gunjan · IIT Madras alumna</div>
+    <p>Quizzes that get harder as you get better, with clear explanations for every answer.</p>
+    <button class="btn gold block" id="getStarted">Create your account</button>
+    <p class="small" style="margin-top:12px">Already have an account? <button class="link" style="color:#fff;text-decoration:underline" id="toLogin">Log in</button></p>
+  </div>
+  <div class="checks">
+    <div>Questions get harder as you improve</div>
+    <div>Every answer explained, every mistake shown</div>
+    <div>Strong and weak topics tracked for you</div>
+    <div>NEET, JEE, AP, A Level, O Level, IGCSE and more</div>
+  </div>`;
+Views.welcome.after = () => { $("getStarted").onclick = () => go("signup"); $("toLogin").onclick = () => go("login"); };
+
+/* ---------- Sign up ---------- */
+Views.signup = () => `
+  <button class="back" id="bk">← Back</button>
+  <div class="card">
+    <div class="steps"><span class="on"></span><span></span><span></span><span></span></div>
+    <h1>Create your account</h1>
+    <p class="muted">Step 1 of 4 · Your details</p>
+    <label for="su_name">Full name</label><input id="su_name" autocomplete="name">
+    <label for="su_email">Gmail address</label><input id="su_email" type="email" placeholder="yourname@gmail.com" autocomplete="email">
+    <label for="su_phone">Mobile number</label>
+    <div style="display:flex;gap:8px"><select id="su_cc" style="width:110px"><option>+91</option><option>+1</option><option>+44</option><option>+971</option><option>+65</option><option>+61</option></select>
+    <input id="su_phone" type="tel" inputmode="numeric" placeholder="10-digit number" autocomplete="tel-national"></div>
+    <label for="su_class">Class or year</label>
+    <select id="su_class"><option value="">Choose…</option><option>Class 8</option><option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option><option>Dropper</option><option>AS / A Level</option><option>O Level / IGCSE / GCSE</option><option>AP / IB</option><option>University</option><option>Other</option></select>
+    <div class="err" id="su_err"></div>
+    <button class="btn block" id="su_go">Send verification code</button>
+  </div>`;
+Views.signup.after = () => {
+  $("bk").onclick = () => go("welcome");
+  $("su_go").onclick = () => {
+    const name = $("su_name").value.trim(), email = $("su_email").value.trim().toLowerCase(),
+          phone = $("su_phone").value.replace(/\D/g,""), cc = $("su_cc").value, cls = $("su_class").value;
+    let e = "";
+    if (name.length < 2) e = "Please enter your name.";
+    else if (!/^[^\s@]+@gmail\.com$/.test(email)) e = "Please enter a valid Gmail address (ending in @gmail.com).";
+    else if (cc === "+91" ? !/^[6-9]\d{9}$/.test(phone) : phone.length < 7) e = "Please enter a valid mobile number.";
+    else if (!cls) e = "Please choose your class or year.";
+    else if (Store.getUser(email)) e = "An account with this Gmail already exists. Please log in instead.";
+    $("su_err").textContent = e; if (e) return;
+    go("otp", {pending:{name, email, phone: cc + " " + phone, cls}});
+  };
+};
+
+/* ---------- OTP (testing mode) ---------- */
+Views.otp = () => `
+  <button class="back" id="bk">← Back</button>
+  <div class="card">
+    <div class="steps"><span class="on"></span><span class="on"></span><span></span><span></span></div>
+    <h1>Verify your number</h1>
+    <p class="muted">Step 2 of 4 · We sent a 6-digit code to <b>${esc(VIEW.pending.phone)}</b></p>
+    <div class="note">Testing version: no SMS is sent yet. Use code <b>123456</b>.</div>
+    <input id="otp" class="otp" inputmode="numeric" maxlength="6" placeholder="••••••">
+    <div class="err" id="otp_err"></div>
+    <button class="btn block" id="otp_go">Verify</button>
+  </div>`;
+Views.otp.after = () => {
+  $("bk").onclick = () => go("signup");
+  $("otp_go").onclick = () => {
+    if ($("otp").value.trim() !== "123456"){ $("otp_err").textContent = "That code is not right. Please try again."; return; }
+    const p = VIEW.pending;
+    Store.saveUser({...p, created:Date.now(), courses:[], attempts:[]}); Store.setSession(p.email);
+    go("catalogue", {onboarding:true});
+  };
+};
+
+/* ---------- Login ---------- */
+Views.login = () => `
+  <button class="back" id="bk">← Back</button>
+  <div class="card">
+    <h1>Log in</h1>
+    <label for="li_email">Gmail address</label><input id="li_email" type="email" placeholder="yourname@gmail.com">
+    <div class="err" id="li_err"></div>
+    <button class="btn block" id="li_go">Send code to my phone</button>
+    <p class="small muted" style="margin-top:12px">New here? <button class="link" id="toSignup">Create an account</button></p>
+  </div>`;
+Views.login.after = () => {
+  $("bk").onclick = () => go("welcome"); $("toSignup").onclick = () => go("signup");
+  $("li_go").onclick = () => {
+    const email = $("li_email").value.trim().toLowerCase(); const u = Store.getUser(email);
+    if (!u){ $("li_err").textContent = "No account found with this Gmail. Please create one."; return; }
+    go("loginOtp", {email, phone:u.phone});
+  };
+};
+Views.loginOtp = () => `
+  <button class="back" id="bk">← Back</button>
+  <div class="card">
+    <h1>Enter your code</h1>
+    <p class="muted">We sent a 6-digit code to <b>${esc(VIEW.phone)}</b></p>
+    <div class="note">Testing version: no SMS is sent yet. Use code <b>123456</b>.</div>
+    <input id="otp" class="otp" inputmode="numeric" maxlength="6" placeholder="••••••">
+    <div class="err" id="otp_err"></div>
+    <button class="btn block" id="otp_go">Log in</button>
+  </div>`;
+Views.loginOtp.after = () => {
+  $("bk").onclick = () => go("login");
+  $("otp_go").onclick = () => {
+    if ($("otp").value.trim() !== "123456"){ $("otp_err").textContent = "That code is not right. Please try again."; return; }
+    Store.setSession(VIEW.email); const u = me(); go(u.courses.length ? "home" : "catalogue", {onboarding:!u.courses.length});
+  };
+};
+
+/* ---------- Course catalogue ---------- */
+Views.catalogue = () => {
+  const u = me(); if (!u) return Views.welcome();
+  return `
+  ${VIEW.onboarding ? "" : '<button class="back" id="bk">← My courses</button>'}
+  <div class="card">
+    ${VIEW.onboarding ? '<div class="steps"><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>' : ""}
+    <h1>Choose your exam</h1>
+    <p class="muted">${VIEW.onboarding ? "Step 3 of 4 · " : ""}Pick the course you want to practise. You can add more courses later.</p>
+  </div>
+  ${CATALOGUE.map(g => `
+    <h2>${esc(g.group)}</h2>
+    <div class="grid two">${g.courses.map(c => {
+      const owned = u.courses.includes(c.id), live = c.status === "live";
+      return `<button class="tile" data-c="${c.id}" ${!live && !owned ? "disabled" : ""}>
+        <div class="t">${esc(c.name)} ${owned ? '<span class="badge own">Enrolled</span>' : live ? '<span class="badge live">Available</span>' : '<span class="badge soon">Coming soon</span>'}</div>
+        <div class="d">${esc(c.desc)}</div></button>`; }).join("")}</div>`).join("")}`;
+};
+Views.catalogue.after = () => {
+  const b = $("bk"); if (b) b.onclick = () => go("home");
+  document.querySelectorAll(".tile[data-c]").forEach(t => t.onclick = () => {
+    const id = t.dataset.c; if (me().courses.includes(id)) go("course",{cid:id,tab:"practice"}); else go("pay",{cid:id, onboarding:VIEW.onboarding});
+  });
+};
+
+/* ---------- Payment (placeholder) ---------- */
+Views.pay = () => { const c = COURSE[VIEW.cid]; return `
+  <button class="back" id="bk">← Back to courses</button>
+  <div class="card">
+    ${VIEW.onboarding ? '<div class="steps"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>' : ""}
+    <h1>${esc(c.name)}</h1>
+    <p class="muted">${VIEW.onboarding ? "Step 4 of 4 · " : ""}${esc(c.desc)}</p>
+    <h2>What you get</h2>
+    <ul class="small" style="padding-left:20px;margin:6px 0">
+      <li>Adaptive topic quizzes: Easy, Medium and Hard</li>
+      <li>Explanations and "where you went wrong" for every question</li>
+      <li>Strengths and weaknesses by topic</li>
+      <li>Your full quiz history</li>
+      <li>Mock tests, past papers and revision notes (coming soon)</li>
+    </ul>
+    <h2>Price</h2>
+    <div class="price">Free <s>${PRICE.default.later}</s></div>
+    <div class="note">Testing version: this course is free while ACE POINT is being tested. Online payment (UPI and cards) will be added here.</div>
+    <button class="btn block" id="payGo">Start learning</button>
+  </div>`; };
+Views.pay.after = () => {
+  $("bk").onclick = () => go("catalogue",{onboarding:VIEW.onboarding});
+  $("payGo").onclick = () => { const u = me(); if (!u.courses.includes(VIEW.cid)) u.courses.push(VIEW.cid); Store.saveUser(u);
+    toast("You're enrolled! 🎉"); go("course",{cid:VIEW.cid, tab:"practice"}); };
+};
+
+/* ---------- Home: my courses ---------- */
+Views.home = () => { const u = me(); if (!u) return Views.welcome();
+  const all = u.attempts||[], right = all.reduce((s,a)=>s+a.right,0), tot = all.reduce((s,a)=>s+a.total,0);
+  return `
+  <div class="card">
+    <h1>Welcome back, ${esc(u.name.split(" ")[0])} 👋</h1>
+    <div class="stat"><div><b>${all.length}</b><span>Quizzes</span></div><div><b>${tot}</b><span>Questions</span></div><div><b>${tot?Math.round(right/tot*100):0}%</b><span>Accuracy</span></div></div>
+  </div>
+  <h2>My courses</h2>
+  <div class="grid">${u.courses.map(cid => { const c = COURSE[cid]; const at = attemptsFor(u,cid);
+     return `<button class="tile" data-c="${cid}"><div class="t">${esc(c.name)}</div><div class="d">${(CHAPTERS[cid]||[]).length} chapter(s) · ${at.length} quiz(zes) taken</div></button>`; }).join("") || '<p class="muted">No courses yet.</p>'}</div>
+  <button class="btn ghost block" id="addCourse">+ Add another course</button>`; };
+Views.home.after = () => {
+  document.querySelectorAll(".tile[data-c]").forEach(t => t.onclick = () => go("course",{cid:t.dataset.c, tab:"practice"}));
+  $("addCourse").onclick = () => go("catalogue");
+};
+
+/* ---------- Course home ---------- */
+Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c = COURSE[VIEW.cid]; const chs = CHAPTERS[VIEW.cid]||[];
+  const at = attemptsFor(u, VIEW.cid); const tab = VIEW.tab || "practice";
+  let body = "";
+  if (tab === "practice"){
+    body = chs.length ? chs.map(ch => { const done = new Set(); at.filter(a=>a.chapter===ch.id).forEach(a=>a.answers.forEach(x=>done.add(x.id)));
+      const pct = Math.round(done.size/ch.qs.length*100);
+      return `<button class="tile" data-ch="${ch.id}"><div class="t">${esc(ch.name)}</div>
+        <div class="d">${ch.topics.length} topics · ${ch.qs.length} questions · ${pct}% seen</div>
+        <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
+      : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
+    body = `<div class="grid">${body}</div>`;
+  } else if (tab === "strengths"){
+    const ts = topicStats(at); const topics = [...new Set(chs.flatMap(ch => ch.topics))];
+    body = `<div class="card"><p class="muted">Answer at least 10 questions in a topic to get your strength score.</p>
+      <table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th>Strength</th></tr>
+      ${topics.map(t => { const s = ts[t]; return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${strengthTag(s)}</td></tr>`; }).join("")}</table></div>`;
+  } else if (tab === "history"){
+    body = at.length ? `<div class="card"><table><tr><th>When</th><th>Chapter</th><th>Score</th><th>Level</th></tr>
+      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(chapterOf(a.course,a.chapter)?.name||"")}</td><td>${a.right}/${a.total}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}</td><td>${LN[a.maxLevel]}</td></tr>`).join("")}</table></div>`
+      : '<p class="muted">No quizzes yet. Start one from Practice.</p>';
+  } else {
+    body = `<div class="grid two">
+      ${[["🎯","Target tests","Timed tests on the topics you choose."],["📝","Mock exams","Full-length exam-style papers."],["📄","Past papers","Real past papers with solutions."],["📘","Revision notes","ACE POINT notes for every chapter."]]
+        .map(x => `<div class="tile" style="cursor:default"><div class="t">${x[0]} ${x[1]} <span class="badge soon">Coming soon</span></div><div class="d">${x[2]}</div></div>`).join("")}</div>`;
+  }
+  return `
+  <button class="back" id="bk">← My courses</button>
+  <div class="card"><h1>${esc(c.name)}</h1><p class="muted">${esc(c.desc)}</p></div>
+  <div class="tabs">${[["practice","Practice"],["strengths","Strengths & weaknesses"],["history","History"],["more","More"]].map(t => `<button data-t="${t[0]}" class="${tab===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>
+  ${body}`; };
+Views.course.after = () => {
+  $("bk").onclick = () => go("home");
+  document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => go("course",{cid:VIEW.cid, tab:b.dataset.t}));
+  document.querySelectorAll(".tile[data-ch]").forEach(t => t.onclick = () => go("chapter",{cid:VIEW.cid, chid:t.dataset.ch}));
+};
+
+/* ---------- Chapter: choose topic and start ---------- */
+Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid).filter(a=>a.chapter===ch.id));
+  return `
+  <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
+  <div class="card">
+    <h1>${esc(ch.name)}</h1>
+    <p class="muted">${ch.qs.length} questions across ${ch.topics.length} topics</p>
+    <label for="topicSel">Practise</label>
+    <select id="topicSel"><option value="">Whole chapter (all topics)</option>${ch.topics.map(t => `<option>${esc(t)}</option>`).join("")}</select>
+    <h2>How it works</h2>
+    <ul class="small" style="padding-left:20px;margin:6px 0">
+      <li>Up to 10 questions. You start on Easy.</li>
+      <li><b>3 right in a row</b> moves you up a level. <b>2 wrong in a row</b> moves you down.</li>
+      <li>45 seconds per question, <b>1 minute</b> for calculations.</li>
+      <li>The quiz goes fullscreen. Leaving it, switching tabs or apps, or split screen gives a warning. <b>3 warnings</b> submits the quiz.</li>
+    </ul>
+    <button class="btn block" id="startQuiz">Start quiz</button>
+  </div>
+  <div class="card"><h3>Your topics in this chapter</h3>
+    <table><tr><th>Topic</th><th>Answered</th><th>Strength</th></tr>
+    ${ch.topics.map(t => `<tr><td>${esc(t)}</td><td>${ts[t]?ts[t].n:0}</td><td>${strengthTag(ts[t])}</td></tr>`).join("")}</table></div>`; };
+Views.chapter.after = () => {
+  $("bk").onclick = () => go("course",{cid:VIEW.cid, tab:"practice"});
+  $("startQuiz").onclick = () => startQuiz(VIEW.cid, VIEW.chid, $("topicSel").value);
+};
+
+/* =====================================================================
+   5. QUIZ ENGINE
+   ===================================================================== */
+const SECONDS = 45, MAX_WARN = 3, UP_AFTER = 3, DOWN_AFTER = 2, MAX_Q = 10;
+const CHEERS = [["🎯","Bullseye!","Spot on."],["🚀","Nailed it!","Keep going."],["🧪","Chemistry champ!","That's correct."],["😎","Too easy for you!","Correct answer."],
+  ["⚗️","Perfect reaction!","Right answer."],["⭐","Superstar!","Correct."],["🙌","Yes!","Well done."],["🧠","Big brain!","Correct."]];
+const LEVELUP = ["🏆","Level up!","Questions get harder now."];
+const OOPS = [["🤏","Almost!","Read the explanation below."],["💪","No worries!","Check what went wrong below."],["🧐","Not quite!","Let's see why."]];
+let Q = null;
+
+async function startQuiz(cid, chid, topic){
+  const ch = chapterOf(cid, chid); const pool = ch.qs.filter(q => !topic || q.topic === topic);
+  Q = {cid, chid, topic, pool, total:Math.min(MAX_Q, pool.length), level:0, maxLevel:0, rs:0, ws:0, asked:[], used:new Set(),
+       warnings:0, incidents:[], cur:null, timerId:null, left:0, limit:0, answered:false, active:true,
+       ts:Date.now(), lastInc:0, grace:Date.now()+2000, baseW:window.innerWidth};
+  try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {}
+  Q.baseW = window.innerWidth; Q.grace = Date.now() + 1500;
+  VIEW = {name:"quiz"}; header(); $("app").innerHTML = quizShell(); $("app").classList.add("quizmode");
+  $("nextBtn").onclick = nextQ; $("quitBtn").onclick = () => $("confirm").classList.add("show");
+  nextQ();
+}
+function quizShell(){ const ch = chapterOf(Q.cid,Q.chid); return `
+  <div class="card">
+    <div class="muted small" style="margin-bottom:8px">${esc(ch.name)}${Q.topic?" · "+esc(Q.topic):""}</div>
+    <div class="bar"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy">Easy</span><span id="streak" class="pill">Streak: 0</span><span id="warnPill" class="pill warn" style="display:none"></span></div>
+    <div id="timer" class="timer"><div></div></div><div id="timeLeft" class="muted small" style="margin-bottom:8px"></div>
+    <div id="topic" class="muted small"></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="feedback"></div>
+    <div class="row" style="justify-content:space-between"><button class="link" id="quitBtn">End quiz</button><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
+  </div>`; }
+function pickQ(){
+  const order = [Q.level, Q.level+1, Q.level-1, Q.level+2, Q.level-2].filter(l => l>=0 && l<3);
+  for (const l of order){ const p = Q.pool.filter(q => q.level === LEVELS[l] && !Q.used.has(q.id)); if (p.length) return p[Math.floor(Math.random()*p.length)]; }
+  return null;
+}
+function nextQ(){
+  if (Q.asked.length >= Q.total) return finishQuiz(false);
+  const q = pickQ(); if (!q) return finishQuiz(false);
+  Q.used.add(q.id); Q.cur = q; Q.answered = false;
+  $("qnum").textContent = `Question ${Q.asked.length+1} of ${Q.total}`;
+  $("lvl").textContent = LN[q.level]; $("lvl").className = "pill " + q.level;
+  $("streak").textContent = `Streak: ${Q.rs}`;
+  $("topic").textContent = "Topic: " + q.topic + (q.time ? " · Calculation: 1 minute" : "");
+  $("qtext").textContent = q.q; $("feedback").innerHTML = ""; $("nextBtn").style.display = "none";
+  const box = $("opts"); box.innerHTML = "";
+  q.options.forEach((o,i) => { const b = document.createElement("button"); b.className = "opt"; b.innerHTML = `<b>${"ABCD"[i]}</b>`; b.appendChild(document.createTextNode(o)); b.onclick = () => answerQ(i); box.appendChild(b); });
+  clearInterval(Q.timerId); Q.limit = q.time || SECONDS; Q.left = Q.limit; drawTimer();
+  Q.timerId = setInterval(() => { Q.left--; drawTimer(); if (Q.left <= 0){ clearInterval(Q.timerId); answerQ(-1); } }, 1000);
+  window.scrollTo(0,0);
+}
+function drawTimer(){ $("timer").firstElementChild.style.width = (Math.max(Q.left,0)/Q.limit*100) + "%"; $("timer").classList.toggle("low", Q.left <= 10); $("timeLeft").textContent = `${Math.max(Q.left,0)} s left`; }
+function answerQ(i){
+  if (Q.answered || !Q.active) return; Q.answered = true; clearInterval(Q.timerId);
+  const q = Q.cur, ok = i === q.answer;
+  document.querySelectorAll(".opt").forEach((b,k) => { b.disabled = true; if (k===q.answer) b.classList.add("correct"); if (k===i && !ok) b.classList.add("wrong"); });
+  Q.asked.push({id:q.id, topic:q.topic, level:q.level, chosen:i, ok, secs:Q.limit - Q.left});
+  let msg = "", up = false;
+  if (ok){ Q.rs++; Q.ws = 0; } else { Q.ws++; Q.rs = 0; }
+  if (Q.rs >= UP_AFTER && Q.level < 2){ Q.level++; Q.rs = 0; up = true; msg = `Level up! Next questions are ${LN[LEVELS[Q.level]]}.`; }
+  if (Q.ws >= DOWN_AFTER && Q.level > 0){ Q.level--; Q.ws = 0; msg = `Let's step back to ${LN[LEVELS[Q.level]]} questions to build up again.`; }
+  Q.maxLevel = Math.max(Q.maxLevel, Q.level); $("streak").textContent = `Streak: ${Q.rs}`;
+  $("feedback").innerHTML = ok
+    ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${esc(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
+    : `<div class="feedback bad"><h3>${i===-1?"⏰ Time's up!":"❌ Not quite."}</h3><p><b>Correct answer: ${"ABCD"[q.answer]}) ${esc(q.options[q.answer])}</b></p><p>${esc(q.explain)}</p>
+       <div class="mist"><b>Where it went wrong:</b> ${i===-1?"You ran out of time on this one.":esc(q.mistakes[i]||"")}</div>${msg?`<p><b>${msg}</b></p>`:""}</div>`;
+  $("nextBtn").textContent = Q.asked.length >= Q.total ? "See my report" : "Next question"; $("nextBtn").style.display = "";
+  if (ok) celebrate(up ? LEVELUP : CHEERS[Math.floor(Math.random()*CHEERS.length)], up);
+  else if (i !== -1) celebrate(OOPS[Math.floor(Math.random()*OOPS.length)], false);
+}
+function celebrate(c, confetti){
+  const el = $("cheer"); el.querySelector(".emo").textContent = c[0]; el.querySelector(".msg").textContent = c[1]; el.querySelector(".sm").textContent = c[2];
+  el.classList.add("show"); if (confetti) burst();
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), confetti ? 5000 : 4000);
+}
+function burst(){ const col = ["#ffcc33","#1f5fbf","#16834a","#c0392b","#8e44ad","#f39c12"];
+  for (let k=0;k<60;k++){ const d = document.createElement("div"); d.className = "confetti"; d.style.left = Math.random()*100+"vw"; d.style.background = col[k%col.length];
+    d.style.animationDelay = (Math.random()*1.5)+"s"; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); } }
+$("cheer").onclick = () => $("cheer").classList.remove("show");
+
+/* ---------- Anti-cheat ---------- */
+function incident(reason){
+  if (!Q || !Q.active) return; const now = Date.now();
+  if (now < Q.grace || now - Q.lastInc < 2500 || $("confirm").classList.contains("show")) return;
+  Q.lastInc = now; Q.warnings++;
+  Q.incidents.push({time:new Date().toLocaleTimeString(), reason, q:Q.asked.length + (Q.answered?0:1)});
+  $("warnPill").style.display = ""; $("warnPill").textContent = `Warnings: ${Q.warnings}/${MAX_WARN}`;
+  if (Q.warnings >= MAX_WARN){ $("warn").classList.remove("show"); return finishQuiz(true); }
+  $("warnCount").textContent = Q.warnings; $("warnText").textContent = reason + "."; $("warn").classList.add("show");
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) incident("You switched to another tab or app"); });
+window.addEventListener("blur", () => incident("You clicked outside the quiz window"));
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && Q && Q.active && Date.now() > Q.grace) incident("You left fullscreen"); });
+window.addEventListener("resize", () => { if (!Q || !Q.active) return; if (window.innerWidth < Q.baseW * 0.6) incident("The window was shrunk or split screen was used"); Q.baseW = Math.max(Q.baseW, window.innerWidth); });
+document.addEventListener("copy", e => { if (Q && Q.active) e.preventDefault(); });
+document.addEventListener("contextmenu", e => { if (Q && Q.active) e.preventDefault(); });
+$("warnBtn").onclick = async () => { $("warn").classList.remove("show"); Q.grace = Date.now() + 1500;
+  try { if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {} };
+$("confNo").onclick = () => { $("confirm").classList.remove("show"); if (Q) Q.grace = Date.now() + 1000; };
+$("confYes").onclick = () => { $("confirm").classList.remove("show"); finishQuiz(false, true); };
+
+/* ---------- Finish + save ---------- */
+function finishQuiz(auto, quit){
+  Q.active = false; clearInterval(Q.timerId); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode");
+  try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
+  const right = Q.asked.filter(a => a.ok).length;
+  const att = {id:"q"+Date.now(), course:Q.cid, chapter:Q.chid, topic:Q.topic||null, ts:Q.ts, right, total:Q.asked.length,
+               maxLevel:LEVELS[Q.maxLevel], auto, quit:!!quit, answers:Q.asked, incidents:Q.incidents};
+  const u = me(); if (u){ u.attempts = u.attempts || []; if (att.total) u.attempts.push(att); Store.saveUser(u); }
+  VIEW = {name:"report", att}; render(); window.scrollTo(0,0);
+}
+function reportHTML(att, forTeacher){
+  const ch = chapterOf(att.course, att.chapter); const byId = id => ch.qs.find(q => q.id === id);
+  const pct = att.total ? Math.round(att.right/att.total*100) : 0;
+  const t = {}; att.answers.forEach(a => { t[a.topic] = t[a.topic]||{r:0,n:0}; t[a.topic].n++; if (a.ok) t[a.topic].r++; });
+  const wrong = att.answers.filter(a => !a.ok).map(a => { const q = byId(a.id); return `
+    <div class="review"><div class="q">${esc(q.q)}</div>
+    <div>${forTeacher?"Answer given":"Your answer"}: ${a.chosen===-1?"<i>No answer (time ran out)</i>":"ABCD"[a.chosen]+") "+esc(q.options[a.chosen])}</div>
+    <div><b>Correct: ${"ABCD"[q.answer]}) ${esc(q.options[q.answer])}</b></div>
+    ${a.chosen!==-1?`<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[a.chosen])}</div>`:""}
+    <div class="muted small" style="margin-top:4px">${esc(q.explain)}</div></div>`; }).join("");
+  return `
+    <div class="big">${att.right} / ${att.total}</div>
+    <p class="muted">${pct}% correct · Highest level: <b>${LN[att.maxLevel]}</b> · ${fmtDate(att.ts)}</p>
+    ${att.auto?`<p style="color:var(--red);font-weight:600">Submitted automatically after ${MAX_WARN} warnings.</p>`:""}
+    ${att.quit?`<p class="muted">Quiz ended early.</p>`:""}
+    <h2>By topic</h2><table><tr><th>Topic</th><th>Score</th><th></th></tr>${Object.entries(t).map(([k,v]) => `<tr><td>${esc(k)}</td><td>${v.r}/${v.n}</td><td>${quickTag(v.r,v.n)}</td></tr>`).join("")}</table>
+    <h2>By level</h2><table><tr><th>Level</th><th>Score</th></tr>${LEVELS.map(l => { const a = att.answers.filter(x=>x.level===l); return a.length?`<tr><td>${LN[l]}</td><td>${a.filter(x=>x.ok).length}/${a.length}</td></tr>`:""; }).join("")}</table>
+    <h2>Questions to review</h2>${wrong || '<p class="muted">Every question right! 🏆</p>'}
+    <h2>Focus log</h2>${att.incidents.length ? `<table><tr><th>Time</th><th>Q</th><th>What happened</th></tr>${att.incidents.map(x => `<tr><td>${x.time}</td><td>${x.q}</td><td>${esc(x.reason)}</td></tr>`).join("")}</table>` : '<p class="muted">No warnings. Great focus!</p>'}`;
+}
+Views.report = () => { const a = VIEW.att, u = me(); const pct = a.total ? a.right/a.total : 0;
+  return `<div class="card"><h1>${pct>=.8?"🏆":pct>=.5?"👍":"📚"} Well done, ${esc(u?u.name.split(" ")[0]:"")}!</h1>
+    <p class="muted small">Saved to your history.</p>${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
+    <div class="row" style="justify-content:flex-start"><button class="btn" id="again">Practise again</button><button class="btn ghost" id="share">Copy result for teacher</button><button class="btn ghost" id="toCourse">Back to course</button></div></div>`; };
+Views.report.after = () => { const a = VIEW.att;
+  $("again").onclick = () => go("chapter",{cid:a.course, chid:a.chapter});
+  $("toCourse").onclick = () => go("course",{cid:a.course, tab:"practice"});
+  $("share").onclick = async () => { const u = me(); const ch = chapterOf(a.course,a.chapter);
+    const txt = `ACE POINT result\n${u.name} (${u.email})\n${COURSE[a.course].name} · ${ch.name}\nScore: ${a.right}/${a.total} · Highest level: ${LN[a.maxLevel]}\nWarnings: ${a.incidents.length}${a.auto?" (auto-submitted)":""}\n${fmtDate(a.ts)}`;
+    try { await navigator.clipboard.writeText(txt); toast("Copied! Paste it on WhatsApp to your teacher."); } catch(e) { toast("Couldn't copy on this device."); } };
+};
+
+/* =====================================================================
+   6. TEACHER DASHBOARD
+   ===================================================================== */
+let TEACHER = false;
+Views.teacherLock = () => { const set = !Store.teacherPass(); return `
+  <button class="back" id="bk">← Back</button>
+  <div class="card"><h1>Teacher login</h1>
+    <p class="muted">${set ? "First time here: create a teacher passcode." : "Enter your teacher passcode."}</p>
+    <label for="tp">Passcode</label><input id="tp" type="password" autocomplete="off">
+    ${set ? '<label for="tp2">Confirm passcode</label><input id="tp2" type="password" autocomplete="off">' : ""}
+    <div class="err" id="tp_err"></div><button class="btn block" id="tp_go">${set ? "Set passcode" : "Open dashboard"}</button></div>`; };
+Views.teacherLock.after = () => {
+  $("bk").onclick = () => go(me() ? "home" : "welcome");
+  $("tp_go").onclick = () => { const p = $("tp").value;
+    if (!Store.teacherPass()){ if (p.length < 4) return $("tp_err").textContent = "Use at least 4 characters."; if (p !== $("tp2").value) return $("tp_err").textContent = "The passcodes don't match."; Store.setTeacherPass(p); }
+    else if (p !== Store.teacherPass()) return $("tp_err").textContent = "Wrong passcode.";
+    TEACHER = true; go("teacher"); };
+};
+Views.teacher = () => { if (!TEACHER) return Views.teacherLock();
+  const us = Store.allUsers(); const at = us.flatMap(u => (u.attempts||[]));
+  return `
+  <button class="back" id="bk">← Leave dashboard</button>
+  <div class="card"><h1>Teacher dashboard</h1>
+    <div class="stat"><div><b>${us.length}</b><span>Students</span></div><div><b>${at.length}</b><span>Quizzes</span></div><div><b>${at.reduce((s,a)=>s+a.incidents.length,0)}</b><span>Warnings</span></div></div>
+    <div class="note">Testing version: this shows students who used the app on this device. Once the online database is connected, every student will show here from any device.</div></div>
+  <h2>Students</h2>
+  <div class="grid">${us.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0);
+    return `<button class="tile" data-u="${esc(u.email)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
+      <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">${a.length} quiz(zes) · ${n?Math.round(r/n*100):0}% accuracy · ${u.courses.map(c=>esc(COURSE[c]?.name||c)).join(", ")||"No course"}</div></button>`; }).join("") || '<p class="muted">No students yet.</p>'}</div>
+  <h2>Question bank</h2>
+  <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
+  ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}</tr>`)).join("")}</table></div>`; };
+Views.teacher.after = () => { $("bk").onclick = () => { TEACHER = false; go(me() ? "home" : "welcome"); };
+  document.querySelectorAll(".tile[data-u]").forEach(t => t.onclick = () => go("tStudent",{email:t.dataset.u})); };
+Views.tStudent = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.email); const a = u.attempts||[];
+  const byCourse = u.courses.map(cid => { const ts = topicStats(a.filter(x=>x.course===cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>c.topics))];
+    return `<h2>${esc(COURSE[cid].name)}</h2><table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th></th></tr>${topics.map(t => { const s = ts[t];
+      return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${s?quickTag(s.r,s.n):'<span class="tag na">Not started</span>'}</td></tr>`; }).join("")}</table>`; }).join("");
+  return `<button class="back" id="bk">← Dashboard</button>
+  <div class="card"><h1>${esc(u.name)}</h1><p class="muted">${esc(u.cls||"")} · ${esc(u.email)} · ${esc(u.phone)}</p>${byCourse}</div>
+  <h2>Quizzes</h2>${a.length ? a.slice().reverse().map((x,i) => `<button class="tile" data-i="${a.length-1-i}" style="margin-bottom:8px">
+    <div class="t">${x.right}/${x.total} · ${esc(chapterOf(x.course,x.chapter)?.name||"")}${x.incidents.length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}</div>
+    <div class="d">${fmtDate(x.ts)} · Highest level ${LN[x.maxLevel]}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}`; };
+Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
+  document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{email:VIEW.email, i:+t.dataset.i})); };
+Views.tAttempt = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.email); const at = u.attempts[VIEW.i];
+  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s quiz</h1><p class="muted">${esc(chapterOf(at.course,at.chapter).name)}</p>${reportHTML(at,true)}</div>`; };
+Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{email:VIEW.email}); };
+
+/* ---------- Boot ---------- */
+go(me() ? "home" : "welcome");
+</script>
+</body>
+</html>
