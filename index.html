@@ -84,6 +84,10 @@ button{font:inherit;cursor:pointer;border:none;border-radius:10px}
 .feedback .mist{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.15)}
 .row{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
 .quizmode{-webkit-user-select:none;user-select:none}
+#wmark{position:fixed;inset:0;pointer-events:none;z-index:9000;display:none;background-repeat:repeat}
+body.qon #wmark{display:block}
+body.veiled #app{filter:blur(14px)}
+@media print{body.qon *{display:none!important}body.qon:after{content:"Printing is disabled during a quiz.";display:block;padding:40px;font:16px sans-serif}}
 table{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0}
 th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 th{font-size:12px;color:var(--muted);font-weight:600}
@@ -1519,7 +1523,7 @@ async function startQuiz(spec){
   try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {}
   Q.fsOK = !!document.fullscreenElement; clearInterval(WATCH); WATCH = setInterval(watchdog, 1000);
   Q.baseW = window.innerWidth; Q.grace = Date.now() + 1500;
-  VIEW = {name:"quiz"}; header(); $("app").classList.add("quizmode");
+  VIEW = {name:"quiz"}; header(); $("app").classList.add("quizmode"); wmOn();
   if (style === "test"){
     $("app").innerHTML = testShell(); bindTest(); Q.deadline = Date.now() + Q.secs*1000; Q.qStart = Date.now();
     drawTestQ(); tickTest(); Q.timerId = setInterval(tickTest, 1000);
@@ -1716,6 +1720,21 @@ function incident(reason){
   if (Q.warnings >= MAX_WARN){ $("warn").classList.remove("show"); return finishQuiz(true); }
   $("warnCount").textContent = Q.warnings; $("warnText").textContent = reason + "."; $("warn").classList.add("show");
 }
+/* ---------- Screenshot deterrents: faint name watermark, print block, hide when away ---------- */
+function wmOn(){ const u = me() || {}; const t = [u.name, u.email].filter(Boolean).join(" · ") || "ACE POINT";
+  let w = $("wmark"); if (!w){ w = document.createElement("div"); w.id = "wmark"; document.body.appendChild(w); }
+  const txt = String(t).replace(/[<>&"]/g, "");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><text x="10" y="110" transform="rotate(-25 160 90)" font-family="Montserrat,Arial,sans-serif" font-size="14" fill="rgba(0,66,122,0.09)">${txt}</text></svg>`;
+  w.style.backgroundImage = `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
+  document.body.classList.add("qon"); }
+function wmOff(){ document.body.classList.remove("qon", "veiled"); }
+function veil(on){ if (Q && Q.active) document.body.classList.toggle("veiled", on); else document.body.classList.remove("veiled"); }
+document.addEventListener("visibilitychange", () => veil(document.hidden));
+window.addEventListener("blur", () => veil(true));
+window.addEventListener("focus", () => veil(false));
+document.addEventListener("keydown", e => { if (!Q || !Q.active) return; const k = (e.key||"").toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && ["p","s","c","u"].includes(k)) { e.preventDefault(); } });
+document.addEventListener("keyup", e => { if (Q && Q.active && e.key === "PrintScreen"){ try { navigator.clipboard.writeText(""); } catch(_){} incident("A screenshot key was pressed"); } });
 document.addEventListener("visibilitychange", () => { if (document.hidden) incident("You switched to another tab or app"); });
 window.addEventListener("blur", () => incident("You clicked outside the quiz window"));
 document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && Q && Q.active && Date.now() > Q.grace) incident("You left fullscreen"); });
@@ -1752,7 +1771,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden && Q &
 function finishQuiz(auto, quit){
   if (!Q || !Q.active) return;
   clearTimeout(DRAFT_T);
-  Q.active = false; clearInterval(Q.timerId); clearInterval(WATCH); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); $("rep").classList.remove("show");
+  Q.active = false; clearInterval(Q.timerId); clearInterval(WATCH); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); wmOff(); $("rep").classList.remove("show");
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
   const att = makeAtt(auto, quit, false); delete att.open;
   const u = me(); if (u && att.total){ u.attempts.push(att); Store.saveAttempt(att).catch(e => { console.error(e); toast("Couldn't save this result online. Check your internet."); }); }
