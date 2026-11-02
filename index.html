@@ -151,6 +151,7 @@ label.chk input{width:20px;height:20px;flex:none}
 .flaglink{color:var(--red);margin-left:28px}
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
 .flagbtn{background:var(--redbg);color:var(--red);border:1.5px solid #f3c1bb;padding:6px 12px;font-size:14px;font-weight:700;border-radius:999px;flex:none}
+.model{margin-top:8px;background:var(--greenbg);border-radius:10px;padding:10px 12px;font-size:15px}.model>div{white-space:pre-line;margin-top:4px}
 </style>
 </head>
 <body>
@@ -190,8 +191,13 @@ const CATALOGUE = [
   {group:"Indian exams", courses:[
     {id:"neet",  name:"NEET Chemistry", desc:"Class 11 and 12, NCERT-based", status:"soon"},
     {id:"jee",   name:"JEE Chemistry", desc:"JEE Main and Advanced", status:"soon"},
-    {id:"cbse",  name:"CBSE Chemistry", desc:"Class 11 and 12 boards", status:"soon"},
-    {id:"found", name:"Class 9–10 Chemistry (Foundation)", desc:"NCERT Class 9–10, foundation for NEET and JEE", status:"live"}
+    {id:"found", name:"Class 9–10 Chemistry (Foundation)", desc:"NCERT Class 9–10, foundation for NEET and JEE", status:"live", ncert:true}
+  ]},
+  {group:"CBSE (NCERT)", courses:[
+    {id:"cbse9",  name:"CBSE Class 9 Chemistry",  desc:"NCERT, NCERT Exemplar and CBSE past questions", status:"live", ncert:true},
+    {id:"cbse10", name:"CBSE Class 10 Chemistry", desc:"NCERT, NCERT Exemplar and CBSE board PYQs", status:"live", ncert:true},
+    {id:"cbse11", name:"CBSE Class 11 Chemistry", desc:"NCERT, NCERT Exemplar and CBSE past questions", status:"live", ncert:true},
+    {id:"cbse12", name:"CBSE Class 12 Chemistry", desc:"NCERT, NCERT Exemplar and CBSE board PYQs", status:"live", ncert:true}
   ]},
   {group:"US", courses:[
     {id:"ap", name:"AP Chemistry", desc:"College Board", status:"soon"}
@@ -706,7 +712,44 @@ const CHAPTERS = {
    mistakes:{1:"You added all the oxygen. Only 8 g can react with 3 g of carbon.",
              2:"50 g is just the oxygen given. Most of it does not react.",
              3:"You added 3 + 50 + a bit extra. Use the fixed 3 : 8 ratio."}}
-  ]}]
+  ]}],
+  // CBSE courses. Each chapter has ACE POINT practice questions (qs) plus NCERT, NCERT Exemplar and CBSE PYQ questions.
+  // MCQ: {id, level, topic, q, options[4], answer, explain, mistakes}. Written answer: {id, type:"written", topic, q, answer:"model answer", marks, year (PYQ), group ("Exercise", "Intext"), explain}
+  "cbse9": [
+    {id:"c9-1", name:"Matter in Our Surroundings", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c9-2", name:"Is Matter Around Us Pure?", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c9-3", name:"Atoms and Molecules", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c9-4", name:"Structure of the Atom", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]}
+  ],
+  "cbse10": [
+    {id:"c10-1", name:"Chemical Reactions and Equations", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c10-2", name:"Acids, Bases and Salts", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c10-3", name:"Metals and Non-metals", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c10-4", name:"Carbon and its Compounds", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]}
+  ],
+  "cbse11": [
+    {id:"c11-1", name:"Some Basic Concepts of Chemistry", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-2", name:"Structure of Atom", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-3", name:"Classification of Elements and Periodicity in Properties", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-4", name:"Chemical Bonding and Molecular Structure", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-5", name:"Thermodynamics", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-6", name:"Equilibrium", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-7", name:"Redox Reactions", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-8", name:"Organic Chemistry: Some Basic Principles and Techniques", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c11-9", name:"Hydrocarbons", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]}
+  ],
+  "cbse12": [
+    {id:"c12-1", name:"Solutions", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-2", name:"Electrochemistry", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-3", name:"Chemical Kinetics", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-4", name:"The d- and f-Block Elements", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-5", name:"Coordination Compounds", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-6", name:"Haloalkanes and Haloarenes", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-7", name:"Alcohols, Phenols and Ethers", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-8", name:"Aldehydes, Ketones and Carboxylic Acids", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-9", name:"Amines", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]},
+    {id:"c12-10", name:"Biomolecules", topics:[], qs:[], ncert:[], exemplar:[], pyq:[]}
+  ]
 };
 
 /* =====================================================================
@@ -838,7 +881,14 @@ function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("
 function chapterOf(cid, chid){ return (CHAPTERS[cid]||[]).find(c => c.id === chid); }
 // Every question knows its chapter; QIDX finds any question in a course by its id
 const QIDX = {};
-Object.entries(CHAPTERS).forEach(([cid, chs]) => { QIDX[cid] = {}; chs.forEach(ch => ch.qs.forEach(q => { q.ch = ch.id; QIDX[cid][q.id] = q; })); });
+const SRC = [["ncert","NCERT"],["exemplar","NCERT Exemplar"],["pyq","CBSE PYQs"]], SRCNAME = Object.fromEntries(SRC);
+const allQs = ch => [...ch.qs, ...SRC.flatMap(([k]) => ch[k] || [])];
+Object.entries(CHAPTERS).forEach(([cid, chs]) => { QIDX[cid] = {}; chs.forEach(ch => {
+  ch.qs.forEach(q => { q.ch = ch.id; QIDX[cid][q.id] = q; });
+  SRC.forEach(([k]) => (ch[k] || []).forEach(q => { q.ch = ch.id; q.src = k; if (!q.level) q.level = "medium"; QIDX[cid][q.id] = q; })); }); });
+const isW = q => q && q.type === "written";
+const correctText = q => isW(q) ? q.answer : q.options[q.answer];
+function allTopics(ch){ const t = new Set(allQs(ch).map(q => q.topic)); return [...ch.topics.filter(x => t.has(x)), ...[...t].filter(x => !ch.topics.includes(x))]; }
 const qOf = (cid, id) => (QIDX[cid] || {})[id];
 const ansCh = (a, x) => x.ch || a.chapter;
 function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid && COURSE[cid]); }
@@ -997,10 +1047,11 @@ function reviewCard(a, i, o = {}){
   return `<div class="review">
     ${o.ctx ? `<div class="muted small" style="margin-bottom:4px">${o.who ? `<b>${esc(o.who)}</b> · ` : ""}${esc(COURSE[a.course]?.name||"")} · ${esc(chapterOf(a.course, ansCh(a,x))?.name||"")} · ${esc(x.topic)} · ${fmtDay(a.ts)}</div>` : ""}
     <div class="q">${esc(q.q)}</div>
+    ${isW(q) ? `<div>Self-check: <b>Didn't get it</b></div><div class="model"><b>Model answer</b><div>${esc(q.answer)}</div></div>` : `
     <div>${o.teacher ? "Answer given" : "Your answer"}: ${x.chosen === -1 ? `<i>${none}</i>` : esc(q.options[x.chosen])}</div>
-    <div><b>Correct: ${esc(q.options[q.answer])}</b></div>
-    ${x.chosen !== -1 && q.mistakes[x.chosen] ? `<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[x.chosen])}</div>` : ""}
-    <div class="muted small" style="margin-top:4px">${esc(q.explain)}</div>
+    <div><b>Correct: ${esc(q.options[q.answer])}</b></div>`}
+    ${!isW(q) && x.chosen >= 0 && q.mistakes && q.mistakes[x.chosen] ? `<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[x.chosen])}</div>` : ""}
+    ${q.explain ? `<div class="muted small" style="margin-top:4px">${esc(q.explain)}</div>` : ""}
     ${ana}
     ${o.teacher ? "" : `<div style="margin-top:6px"><button class="link small flaglink" style="margin-left:0" data-flag="${esc(a.course)}|${esc(x.id)}">🚩 Report this question</button></div>`}
   </div>`;
@@ -1231,10 +1282,11 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
   let body = "";
   if (tab === "practice"){
     body = chs.length ? chs.map(ch => { const done = new Set(); at.forEach(a => a.answers.forEach(x => { if (ansCh(a,x) === ch.id) done.add(x.id); }));
-      if (!ch.qs.length) return `<button class="tile" disabled><div class="t">${esc(ch.name)} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.join(" · ")}</div></button>`;
-      const pct = Math.min(100, Math.round(done.size/ch.qs.length*100));
+      const nq = allQs(ch).length;
+      if (!nq) return `<button class="tile" disabled><div class="t">${esc(ch.name)} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.join(" · ")}</div></button>`;
+      const pct = Math.min(100, Math.round(done.size/nq*100));
       return `<button class="tile" data-ch="${ch.id}"><div class="t">${esc(ch.name)}</div>
-        <div class="d">${liveTopics(ch).length} topics · ${ch.qs.length} questions · ${pct}% seen</div>
+        <div class="d">${nq} questions${SRC.some(([k]) => (ch[k]||[]).length) ? " · " + [["qs","Practice"], ...SRC].filter(([k]) => (ch[k]||[]).length).map(([k,l]) => `${l} ${ch[k].length}`).join(" · ") : ""} · ${pct}% seen</div>
         <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
       : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
     body = `<div class="grid">${body}</div>`;
@@ -1250,11 +1302,11 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
         ${chs.filter(ch => byCh[ch.id]).map(ch => { const rs = byCh[ch.id]; const byT = {}; rs.forEach(r => (byT[r.x.topic] = byT[r.x.topic] || []).push(r));
           return `<div class="card"><div class="bar" style="margin:0"><h3 style="margin:0">${esc(ch.name)} (${rs.length})</h3><button class="btn ghost" data-msch="${ch.id}" style="padding:8px 14px;font-size:14px">Practise these</button></div>
             ${Object.entries(byT).map(([t, list]) => `<h3 style="margin-top:12px;font-size:15px;color:var(--navy)">${esc(t)}</h3>${list.map(r => { const q = qOf(VIEW.cid, r.x.id);
-              return `<div class="review"><div class="q">${esc(q.q)}</div><div class="small">Your answer: ${r.x.chosen === -1 ? `<i>${r.a.style==="test"?"Not answered":"Time ran out"}</i>` : esc(q.options[r.x.chosen])}</div>
+              return `<div class="review"><div class="q">${esc(q.q)}</div><div class="small">${isW(q) ? "Self-check: Didn't get it" : "Your answer: " + (r.x.chosen === -1 ? `<i>${r.a.style==="test"?"Not answered":"Time ran out"}</i>` : esc(q.options[r.x.chosen]))}</div>
                 <div class="small muted">${fmtDay(r.a.ts)} · <span class="pill ${q.level}" style="font-size:11px;padding:2px 8px">${LN[q.level]}</span> · ${r.x.err && ET[r.x.err] ? ET[r.x.err].e + " " + ET[r.x.err].n : "Not analysed"}</div></div>`; }).join("")}`).join("")}</div>`; }).join("")}`;
     }
   } else if (tab === "strengths"){
-    const ts = topicStats(at); const topics = [...new Set(chs.flatMap(ch => liveTopics(ch)))];
+    const ts = topicStats(at); const topics = [...new Set(chs.flatMap(ch => allTopics(ch)))];
     body = `<div class="card"><p class="muted">Answer at least 10 questions in a topic to get your strength score.</p>
       <table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th>Strength</th></tr>
       ${topics.map(t => { const s = ts[t]; return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${strengthTag(s)}</td></tr>`; }).join("")}</table></div>`;
@@ -1333,13 +1385,29 @@ function cqBind(){
 /* ---------- Chapter: choose topic and mode ---------- */
 function testSize(ch){ return Math.min(TEST_N, ch.qs.length); }
 Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid), ch.id);
-  const topic = VIEW.topic || ""; const pool = ch.qs.filter(q => !topic || q.topic === topic);
-  const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch);
-  return `
-  <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
-  <div class="card">
-    <h1>${esc(ch.name)}</h1>
-    <p class="muted">${ch.qs.length} questions across ${liveTopics(ch).length} topics</p>
+  const hasSrc = !!COURSE[VIEW.cid].ncert; const src = hasSrc ? (VIEW.src || "practice") : "practice";
+  const tabs = hasSrc ? `<div class="tabs">${[["practice","Practice"], ...SRC].map(([k,l]) => `<button data-src="${k}" class="${src===k?"on":""}">${l}${k!=="practice" && (ch[k]||[]).length ? ` (${ch[k].length})` : ""}</button>`).join("")}</div>` : "";
+  let body;
+  if (src !== "practice"){
+    const list = ch[src] || [], mc = list.filter(q => !isW(q)).length, wr = list.length - mc;
+    const groups = {}; list.forEach(q => { const g = src === "pyq" ? (q.year ? "CBSE " + q.year : "Other years") : (q.group || "Questions"); groups[g] = (groups[g]||0) + 1; });
+    body = `<div class="card"><h2 style="margin-top:0">${SRCNAME[src]} questions</h2>
+      ${list.length ? `<p class="muted">${list.length} question${list.length>1?"s":""} · ${mc} MCQ · ${wr} written answer</p>
+        <table><tr><th>${src==="pyq"?"Year":"Section"}</th><th>Questions</th></tr>${Object.entries(groups).map(([g,n]) => `<tr><td>${esc(g)}</td><td>${n}</td></tr>`).join("")}</table>
+        <div class="grid" style="margin-top:12px">
+          <button class="tile" data-sk="all"><div class="t">📚 All ${SRCNAME[src]} questions</div><div class="d">${list.length} questions in order</div></button>
+          <button class="tile" data-sk="mcq" ${mc?"":"disabled"}><div class="t">🔘 MCQs only</div><div class="d">${mc} question${mc===1?"":"s"} · answers after each one</div></button>
+          <button class="tile" data-sk="written" ${wr?"":"disabled"}><div class="t">✍️ Written answers only</div><div class="d">${wr} question${wr===1?"":"s"} · think or write your answer, then check the model answer</div></button>
+        </div>
+        <p class="muted small" style="margin-top:12px">Written answers have no timer: write your answer in your notebook, tap Show answer, then mark Got it or Didn't get it honestly.</p>`
+      : `<p class="muted">${SRCNAME[src]} questions for this chapter are coming soon.</p>`}</div>`;
+  } else if (!ch.qs.length){
+    body = `<div class="card"><p class="muted">ACE POINT practice questions for this chapter are coming soon.${hasSrc ? " Try the NCERT, Exemplar and PYQ tabs." : ""}</p></div>`;
+  } else {
+    const topic = VIEW.topic || ""; const pool = ch.qs.filter(q => !topic || q.topic === topic);
+    const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch);
+    body = `<div class="card">
+    <p class="muted" style="margin-top:0">${ch.qs.length} practice questions across ${liveTopics(ch).length} topics</p>
     <h2>📝 Chapter test</h2>
     <button class="tile" id="chTest"><div class="t">Chapter test (exam style) <span class="badge own">${tn} questions · ${Math.round(tn*pace(VIEW.cid)/60)} min</span></div>
       <div class="d">Whole chapter, about a third Easy, Medium and Hard. One timer for the whole test; jump between questions, change answers, mark for review. Answers at the end.</div></button>
@@ -1354,16 +1422,28 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
       <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d">${n("hard")} questions</div></button>
     </div>
     <p class="muted small" style="margin-top:12px">Practice: 45 seconds per question, 1 minute for calculations. After a wrong answer, pick why it happened before going on. The quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning, and 3 warnings submits the quiz.</p>
-  </div>
-  <div class="card"><h3>Your topics in this chapter</h3>
+  </div>`;
+  }
+  const tps = allTopics(ch);
+  return `
+  <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
+  <div class="card"><h1>${esc(ch.name)}</h1></div>
+  ${tabs}${body}
+  ${tps.length ? `<div class="card"><h3>Your topics in this chapter</h3>
     <table><tr><th>Topic</th><th>Answered</th><th>Strength</th></tr>
-    ${liveTopics(ch).map(t => `<tr><td>${esc(t)}</td><td>${ts[t]?ts[t].n:0}</td><td>${strengthTag(ts[t])}</td></tr>`).join("")}</table></div>`; };
+    ${tps.map(t => `<tr><td>${esc(t)}</td><td>${ts[t]?ts[t].n:0}</td><td>${strengthTag(ts[t])}</td></tr>`).join("")}</table></div>` : ""}`; };
 Views.chapter.after = () => {
-  $("bk").onclick = () => go("course",{cid:VIEW.cid, tab:"practice"});
-  $("topicSel").onchange = e => go("chapter",{cid:VIEW.cid, chid:VIEW.chid, topic:e.target.value});
-  $("chTest").onclick = () => startChapterTest(VIEW.cid, VIEW.chid);
+  const cid = VIEW.cid, chid = VIEW.chid, ch = chapterOf(cid, chid);
+  $("bk").onclick = () => go("course",{cid, tab:"practice"});
+  document.querySelectorAll(".tabs button[data-src]").forEach(b => b.onclick = () => go("chapter", {cid, chid, src:b.dataset.src}));
+  document.querySelectorAll(".tile[data-sk]").forEach(t => t.onclick = () => { const src = VIEW.src, k = t.dataset.sk;
+    const list = (ch[src]||[]).filter(q => k === "all" || (k === "written") === isW(q));
+    startQuiz({cid, chid, mode:src, list, title: ch.name + " · " + SRCNAME[src] + (k === "mcq" ? " MCQs" : k === "written" ? " written answers" : "")}); });
+  if (!$("chTest")) return;
+  $("topicSel").onchange = e => go("chapter",{cid, chid, topic:e.target.value});
+  $("chTest").onclick = () => startChapterTest(cid, chid);
   document.querySelectorAll(".tile[data-m]").forEach(t => t.onclick = () => {
-    const cid = VIEW.cid, chid = VIEW.chid, topic = $("topicSel").value, m = t.dataset.m; const ch = chapterOf(cid, chid);
+    const topic = $("topicSel").value, m = t.dataset.m;
     if (m === "adaptive") return startQuiz({cid, chid, topic, mode:m});
     startQuiz({cid, chid, topic, mode:m, list: shuffle(ch.qs.filter(q => (!topic || q.topic === topic) && q.level === m))});
   });
@@ -1376,10 +1456,10 @@ function startChapterTest(cid, chid){
 }
 function startRevision(cid, chid){
   const u = me(), ch = chapterOf(cid, chid);
-  const inCh = Object.values(lastResults(u, cid)).filter(r => qOf(cid, r.x.id).ch === chid);
+  const inCh = Object.values(lastResults(u, cid)).filter(r => qOf(cid, r.x.id).ch === chid && !isW(qOf(cid, r.x.id)));
   const wrong = shuffle(inCh.filter(r => !r.x.ok)).map(r => qOf(cid, r.x.id)), right = shuffle(inCh.filter(r => r.x.ok)).map(r => qOf(cid, r.x.id));
   let list = wrong.slice(0, 7); list = list.concat(right.slice(0, 10 - list.length)); list = list.concat(wrong.slice(7, 7 + 10 - list.length));
-  if (list.length < 10){ const have = new Set(list.map(q => q.id)); list = list.concat(shuffle(ch.qs.filter(q => !have.has(q.id))).slice(0, 10 - list.length)); }
+  if (list.length < 10){ const have = new Set(list.map(q => q.id)); list = list.concat(shuffle(allQs(ch).filter(q => !isW(q) && !have.has(q.id))).slice(0, 10 - list.length)); }
   startQuiz({cid, chid, mode:"revision", style:"test", list: shuffle(list), secs: list.length * 60, title: ch.name + " · Quick Revision"});
 }
 function startHomework(id){
@@ -1392,7 +1472,7 @@ function startHomework(id){
    5. QUIZ ENGINE
    ===================================================================== */
 const SECONDS = 45, MAX_WARN = 3, NEED = {0:5, 1:10};
-const MODE_NAME = {adaptive:"Adaptive quiz", easy:"All Easy", medium:"All Medium", hard:"All Hard", test:"Chapter test", custom:"Create a Quiz",
+const MODE_NAME = {ncert:"NCERT", exemplar:"NCERT Exemplar", pyq:"CBSE PYQs", adaptive:"Adaptive quiz", easy:"All Easy", medium:"All Medium", hard:"All Hard", test:"Chapter test", custom:"Create a Quiz",
   mistakes:"My Mistakes", revision:"Quick Revision", homework:"Homework"};
 const CHEERS = [["🎯","Bullseye!","Spot on."],["🚀","Nailed it!","Keep going."],["🧪","Chemistry champ!","That's correct."],["😎","Too easy for you!","Correct answer."],
   ["⚗️","Perfect reaction!","Right answer."],["⭐","Superstar!","Correct."],["🙌","Yes!","Well done."],["🧠","Big brain!","Correct."]];
@@ -1433,7 +1513,7 @@ async function startQuiz(spec){
 function shuffle(a){ a = a.slice(); for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
 function quizShell(){ return `
   <div class="card">
-    <div class="muted small" style="margin-bottom:8px">${esc(Q.title)}${Q.topic && Q.mode !== "custom" ? " · "+esc(Q.topic) : ""} · ${MODE_NAME[Q.mode]}</div>
+    <div class="muted small" style="margin-bottom:8px">${esc(Q.title)}${Q.topic && Q.mode !== "custom" ? " · "+esc(Q.topic) : ""}${SRCNAME[Q.mode] ? "" : " · " + MODE_NAME[Q.mode]}</div>
     <div class="bar"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy">Easy</span><span id="streak" class="pill">Streak: 0</span><span id="warnPill" class="pill warn" style="display:none"></span></div>
     <div id="timer" class="timer"><div></div></div><div id="timeLeft" class="muted small" style="margin-bottom:8px"></div>
     <div class="qhead"><div id="topic" class="muted small"></div><button class="flagbtn" id="flagBtn">🚩 Report</button></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="feedback"></div>
@@ -1463,14 +1543,35 @@ function nextQ(){
   $("qnum").textContent = Q.fixed ? `Question ${Q.asked.length+1} of ${Q.total}` : `Question ${Q.asked.length+1}`;
   $("lvl").textContent = LN[q.level]; $("lvl").className = "pill " + q.level;
   $("streak").textContent = streakText();
-  $("topic").textContent = "Topic: " + q.topic + (q.time ? " · Calculation: 1 minute" : "");
+  $("topic").textContent = "Topic: " + q.topic + (q.src ? " · " + SRCNAME[q.src] + (q.year ? " " + q.year : "") : "") + (q.marks ? ` · ${q.marks} mark${q.marks>1?"s":""}` : "") + (q.time ? " · Calculation: 1 minute" : "");
   $("qtext").textContent = q.q; $("feedback").innerHTML = ""; $("nextBtn").style.display = "none"; $("nextBtn").disabled = false;
   const box = $("opts"); box.innerHTML = "";
+  clearInterval(Q.timerId); $("timer").style.display = isW(q) ? "none" : ""; $("timeLeft").style.display = isW(q) ? "none" : "";
+  if (isW(q)){ // written answer: no timer; student checks against the model answer and marks themselves
+    box.innerHTML = `<p class="muted small">Write your answer in your notebook (or think it through), then check it.</p><button class="btn block" id="showAns">Show answer</button>`;
+    $("showAns").onclick = () => { box.innerHTML = `<div class="model"><b>Model answer</b><div>${esc(q.answer)}</div>${q.explain ? `<div class="muted small">${esc(q.explain)}</div>` : ""}</div>
+      <p class="small" style="margin-top:10px;font-weight:600">Was your answer right? Be honest, it helps you improve.</p>
+      <div class="row" style="justify-content:space-between;margin-top:4px"><button class="btn ghost" id="wNo">❌ Didn't get it</button><button class="btn" id="wYes">✅ Got it</button></div>`;
+      $("wYes").onclick = () => answerWritten(true); $("wNo").onclick = () => answerWritten(false); };
+    window.scrollTo(0,0); return;
+  }
   Q.order = shuffle([0,1,2,3]); // show options in a random order so the answer is not always in the same place
   Q.order.forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt"; b.dataset.i = i; b.innerHTML = `<b>${"ABCD"[pos]}</b>`; b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => answerQ(i); box.appendChild(b); });
   clearInterval(Q.timerId); Q.limit = q.time || SECONDS; Q.left = Q.limit; drawTimer();
   Q.timerId = setInterval(() => { Q.left--; drawTimer(); if (Q.left <= 0){ clearInterval(Q.timerId); answerQ(-1); } }, 1000);
   window.scrollTo(0,0);
+}
+function answerWritten(ok){
+  if (Q.answered || !Q.active) return; Q.answered = true;
+  const q = Q.cur; const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen: ok ? 0 : -2, ok, written:true, secs:0};
+  Q.asked.push(entry); saveDraft();
+  if (ok) Q.rs++; else { Q.rs = 0; Q.wrong.add(q.id); }
+  $("streak").textContent = streakText();
+  const row = $("wYes") && $("wYes").parentElement; if (row) row.remove();
+  $("feedback").innerHTML = ok ? `<div class="feedback good"><h3>✅ Well done!</h3></div>`
+    : `<div class="feedback bad"><h3>📚 Keep practising</h3><p>Compare your answer with the model answer above. This question goes into My Mistakes.</p></div>${anaBox("live", Q.asked.length-1, entry)}`;
+  $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = ""; $("nextBtn").disabled = !ok;
+  if (ok) celebrate(CHEERS[Math.floor(Math.random()*CHEERS.length)], false);
 }
 function drawTimer(){ $("timer").firstElementChild.style.width = (Math.max(Q.left,0)/Q.limit*100) + "%"; $("timer").classList.toggle("low", Q.left <= 10); $("timeLeft").textContent = `${Math.max(Q.left,0)} s left`; }
 function answerQ(i){
@@ -1631,7 +1732,7 @@ Views.report = () => { const a = VIEW.att, u = me(); const pct = a.total ? a.rig
     <p class="muted small">${esc(attTitle(a))} · Saved to your account.</p>${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
     <div class="row" style="justify-content:flex-start"><button class="btn" id="again">Practise again</button><button class="btn ghost" id="share">Copy result for teacher</button><button class="btn ghost" id="toCourse">Back to course</button></div></div>`; };
 Views.report.after = () => { const a = VIEW.att;
-  $("again").onclick = () => a.chapter && a.mode !== "custom" ? go("chapter",{cid:a.course, chid:a.chapter}) : go("course",{cid:a.course, tab: a.mode === "custom" ? "create" : a.mode === "mistakes" ? "mistakes" : "practice"});
+  $("again").onclick = () => a.chapter && a.mode !== "custom" ? go("chapter",{cid:a.course, chid:a.chapter, src: SRCNAME[a.mode] ? a.mode : undefined}) : go("course",{cid:a.course, tab: a.mode === "custom" ? "create" : a.mode === "mistakes" ? "mistakes" : "practice"});
   $("toCourse").onclick = () => go("course",{cid:a.course, tab:"practice"});
   $("share").onclick = async () => { const u = me();
     const txt = `ACE POINT result\n${u.name} (${u.email})\n${COURSE[a.course].name} · ${attTitle(a)}\nScore: ${a.right}/${a.total} · Highest level: ${LN[a.maxLevel]||""}\nWarnings: ${a.incidents.length}${a.auto?" (auto-submitted)":""}\n${fmtDate(a.ts)}`;
@@ -1688,8 +1789,8 @@ Views.teacher = () => { if (tOnly()) return Views.teacherLock();
   <div class="grid">${us.filter(u => !u.acepoint).map(u => `<button class="tile" data-u="${esc(u.uid)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
       <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">Joined ${fmtDay(u.created||Date.now())} · Bought: ${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join(", ")||"no course yet"}</div></button>`).join("") || '<p class="muted">None.</p>'}</div>
   <h2>Question bank</h2>
-  <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
-  ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => ch.qs.length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}</tr>`)).join("")}</table></div>`; };
+  <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th><th>NCERT / Exemplar / PYQ</th></tr>
+  ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => allQs(ch).length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}<td>${SRC.map(([k]) => (ch[k]||[]).length).join(" / ")}</td></tr>`)).join("")}</table></div>`; };
 Views.teacher.after = () => { if (!$("tRefresh")) return Views.teacherLock.after();
   $("bk").onclick = () => { TEACHER = false; try { history.replaceState(null, "", location.pathname); } catch(e) {} go(me() ? "home" : "welcome"); };
   $("tRefresh").onclick = async () => { $("tRefresh").disabled = true; try { await Store.loadAllUsers(); } catch(e) { toast("Couldn't refresh."); } go("teacher"); };
@@ -1698,7 +1799,7 @@ Views.teacher.after = () => { if (!$("tRefresh")) return Views.teacherLock.after
 
 /* ---------- One student ---------- */
 Views.tStudent = () => { if (tOnly()) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const a = u.attempts||[];
-  const byCourse = (u.courses||[]).filter(c => COURSE[c]).map(cid => { const ts = topicStats(attemptsFor(u, cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>liveTopics(c)))];
+  const byCourse = (u.courses||[]).filter(c => COURSE[c]).map(cid => { const ts = topicStats(attemptsFor(u, cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>allTopics(c)))];
     return `<h2>${esc(COURSE[cid].name)}</h2><table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th></th></tr>${topics.map(t => { const s = ts[t];
       return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${s?quickTag(s.r,s.n):'<span class="tag na">Not started</span>'}</td></tr>`; }).join("")}</table>`; }).join("");
   const hws = THW.filter(h => (h.students||[]).includes(u.uid)).sort((p,q) => dueTs(q.due) - dueTs(p.due));
@@ -1806,7 +1907,7 @@ Views.tErrors.after = () => { $("bk").onclick = () => go("teacher");
     const head = ["Date","Student","Email","Course","Chapter","Topic","Level","Question","Student's answer","Correct answer","Error type","What I will do differently","Quiz"];
     const data = rows.map(r => { const q = qOf(r.a.course, r.x.id) || {q:"", options:[], answer:0}; const d = new Date(r.a.ts);
       return [localDate(d), r.u.name, r.u.email, COURSE[r.a.course]?.name, chapterOf(r.a.course, ansCh(r.a, r.x))?.name, r.x.topic, LN[r.x.level], q.q,
-        r.x.chosen === -1 ? "No answer" : q.options[r.x.chosen], q.options[q.answer], ET[r.x.err].n, r.x.note || "", attTitle(r.a)]; });
+        isW(q) ? "Self-check: didn't get it" : r.x.chosen === -1 ? "No answer" : q.options[r.x.chosen], correctText(q), ET[r.x.err].n, r.x.note || "", attTitle(r.a)]; });
     downloadCSV(`ACE POINT error analysis ${localDate(new Date())}.csv`, [head, ...data]);
   };
 };
@@ -1820,7 +1921,7 @@ Views.tReports = () => { if (tOnly()) return Views.teacherLock();
     return `<div class="review" style="background:#fff;${r.status==="done"?"opacity:.6":""}">
       <div class="muted small">${esc(COURSE[r.course]?.name||r.course)} · ${esc(chapterOf(r.course, r.chapter)?.name||"")} · Question ${esc(r.qid)} · ${fmtDate(r.ts)}</div>
       <div class="q" style="margin-top:4px">${q ? esc(q.q) : "(question no longer in the bank)"}</div>
-      ${q ? `<div class="small">Correct answer in the bank: <b>${esc(q.options[q.answer])}</b></div>` : ""}
+      ${q ? `<div class="small">Correct answer in the bank: <b>${esc(correctText(q))}</b></div>` : ""}
       <div style="margin-top:6px"><span class="tag ${r.status==="done"?"ok":"weak"}">${r.status==="done"?"Fixed":esc(REASON[r.reason]||r.reason)}</span> ${r.text ? `“${esc(r.text)}”` : ""}</div>
       <div class="muted small" style="margin-top:4px">From ${esc(r.name)} (${esc(r.email)})</div>
       <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn ghost" style="padding:8px 14px;font-size:14px" data-rs="${esc(r.id)}">${r.status==="done"?"Reopen":"Mark as fixed"}</button><button class="link" style="color:var(--red)" data-rd="${esc(r.id)}">Delete</button></div></div>`; }).join("") || '<p class="muted">No reports yet.</p>'}`; };
