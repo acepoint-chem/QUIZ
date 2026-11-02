@@ -149,6 +149,8 @@ label.chk input{width:20px;height:20px;flex:none}
 .toggle.on{background:var(--green)}.toggle.on span{left:27px}
 #rep textarea,#rep input{margin-top:10px}
 .flaglink{color:var(--red);margin-left:28px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+.flagbtn{background:var(--redbg);color:var(--red);border:1.5px solid #f3c1bb;padding:6px 12px;font-size:14px;font-weight:700;border-radius:999px;flex:none}
 </style>
 </head>
 <body>
@@ -163,7 +165,7 @@ label.chk input{width:20px;height:20px;flex:none}
 <div id="warn" class="modal"><div class="box">
   <h3>Warning <span id="warnCount">1</span> of 3</h3>
   <p id="warnText">You left the quiz screen.</p>
-  <p class="muted">Stay on this screen until you finish. At 3 warnings the quiz submits itself.</p>
+  <p class="muted">Stay on this screen until you finish. Staying in another app or split screen gives a new warning every few seconds. At 3 warnings the quiz submits itself.</p>
   <button id="warnBtn" class="btn" style="margin-top:10px">Back to the quiz</button>
 </div></div>
 <div id="confirm" class="modal" style="background:rgba(20,40,75,.5)"><div class="box">
@@ -1414,6 +1416,7 @@ async function startQuiz(spec){
        ts:Date.now(), lastInc:0, grace:Date.now()+2000, baseW:window.innerWidth};
   if (style === "test"){ Q.list = queue; Q.sel = queue.map(() => -1); Q.marked = new Set(); Q.idx = 0; Q.orders = queue.map(() => shuffle([0,1,2,3])); Q.spent = queue.map(() => 0); Q.secs = spec.secs || queue.length * pace(cid); }
   try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {}
+  Q.fsOK = !!document.fullscreenElement; clearInterval(WATCH); WATCH = setInterval(watchdog, 1000);
   Q.baseW = window.innerWidth; Q.grace = Date.now() + 1500;
   VIEW = {name:"quiz"}; header(); $("app").classList.add("quizmode");
   if (style === "test"){
@@ -1433,8 +1436,8 @@ function quizShell(){ return `
     <div class="muted small" style="margin-bottom:8px">${esc(Q.title)}${Q.topic && Q.mode !== "custom" ? " · "+esc(Q.topic) : ""} · ${MODE_NAME[Q.mode]}</div>
     <div class="bar"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy">Easy</span><span id="streak" class="pill">Streak: 0</span><span id="warnPill" class="pill warn" style="display:none"></span></div>
     <div id="timer" class="timer"><div></div></div><div id="timeLeft" class="muted small" style="margin-bottom:8px"></div>
-    <div id="topic" class="muted small"></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="feedback"></div>
-    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="quitBtn">End quiz</button><button class="link flaglink" id="flagBtn">🚩 Report question</button></span><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
+    <div class="qhead"><div id="topic" class="muted small"></div><button class="flagbtn" id="flagBtn">🚩 Report</button></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="feedback"></div>
+    <div class="row" style="justify-content:space-between;align-items:center"><button class="link" id="quitBtn">End quiz</button><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
   </div>`; }
 function pickQ(){
   if (Q.fixed) return Q.queue[Q.asked.length] || null;
@@ -1507,9 +1510,9 @@ function testShell(){ return `
     <div class="bar"><span id="tClock" class="pill">--:--</span><span id="tCount" class="pill"></span><span id="warnPill" class="pill warn" style="display:none"></span></div>
     <div id="palette" class="palette"></div>
     <div class="bar" style="margin:14px 0 0"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy"></span></div>
-    <div id="topic" class="muted small" style="margin-top:8px"></div><div id="qtext" class="qtext"></div><div id="opts"></div>
+    <div class="qhead" style="margin-top:8px"><div id="topic" class="muted small"></div><button class="flagbtn" id="flagBtn">🚩 Report</button></div><div id="qtext" class="qtext"></div><div id="opts"></div>
     <div class="row" style="justify-content:space-between"><button class="btn ghost" id="prevBtn">← Back</button><button class="btn ghost" id="markBtn">☆ Mark for review</button><button class="btn" id="nextBtn">Next →</button></div>
-    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="clearBtn">Clear answer</button><button class="link flaglink" id="flagBtn">🚩 Report question</button></span><button class="btn" id="submitBtn" style="background:var(--green)">Submit test</button></div>
+    <div class="row" style="justify-content:space-between;align-items:center"><button class="link" id="clearBtn">Clear answer</button><button class="btn" id="submitBtn" style="background:var(--green)">Submit test</button></div>
     <p class="muted small" style="margin-top:10px">You can change answers until you submit. Answers and explanations are shown at the end. The test submits itself when time is up.</p>
   </div>`; }
 function bindTest(){
@@ -1541,6 +1544,18 @@ function tickTest(){
 }
 
 /* ---------- Anti-cheat ---------- */
+// While the student stays away (other app, split screen, out of fullscreen), a new warning comes every 4 seconds
+let WATCH = null;
+function watchdog(){
+  if (!Q || !Q.active) return clearInterval(WATCH);
+  const away = document.hidden ? "You switched to another tab or app"
+    : !document.hasFocus() ? "You are using another app or window"
+    : (Q.fsOK && !document.fullscreenElement) ? "You are out of fullscreen"
+    : window.innerWidth < Q.baseW * 0.6 ? "Split screen is still on" : null;
+  if (!away){ Q.awaySince = 0; return; }
+  if (!Q.awaySince){ Q.awaySince = Date.now(); return; }
+  if (Date.now() - Q.awaySince >= 4000){ Q.awaySince = Date.now(); incident(away + " (still away from the quiz)"); }
+}
 function incident(reason){
   if (!Q || !Q.active) return; const now = Date.now();
   if (now < Q.grace || now - Q.lastInc < 2500 || $("confirm").classList.contains("show")) return;
@@ -1556,7 +1571,7 @@ document.addEventListener("fullscreenchange", () => { if (!document.fullscreenEl
 window.addEventListener("resize", () => { if (!Q || !Q.active) return; if (window.innerWidth < Q.baseW * 0.6) incident("The window was shrunk or split screen was used"); Q.baseW = Math.max(Q.baseW, window.innerWidth); });
 document.addEventListener("copy", e => { if (Q && Q.active) e.preventDefault(); });
 document.addEventListener("contextmenu", e => { if (Q && Q.active) e.preventDefault(); });
-$("warnBtn").onclick = async () => { $("warn").classList.remove("show"); Q.grace = Date.now() + 1500;
+$("warnBtn").onclick = async () => { $("warn").classList.remove("show"); Q.grace = Date.now() + 1500; Q.awaySince = 0;
   try { if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {} };
 
 /* ---------- Finish + save ---------- */
@@ -1586,7 +1601,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden && Q &
 function finishQuiz(auto, quit){
   if (!Q || !Q.active) return;
   clearTimeout(DRAFT_T);
-  Q.active = false; clearInterval(Q.timerId); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); $("rep").classList.remove("show");
+  Q.active = false; clearInterval(Q.timerId); clearInterval(WATCH); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); $("rep").classList.remove("show");
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
   const att = makeAtt(auto, quit, false); delete att.open;
   const u = me(); if (u && att.total){ u.attempts.push(att); Store.saveAttempt(att).catch(e => { console.error(e); toast("Couldn't save this result online. Check your internet."); }); }
