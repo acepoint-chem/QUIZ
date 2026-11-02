@@ -152,6 +152,8 @@ label.chk input{width:20px;height:20px;flex:none}
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
 .flagbtn{background:var(--redbg);color:var(--red);border:1.5px solid #f3c1bb;padding:6px 12px;font-size:14px;font-weight:700;border-radius:999px;flex:none}
 .model{margin-top:8px;background:var(--greenbg);border-radius:10px;padding:10px 12px;font-size:15px}.model>div{white-space:pre-line;margin-top:4px}
+textarea{width:100%;padding:12px;font-size:16px;border:1px solid var(--line);border-radius:10px;font-family:inherit;resize:vertical}
+.kw{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:15px}.kw>div{margin-top:4px}.kw .miss{color:#7a4b00}
 </style>
 </head>
 <body>
@@ -884,7 +886,9 @@ const QIDX = {};
 const SRC = [["ncert","NCERT"],["exemplar","NCERT Exemplar"],["pyq","CBSE PYQs"]], SRCNAME = Object.fromEntries(SRC);
 const allQs = ch => [...ch.qs, ...SRC.flatMap(([k]) => ch[k] || [])];
 Object.entries(CHAPTERS).forEach(([cid, chs]) => { QIDX[cid] = {}; chs.forEach(ch => {
-  ch.qs.forEach(q => { q.ch = ch.id; QIDX[cid][q.id] = q; });
+  // Questions marked test:true are kept only for the chapter test and never appear in practice
+  ch.tq = ch.qs.filter(q => q.test); ch.qs = ch.qs.filter(q => !q.test);
+  [...ch.qs, ...ch.tq].forEach(q => { q.ch = ch.id; QIDX[cid][q.id] = q; });
   SRC.forEach(([k]) => (ch[k] || []).forEach(q => { q.ch = ch.id; q.src = k; if (!q.level) q.level = "medium"; QIDX[cid][q.id] = q; })); }); });
 const isW = q => q && q.type === "written";
 const correctText = q => isW(q) ? q.answer : q.options[q.answer];
@@ -1047,7 +1051,7 @@ function reviewCard(a, i, o = {}){
   return `<div class="review">
     ${o.ctx ? `<div class="muted small" style="margin-bottom:4px">${o.who ? `<b>${esc(o.who)}</b> · ` : ""}${esc(COURSE[a.course]?.name||"")} · ${esc(chapterOf(a.course, ansCh(a,x))?.name||"")} · ${esc(x.topic)} · ${fmtDay(a.ts)}</div>` : ""}
     <div class="q">${esc(q.q)}</div>
-    ${isW(q) ? `<div>Self-check: <b>Didn't get it</b></div><div class="model"><b>Model answer</b><div>${esc(q.answer)}</div></div>` : `
+    ${isW(q) ? `<div>Self-check: <b>Didn't get it</b></div>${x.typed ? `<div class="small" style="white-space:pre-line;margin-top:4px">${o.teacher ? "Answer typed" : "You wrote"}: ${esc(x.typed)}</div>` : ""}${x.kwMissing ? `<div class="small" style="color:#7a4b00;margin-top:4px">💡 Missing key points: ${x.kwMissing.map(esc).join(", ")}</div>` : ""}<div class="model"><b>Model answer</b><div>${esc(q.answer)}</div></div>` : `
     <div>${o.teacher ? "Answer given" : "Your answer"}: ${x.chosen === -1 ? `<i>${none}</i>` : esc(q.options[x.chosen])}</div>
     <div><b>Correct: ${esc(q.options[q.answer])}</b></div>`}
     ${!isW(q) && x.chosen >= 0 && q.mistakes && q.mistakes[x.chosen] ? `<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[x.chosen])}</div>` : ""}
@@ -1383,7 +1387,16 @@ function cqBind(){
 }
 
 /* ---------- Chapter: choose topic and mode ---------- */
-function testSize(ch){ return Math.min(TEST_N, ch.qs.length); }
+function testSize(ch){ return Math.min(TEST_N, ch.tq.length); }
+// An answer counts towards unlocking the chapter test only if an option was picked after at least 10 s (20 s for calculations)
+const minSecs = q => q.time ? 20 : 10;
+const validAns = (x, q) => x.chosen >= 0 && !x.rushed && (x.secs ?? 99) >= minSecs(q);
+function hardProgress(u, cid, ch){
+  const hard = ch.qs.filter(q => q.level === "hard"), ids = new Set(hard.map(q => q.id)), done = new Set();
+  attemptsFor(u, cid).forEach(a => a.answers.forEach(x => { if (ids.has(x.id) && validAns(x, qOf(cid, x.id))) done.add(x.id); }));
+  const left = {}; hard.filter(q => !done.has(q.id)).forEach(q => left[q.topic] = (left[q.topic]||0) + 1);
+  return {done: done.size, total: hard.length, left};
+}
 Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid), ch.id);
   const hasSrc = !!COURSE[VIEW.cid].ncert; const src = hasSrc ? (VIEW.src || "practice") : "practice";
   const tabs = hasSrc ? `<div class="tabs">${[["practice","Practice"], ...SRC].map(([k,l]) => `<button data-src="${k}" class="${src===k?"on":""}">${l}${k!=="practice" && (ch[k]||[]).length ? ` (${ch[k].length})` : ""}</button>`).join("")}</div>` : "";
@@ -1405,12 +1418,18 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
     body = `<div class="card"><p class="muted">ACE POINT practice questions for this chapter are coming soon.${hasSrc ? " Try the NCERT, Exemplar and PYQ tabs." : ""}</p></div>`;
   } else {
     const topic = VIEW.topic || ""; const pool = ch.qs.filter(q => !topic || q.topic === topic);
-    const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch);
+    const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch); const hp = hardProgress(u, VIEW.cid, ch);
     body = `<div class="card">
     <p class="muted" style="margin-top:0">${ch.qs.length} practice questions across ${liveTopics(ch).length} topics</p>
     <h2>📝 Chapter test</h2>
-    <button class="tile" id="chTest"><div class="t">Chapter test (exam style) <span class="badge own">${tn} questions · ${Math.round(tn*pace(VIEW.cid)/60)} min</span></div>
-      <div class="d">Whole chapter, about a third Easy, Medium and Hard. One timer for the whole test; jump between questions, change answers, mark for review. Answers at the end.</div></button>
+    ${!tn ? `<button class="tile" disabled><div class="t">Chapter test <span class="badge soon">Coming soon</span></div><div class="d">Test questions for this chapter are being added.</div></button>`
+      : hp.done < hp.total ? `<button class="tile" disabled style="opacity:1"><div class="t">🔒 Chapter test <span class="badge soon">Locked</span></div>
+        <div class="d">Unlocks when you have answered <b>every Hard question</b> in this chapter, right or wrong.</div>
+        <div class="progress"><div style="width:${Math.round(hp.done/hp.total*100)}%"></div></div>
+        <div class="d" style="margin-top:6px"><b>Hard questions done: ${hp.done} of ${hp.total}</b>${Object.keys(hp.left).length ? " · Still to do: " + Object.entries(hp.left).map(([t,n]) => `${esc(t)} (${n})`).join(", ") : ""}</div>
+        <div class="d">Take your time: answers given in under 10 seconds (20 for calculations) or left unanswered don't count.</div></button>`
+      : `<button class="tile" id="chTest"><div class="t">Chapter test (exam style) <span class="badge own">${tn} questions · ${Math.round(tn*pace(VIEW.cid)/60)} min</span></div>
+      <div class="d">New questions you haven't seen in practice, about a third Easy, Medium and Hard. One timer for the whole test; jump between questions, change answers, mark for review. Answers at the end.</div></button>`}
     <h2>Practice</h2>
     <label for="topicSel">What do you want to practise?</label>
     <select id="topicSel"><option value="">Whole chapter (all topics)</option>${liveTopics(ch).map(t => `<option ${t===topic?"selected":""}>${esc(t)}</option>`).join("")}</select>
@@ -1439,9 +1458,9 @@ Views.chapter.after = () => {
   document.querySelectorAll(".tile[data-sk]").forEach(t => t.onclick = () => { const src = VIEW.src, k = t.dataset.sk;
     const list = (ch[src]||[]).filter(q => k === "all" || (k === "written") === isW(q));
     startQuiz({cid, chid, mode:src, list, title: ch.name + " · " + SRCNAME[src] + (k === "mcq" ? " MCQs" : k === "written" ? " written answers" : "")}); });
-  if (!$("chTest")) return;
+  if (!$("topicSel")) return;
+  if ($("chTest")) $("chTest").onclick = () => startChapterTest(cid, chid);
   $("topicSel").onchange = e => go("chapter",{cid, chid, topic:e.target.value});
-  $("chTest").onclick = () => startChapterTest(cid, chid);
   document.querySelectorAll(".tile[data-m]").forEach(t => t.onclick = () => {
     const topic = $("topicSel").value, m = t.dataset.m;
     if (m === "adaptive") return startQuiz({cid, chid, topic, mode:m});
@@ -1451,7 +1470,9 @@ Views.chapter.after = () => {
 
 /* ---------- Quiz starters ---------- */
 function startChapterTest(cid, chid){
-  const ch = chapterOf(cid, chid); const list = shuffle(pickBalanced(ch.qs, TEST_N, "mixed"));
+  const ch = chapterOf(cid, chid); const hp = hardProgress(me(), cid, ch);
+  if (!ch.tq.length || hp.done < hp.total) return toast("The chapter test is locked. Answer every Hard question in this chapter first.");
+  const list = shuffle(pickBalanced(ch.tq, TEST_N, "mixed"));
   startQuiz({cid, chid, mode:"test", style:"test", list, secs: list.length * pace(cid), title: ch.name + " · Chapter test"});
 }
 function startRevision(cid, chid){
@@ -1547,12 +1568,22 @@ function nextQ(){
   $("qtext").textContent = q.q; $("feedback").innerHTML = ""; $("nextBtn").style.display = "none"; $("nextBtn").disabled = false;
   const box = $("opts"); box.innerHTML = "";
   clearInterval(Q.timerId); $("timer").style.display = isW(q) ? "none" : ""; $("timeLeft").style.display = isW(q) ? "none" : "";
-  if (isW(q)){ // written answer: no timer; student checks against the model answer and marks themselves
-    box.innerHTML = `<p class="muted small">Write your answer in your notebook (or think it through), then check it.</p><button class="btn block" id="showAns">Show answer</button>`;
-    $("showAns").onclick = () => { box.innerHTML = `<div class="model"><b>Model answer</b><div>${esc(q.answer)}</div>${q.explain ? `<div class="muted small">${esc(q.explain)}</div>` : ""}</div>
-      <p class="small" style="margin-top:10px;font-weight:600">Was your answer right? Be honest, it helps you improve.</p>
-      <div class="row" style="justify-content:space-between;margin-top:4px"><button class="btn ghost" id="wNo">❌ Didn't get it</button><button class="btn" id="wYes">✅ Got it</button></div>`;
+  if (isW(q)){ // written answer: no timer; optional keyword check, then the model answer; the student marks themselves
+    Q.wTyped = null; Q.wMissing = null;
+    box.innerHTML = `<label for="wAns" style="margin-top:0">Your answer</label><textarea id="wAns" rows="5" placeholder="Type your answer here"></textarea>
+      <button class="btn block" id="chkAns">Check my answer</button>
+      <div style="text-align:center;margin-top:12px"><button class="link" id="nbAns">I wrote it in my notebook: show the model answer</button></div>`;
+    const show = typed => {
+      const kws = q.keywords || [], kw = typed != null && kws.length ? kwCheck(typed, kws) : null;
+      Q.wTyped = typed; Q.wMissing = kw ? kw.missing : null;
+      box.innerHTML = `${typed != null ? `<div class="review" style="margin:0 0 8px"><div class="muted small">Your answer</div><div style="white-space:pre-line">${esc(typed)}</div></div>` : ""}
+        ${kw ? `<div class="kw"><b>Key points</b>${kw.found.map(k => `<div>✅ ${esc(k)}</div>`).join("")}${kw.missing.map(k => `<div class="miss">💡 Also mention: <b>${esc(k)}</b></div>`).join("")}${kw.missing.length ? "" : "<div><b>Great, all the key points are there!</b></div>"}</div>` : ""}
+        <div class="model"><b>Model answer</b><div>${esc(q.answer)}</div>${q.explain ? `<div class="muted small">${esc(q.explain)}</div>` : ""}</div>
+        <p class="small" style="margin-top:10px;font-weight:600">Was your answer right? Be honest, it helps you improve.</p>
+        <div class="row" style="justify-content:space-between;margin-top:4px"><button class="btn ghost" id="wNo">❌ Didn't get it</button><button class="btn" id="wYes">✅ Got it</button></div>`;
       $("wYes").onclick = () => answerWritten(true); $("wNo").onclick = () => answerWritten(false); };
+    $("chkAns").onclick = () => { const t = $("wAns").value.trim(); if (t.length < 3) return toast("Type your answer first, or tap the notebook option."); show(t); };
+    $("nbAns").onclick = () => show(null);
     window.scrollTo(0,0); return;
   }
   Q.order = shuffle([0,1,2,3]); // show options in a random order so the answer is not always in the same place
@@ -1563,7 +1594,8 @@ function nextQ(){
 }
 function answerWritten(ok){
   if (Q.answered || !Q.active) return; Q.answered = true;
-  const q = Q.cur; const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen: ok ? 0 : -2, ok, written:true, secs:0};
+  const q = Q.cur; const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen: ok ? 0 : -2, ok, written:true, secs:0,
+    typed: Q.wTyped != null ? Q.wTyped.slice(0, 1500) : undefined, kwMissing: Q.wMissing && Q.wMissing.length ? Q.wMissing : undefined};
   Q.asked.push(entry); saveDraft();
   if (ok) Q.rs++; else { Q.rs = 0; Q.wrong.add(q.id); }
   $("streak").textContent = streakText();
@@ -1573,12 +1605,29 @@ function answerWritten(ok){
   $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = ""; $("nextBtn").disabled = !ok;
   if (ok) celebrate(CHEERS[Math.floor(Math.random()*CHEERS.length)], false);
 }
+/* ---------- Keyword check for written answers ---------- */
+// Keywords: ["magnesium oxide / MgO", "protective layer / coating"]; any one word in a group counts.
+// Capitals don't matter, H₂O = H2O, and small spelling mistakes are accepted.
+const SUBMAP = {"₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9","⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁺":"+","⁻":"-"};
+const normTxt = t => String(t).toLowerCase().replace(/[₀-₉⁰¹²³⁴-⁹⁺⁻]/g, c => SUBMAP[c] || c).replace(/[^a-z0-9+\-\s]/g, " ").replace(/\s+/g, " ").trim();
+function lev(a, b){ const d = Array.from({length:a.length+1}, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[a.length][b.length]; }
+function kwCheck(text, kws){
+  const n = " " + normTxt(text) + " ", words = n.trim().split(" "), found = [], missing = [];
+  const wordOk = w => { const tol = w.length >= 9 ? 2 : w.length >= 5 ? 1 : 0; return words.some(x => x === w || (tol && Math.abs(x.length - w.length) <= tol && lev(x, w) <= tol)); };
+  kws.forEach(k => { const alts = String(k).split("/").map(x => x.trim()).filter(Boolean);
+    const hit = alts.some(a => { const an = normTxt(a); return an && (n.includes(" " + an + " ") || an.split(" ").every(wordOk)); });
+    (hit ? found : missing).push(alts[0]); });
+  return {found, missing};
+}
 function drawTimer(){ $("timer").firstElementChild.style.width = (Math.max(Q.left,0)/Q.limit*100) + "%"; $("timer").classList.toggle("low", Q.left <= 10); $("timeLeft").textContent = `${Math.max(Q.left,0)} s left`; }
 function answerQ(i){
   if (Q.answered || !Q.active) return; Q.answered = true; clearInterval(Q.timerId);
   const q = Q.cur, ok = i === q.answer;
   document.querySelectorAll(".opt").forEach(b => { const k = +b.dataset.i; b.disabled = true; if (k===q.answer) b.classList.add("correct"); if (k===i && !ok) b.classList.add("wrong"); });
   const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:i, ok, secs:Q.limit - Q.left};
+  const fast = i >= 0 && entry.secs < minSecs(q); if (fast) entry.rushed = true;
+  Q.fastRun = fast ? (Q.fastRun||0) + 1 : 0;
   Q.asked.push(entry); saveDraft();
   let msg = "", up = false;
   if (ok){ Q.rs++; } else { Q.rs = 0; Q.wrong.add(q.id); }
@@ -1591,7 +1640,8 @@ function answerQ(i){
        ${anaBox("live", Q.asked.length-1, entry)}`;
   $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = "";
   $("nextBtn").disabled = !ok;
-  if (ok) celebrate(up ? LEVELUP : CHEERS[Math.floor(Math.random()*CHEERS.length)], up);
+  if (Q.fastRun >= 3){ Q.fastRun = 0; celebrate(["🐢","Slow down!","Read each question fully. Very quick answers don't count towards unlocking the chapter test."], false); }
+  else if (ok) celebrate(up ? LEVELUP : CHEERS[Math.floor(Math.random()*CHEERS.length)], up);
   else if (i !== -1) celebrate(OOPS[Math.floor(Math.random()*OOPS.length)], false);
 }
 function celebrate(c, confetti){
@@ -1681,14 +1731,14 @@ function makeAtt(auto, quit, draft){
   let asked = Q.asked;
   if (Q.style === "test"){
     const spent = Q.spent.slice(); spent[Q.idx] += (Date.now() - Q.qStart)/1000;
-    asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(spent[k]), marked:Q.marked.has(k) || undefined}));
+    asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(spent[k]), marked:Q.marked.has(k) || undefined, rushed:(Q.sel[k] >= 0 && spent[k] < minSecs(q)) || undefined}));
   }
   const right = asked.filter(a => a.ok).length;
   const maxL = Q.fixed ? Math.max(0, ...asked.map(a => LEVELS.indexOf(a.level))) : Q.maxLevel;
   const chs = [...new Set(asked.map(a => a.ch))];
   return {v:2, id:Q.id, course:Q.cid, chapter: Q.chid || (chs.length === 1 ? chs[0] : null), topic:Q.topic, mode:Q.mode, style:Q.style, title:Q.title, hw:Q.hw || undefined,
           ts:Q.ts, right, total:asked.length, maxLevel:LEVELS[maxL], auto, quit:!!quit, timeUp:!!Q.timeUp, secs: Q.style === "test" ? Q.secs : undefined,
-          open: draft || undefined, answers:asked, incidents:Q.incidents};
+          open: draft || undefined, rushed: asked.filter(a => a.rushed).length || undefined, answers:asked, incidents:Q.incidents};
 }
 let DRAFT_T = null;
 function saveDraft(now){
@@ -1789,8 +1839,8 @@ Views.teacher = () => { if (tOnly()) return Views.teacherLock();
   <div class="grid">${us.filter(u => !u.acepoint).map(u => `<button class="tile" data-u="${esc(u.uid)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
       <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">Joined ${fmtDay(u.created||Date.now())} · Bought: ${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join(", ")||"no course yet"}</div></button>`).join("") || '<p class="muted">None.</p>'}</div>
   <h2>Question bank</h2>
-  <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th><th>NCERT / Exemplar / PYQ</th></tr>
-  ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => allQs(ch).length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}<td>${SRC.map(([k]) => (ch[k]||[]).length).join(" / ")}</td></tr>`)).join("")}</table></div>`; };
+  <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th><th>Test only</th><th>NCERT / Exemplar / PYQ</th></tr>
+  ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => allQs(ch).length || ch.tq.length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}<td>${ch.tq.length}</td><td>${SRC.map(([k]) => (ch[k]||[]).length).join(" / ")}</td></tr>`)).join("")}</table></div>`; };
 Views.teacher.after = () => { if (!$("tRefresh")) return Views.teacherLock.after();
   $("bk").onclick = () => { TEACHER = false; try { history.replaceState(null, "", location.pathname); } catch(e) {} go(me() ? "home" : "welcome"); };
   $("tRefresh").onclick = async () => { $("tRefresh").disabled = true; try { await Store.loadAllUsers(); } catch(e) { toast("Couldn't refresh."); } go("teacher"); };
@@ -1812,11 +1862,13 @@ Views.tStudent = () => { if (tOnly()) return Views.teacherLock(); const u = Stor
   const del = `<div class="card" style="border-color:#f3c1bb"><h3 style="color:var(--red)">Delete student</h3><p class="muted small">Removes ${esc(u.name)}'s details, courses and all quiz results for good. This can't be undone.</p>
     <button class="btn" id="delStu" style="background:var(--red)">Delete ${esc(u.name.split(" ")[0])} and all their data</button></div>`;
   if (!u.acepoint) return top + del;
+  const rushed = a.reduce((n,x) => n + x.answers.filter(y => y.rushed).length, 0);
   return top + `
+  <div class="card"><b>Rushed answers: ${rushed}</b><div class="muted small">Answers given in under 10 seconds (20 for calculations). They don't count towards unlocking chapter tests.</div></div>
   ${hws.length ? `<h2>Homework</h2><div class="card"><table><tr><th>Homework</th><th>Due</th><th>Status</th></tr>${hws.map(h => `<tr><td>${esc(hwTitle(h))}<div class="muted small">${h.n} questions</div></td><td>${fmtDay(dueTs(h.due))}</td><td>${hwStatusHTML(h, u)}</td></tr>`).join("")}</table></div>` : ""}
   <h2>Error analysis</h2><div class="card">${errorSummaryHTML(rows)}</div>
   <h2>Quizzes</h2>${a.length ? a.slice().reverse().map((x,i) => `<button class="tile" data-i="${a.length-1-i}" style="margin-bottom:8px">
-    <div class="t">${x.right}/${x.total} · ${esc(attTitle(x))}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}</div>
+    <div class="t">${x.right}/${x.total} · ${esc(attTitle(x))}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}${x.rushed?` <span class="badge" style="background:var(--amberbg);color:var(--amber)">${x.rushed} rushed</span>`:""}</div>
     <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]||""}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}` + del; };
 Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
   $("delStu").onclick = () => { const u = Store.getUser(VIEW.uid);
