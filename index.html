@@ -669,24 +669,64 @@ const CHAPTERS = {
 };
 
 /* =====================================================================
-   2. STORAGE  (swap this block for Firebase later; nothing else changes)
+   2. ONLINE ACCOUNTS AND DATA (Firebase)
    ===================================================================== */
-const Store = (() => {
-  const KEY = "acepoint_v1"; let mem = null;
-  function load(){ if (mem) return mem;
-    try { mem = JSON.parse(localStorage.getItem(KEY)) || null; } catch(e) {}
-    mem = mem || {users:{}, session:null, teacherPass:null}; return mem; }
-  function save(){ try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch(e) {} }
-  return {
-    getUser: email => load().users[email] || null,
-    allUsers: () => Object.values(load().users),
-    saveUser: u => { load().users[u.email] = u; save(); },
-    session: () => load().session,
-    setSession: email => { load().session = email; save(); },
-    teacherPass: () => load().teacherPass,
-    setTeacherPass: p => { load().teacherPass = p; save(); }
-  };
-})();
+const FB_CONFIG = {
+  apiKey: "AIzaSyAcniOLJyncAI9BvXbh_gsx7r1_HYa4gXw",
+  authDomain: "acepoint-ed234.firebaseapp.com",
+  projectId: "acepoint-ed234",
+  storageBucket: "acepoint-ed234.firebasestorage.app",
+  messagingSenderId: "834250616812",
+  appId: "1:834250616812:web:706bf4380a5c817d6d5ac9"
+};
+const TEACHER_EMAIL = "acepoint0320@gmail.com";
+const FB_URL = "https://www.gstatic.com/firebasejs/10.14.1/";
+let FB = null;          // firebase handles
+let AUTH_USER = null;   // signed-in Google account
+let ME = null;          // the student's profile + attempts
+let TUSERS = [];        // teacher view: all students
+const isTeacher = () => !!(AUTH_USER && AUTH_USER.email === TEACHER_EMAIL);
+
+const Store = {
+  async init(onChange){
+    const [A, U, F] = await Promise.all([import(FB_URL+"firebase-app.js"), import(FB_URL+"firebase-auth.js"), import(FB_URL+"firebase-firestore.js")]);
+    const app = A.initializeApp(FB_CONFIG);
+    const db = F.initializeFirestore(app, {ignoreUndefinedProperties:true});
+    FB = {auth: U.getAuth(app), db, U, F};
+    U.onAuthStateChanged(FB.auth, async user => {
+      AUTH_USER = user; ME = null;
+      if (user){ try { await Store.loadMe(); } catch(e){ console.error(e); toast("Couldn't load your account. Please refresh."); } }
+      onChange();
+    });
+  },
+  async loadMe(){
+    const {F, db} = FB, uid = AUTH_USER.uid;
+    const snap = await F.getDoc(F.doc(db, "users", uid));
+    if (!snap.exists()){ ME = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"", profileMissing:true, courses:[], attempts:[]}; return; }
+    const at = await F.getDocs(F.collection(db, "users", uid, "attempts"));
+    ME = {...snap.data(), uid, attempts: at.docs.map(d => d.data()).sort((a,b) => a.ts - b.ts)};
+  },
+  async signIn(){
+    const p = new FB.U.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
+    await FB.U.signInWithPopup(FB.auth, p);
+  },
+  signOut(){ TUSERS = []; return FB.U.signOut(FB.auth); },
+  saveProfile(u){
+    const {F, db} = FB;
+    return F.setDoc(F.doc(db, "users", u.uid), {name:u.name, email:u.email, phone:u.phone||"", cls:u.cls||"", courses:u.courses||[], created:u.created||Date.now()}, {merge:true});
+  },
+  saveAttempt(att){ const {F, db} = FB; return F.setDoc(F.doc(db, "users", ME.uid, "attempts", att.id), att); },
+  async loadAllUsers(){
+    const {F, db} = FB;
+    const us = await F.getDocs(F.collection(db, "users"));
+    TUSERS = await Promise.all(us.docs.map(async d => {
+      const at = await F.getDocs(F.collection(db, "users", d.id, "attempts"));
+      return {...d.data(), uid:d.id, attempts: at.docs.map(x => x.data()).sort((a,b) => a.ts - b.ts)};
+    }));
+    TUSERS.sort((a,b) => (b.attempts.at(-1)?.ts||b.created||0) - (a.attempts.at(-1)?.ts||a.created||0));
+  },
+  getUser: uid => TUSERS.find(u => u.uid === uid)
+};
 
 /* =====================================================================
    3. HELPERS
@@ -694,7 +734,7 @@ const Store = (() => {
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const LEVELS = ["easy","medium","hard"], LN = {easy:"Easy",medium:"Medium",hard:"Hard"};
-const me = () => { const e = Store.session(); return e ? Store.getUser(e) : null; };
+const me = () => (ME && !ME.profileMissing) ? ME : null;
 function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove("show"), 2500); }
 function chapterOf(cid, chid){ return (CHAPTERS[cid]||[]).find(c => c.id === chid); }
 function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid && chapterOf(a.course, a.chapter)); }
@@ -720,10 +760,12 @@ function header(){
   const u = me(); const h = $("hdrRight");
   if (u && VIEW.name !== "quiz") h.innerHTML = `<span>Hi, ${esc(u.name.split(" ")[0])}</span><button id="logoutBtn">Log out</button>`;
   else h.innerHTML = "";
-  const lb = $("logoutBtn"); if (lb) lb.onclick = () => { Store.setSession(null); go("welcome"); };
+  const lb = $("logoutBtn"); if (lb) lb.onclick = () => Store.signOut();
   $("foot").style.display = VIEW.name === "quiz" ? "none" : "";
 }
+const NEEDS_STUDENT = ["catalogue","pay","home","course","chapter","report"];
 function render(){
+  if (NEEDS_STUDENT.includes(VIEW.name) && !me()) VIEW = {name: AUTH_USER ? (ME && ME.profileMissing ? "profile" : "loading") : "welcome"};
   header(); const app = $("app");
   const V = Views[VIEW.name] || Views.welcome; app.innerHTML = V(); if (V.after) V.after();
 }
@@ -734,14 +776,27 @@ window.addEventListener("hashchange", checkTeacherHash);
 
 const Views = {};
 
+/* ---------- Loading / offline ---------- */
+Views.loading = () => `<div class="card" style="text-align:center"><p class="muted">Loading ACE POINT…</p></div>`;
+Views.offline = () => `<div class="card"><h1>Can't connect</h1><p class="muted">Please check your internet connection and refresh the page.</p><button class="btn block" onclick="location.reload()">Refresh</button></div>`;
+
 /* ---------- Welcome ---------- */
+const GOOGLE_BTN = `<span style="display:inline-flex;align-items:center;gap:10px;justify-content:center"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6C12.3 13.4 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 7l7.4 5.7c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.7-4.2-13.6-9.9l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>Continue with Google</span>`;
+async function doSignIn(btn){
+  if (!FB) return toast("Still connecting. Please wait a moment.");
+  btn.disabled = true;
+  try { await Store.signIn(); }
+  catch(e){ btn.disabled = false;
+    if (e && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) return;
+    toast(e && e.code === "auth/popup-blocked" ? "Please allow pop-ups for this site and try again." : "Sign-in didn't work. Please try again."); console.error(e); }
+}
 Views.welcome = () => `
   <div class="hero">
     <h1>Adaptive Chemistry Practice for Every Exam</h1>
     <div class="byline">By Gunjan · IIT Madras alumna</div>
     <p>Quizzes that get harder as you get better, with clear explanations for every answer.</p>
-    <button class="btn gold block" id="getStarted">Create your account</button>
-    <p class="small" style="margin-top:12px">Already have an account? <button class="link" style="color:#fff;text-decoration:underline" id="toLogin">Log in</button></p>
+    <button class="btn gold block" id="gIn">${GOOGLE_BTN}</button>
+    <p class="small" style="margin-top:12px;opacity:.9">New or returning student, use the same button. Your progress is saved to your account.</p>
   </div>
   <div class="checks">
     <div>Questions get harder as you improve</div>
@@ -749,96 +804,38 @@ Views.welcome = () => `
     <div>Strong and weak topics tracked for you</div>
     <div>NEET, JEE, AP, A Level, O Level, IGCSE and more</div>
   </div>`;
-Views.welcome.after = () => { $("getStarted").onclick = () => go("signup"); $("toLogin").onclick = () => go("login"); };
+Views.welcome.after = () => { $("gIn").onclick = e => doSignIn(e.currentTarget); };
 
-/* ---------- Sign up ---------- */
-Views.signup = () => `
-  <button class="back" id="bk">← Back</button>
+/* ---------- First sign-in: student details ---------- */
+Views.profile = () => `
   <div class="card">
-    <div class="steps"><span class="on"></span><span></span><span></span><span></span></div>
-    <h1>Create your account</h1>
-    <p class="muted">Step 1 of 4 · Your details</p>
-    <label for="su_name">Full name</label><input id="su_name" autocomplete="name">
-    <label for="su_email">Gmail address</label><input id="su_email" type="email" placeholder="yourname@gmail.com" autocomplete="email">
+    <div class="steps"><span class="on"></span><span class="on"></span><span></span></div>
+    <h1>Welcome to ACE POINT!</h1>
+    <p class="muted">Step 1 of 2 · A few details about you</p>
+    <label for="su_name">Full name</label><input id="su_name" autocomplete="name" value="${esc(ME.name)}">
+    <label>Gmail</label><input value="${esc(ME.email)}" disabled>
     <label for="su_phone">Mobile number</label>
-    <div style="display:flex;gap:8px"><select id="su_cc" style="width:110px"><option>+91</option><option>+1</option><option>+44</option><option>+971</option><option>+65</option><option>+61</option></select>
-    <input id="su_phone" type="tel" inputmode="numeric" placeholder="10-digit number" autocomplete="tel-national"></div>
+    <div style="display:flex;gap:8px"><select id="su_cc" style="width:110px"><option>+91</option><option>+971</option><option>+1</option><option>+44</option><option>+65</option><option>+61</option><option>+966</option><option>+974</option></select>
+    <input id="su_phone" type="tel" inputmode="numeric" placeholder="Mobile number" autocomplete="tel-national"></div>
     <label for="su_class">Class or year</label>
     <select id="su_class"><option value="">Choose…</option><option>Class 8</option><option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option><option>Dropper</option><option>AS / A Level</option><option>O Level / IGCSE / GCSE</option><option>AP / IB</option><option>University</option><option>Other</option></select>
     <div class="err" id="su_err"></div>
-    <button class="btn block" id="su_go">Send verification code</button>
+    <button class="btn block" id="su_go">Continue</button>
+    <p class="small muted" style="margin-top:10px">Not you? <button class="link" id="su_out">Use a different Google account</button></p>
   </div>`;
-Views.signup.after = () => {
-  $("bk").onclick = () => go("welcome");
-  $("su_go").onclick = () => {
-    const name = $("su_name").value.trim(), email = $("su_email").value.trim().toLowerCase(),
-          phone = $("su_phone").value.replace(/\D/g,""), cc = $("su_cc").value, cls = $("su_class").value;
+Views.profile.after = () => {
+  $("su_out").onclick = () => Store.signOut();
+  $("su_go").onclick = async () => {
+    const name = $("su_name").value.trim(), phone = $("su_phone").value.replace(/\D/g,""), cc = $("su_cc").value, cls = $("su_class").value;
     let e = "";
     if (name.length < 2) e = "Please enter your name.";
-    else if (!/^[^\s@]+@gmail\.com$/.test(email)) e = "Please enter a valid Gmail address (ending in @gmail.com).";
-    else if (cc === "+91" ? !/^[6-9]\d{9}$/.test(phone) : phone.length < 7) e = "Please enter a valid mobile number.";
+    else if (cc === "+91" ? !/^[6-9]\d{9}$/.test(phone) : (phone.length < 7 || phone.length > 12)) e = "Please enter a valid mobile number.";
     else if (!cls) e = "Please choose your class or year.";
-    else if (Store.getUser(email)) e = "An account with this Gmail already exists. Please log in instead.";
     $("su_err").textContent = e; if (e) return;
-    go("otp", {pending:{name, email, phone: cc + " " + phone, cls}});
-  };
-};
-
-/* ---------- OTP (testing mode) ---------- */
-Views.otp = () => `
-  <button class="back" id="bk">← Back</button>
-  <div class="card">
-    <div class="steps"><span class="on"></span><span class="on"></span><span></span><span></span></div>
-    <h1>Verify your number</h1>
-    <p class="muted">Step 2 of 4 · We sent a 6-digit code to <b>${esc(VIEW.pending.phone)}</b></p>
-    <div class="note">Enter the code <b>123456</b> to continue.</div>
-    <input id="otp" class="otp" inputmode="numeric" maxlength="6" placeholder="••••••">
-    <div class="err" id="otp_err"></div>
-    <button class="btn block" id="otp_go">Verify</button>
-  </div>`;
-Views.otp.after = () => {
-  $("bk").onclick = () => go("signup");
-  $("otp_go").onclick = () => {
-    if ($("otp").value.trim() !== "123456"){ $("otp_err").textContent = "That code is not right. Please try again."; return; }
-    const p = VIEW.pending;
-    Store.saveUser({...p, created:Date.now(), courses:[], attempts:[]}); Store.setSession(p.email);
-    go("catalogue", {onboarding:true});
-  };
-};
-
-/* ---------- Login ---------- */
-Views.login = () => `
-  <button class="back" id="bk">← Back</button>
-  <div class="card">
-    <h1>Log in</h1>
-    <label for="li_email">Gmail address</label><input id="li_email" type="email" placeholder="yourname@gmail.com">
-    <div class="err" id="li_err"></div>
-    <button class="btn block" id="li_go">Send code to my phone</button>
-    <p class="small muted" style="margin-top:12px">New here? <button class="link" id="toSignup">Create an account</button></p>
-  </div>`;
-Views.login.after = () => {
-  $("bk").onclick = () => go("welcome"); $("toSignup").onclick = () => go("signup");
-  $("li_go").onclick = () => {
-    const email = $("li_email").value.trim().toLowerCase(); const u = Store.getUser(email);
-    if (!u){ $("li_err").textContent = "No account found with this Gmail. Please create one."; return; }
-    go("loginOtp", {email, phone:u.phone});
-  };
-};
-Views.loginOtp = () => `
-  <button class="back" id="bk">← Back</button>
-  <div class="card">
-    <h1>Enter your code</h1>
-    <p class="muted">We sent a 6-digit code to <b>${esc(VIEW.phone)}</b></p>
-    <div class="note">Enter the code <b>123456</b> to continue.</div>
-    <input id="otp" class="otp" inputmode="numeric" maxlength="6" placeholder="••••••">
-    <div class="err" id="otp_err"></div>
-    <button class="btn block" id="otp_go">Log in</button>
-  </div>`;
-Views.loginOtp.after = () => {
-  $("bk").onclick = () => go("login");
-  $("otp_go").onclick = () => {
-    if ($("otp").value.trim() !== "123456"){ $("otp_err").textContent = "That code is not right. Please try again."; return; }
-    Store.setSession(VIEW.email); const u = me(); go(u.courses.length ? "home" : "catalogue", {onboarding:!u.courses.length});
+    const btn = $("su_go"); btn.disabled = true;
+    const u = {uid:ME.uid, email:ME.email, name, phone: cc + " " + phone, cls, courses:[], created:Date.now(), attempts:[]};
+    try { await Store.saveProfile(u); ME = u; go("catalogue", {onboarding:true}); }
+    catch(err){ console.error(err); btn.disabled = false; $("su_err").textContent = "Couldn't save. Please check your internet and try again."; }
   };
 };
 
@@ -848,9 +845,9 @@ Views.catalogue = () => {
   return `
   ${VIEW.onboarding ? "" : '<button class="back" id="bk">← My courses</button>'}
   <div class="card">
-    ${VIEW.onboarding ? '<div class="steps"><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div>' : ""}
+    ${VIEW.onboarding ? '<div class="steps"><span class="on"></span><span class="on"></span><span class="on"></span></div>' : ""}
     <h1>Choose your exam</h1>
-    <p class="muted">${VIEW.onboarding ? "Step 3 of 4 · " : ""}Pick the course you want to practise. You can add more courses later.</p>
+    <p class="muted">${VIEW.onboarding ? "Step 2 of 2 · " : ""}Pick the course you want to practise. You can add more courses later.</p>
   </div>
   ${CATALOGUE.map(g => `
     <h2>${esc(g.group)}</h2>
@@ -871,9 +868,9 @@ Views.catalogue.after = () => {
 Views.pay = () => { const c = COURSE[VIEW.cid]; return `
   <button class="back" id="bk">← Back to courses</button>
   <div class="card">
-    ${VIEW.onboarding ? '<div class="steps"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>' : ""}
+    
     <h1>${esc(c.name)}</h1>
-    <p class="muted">${VIEW.onboarding ? "Step 4 of 4 · " : ""}${esc(c.desc)}</p>
+    <p class="muted">${esc(c.desc)}</p>
     <h2>What you get</h2>
     <ul class="small" style="padding-left:20px;margin:6px 0">
       <li>Adaptive topic quizzes: Easy, Medium and Hard</li>
@@ -889,8 +886,10 @@ Views.pay = () => { const c = COURSE[VIEW.cid]; return `
   </div>`; };
 Views.pay.after = () => {
   $("bk").onclick = () => go("catalogue",{onboarding:VIEW.onboarding});
-  $("payGo").onclick = () => { const u = me(); if (!u.courses.includes(VIEW.cid)) u.courses.push(VIEW.cid); Store.saveUser(u);
-    toast("You're enrolled! 🎉"); go("course",{cid:VIEW.cid, tab:"practice"}); };
+  $("payGo").onclick = async () => { const u = me(); const btn = $("payGo"); btn.disabled = true;
+    const courses = u.courses.includes(VIEW.cid) ? u.courses : [...u.courses, VIEW.cid];
+    try { await Store.saveProfile({...u, courses}); u.courses = courses; toast("You're enrolled! 🎉"); go("course",{cid:VIEW.cid, tab:"practice"}); }
+    catch(e){ console.error(e); btn.disabled = false; toast("Couldn't enrol. Please check your internet."); } };
 };
 
 /* ---------- Home: my courses ---------- */
@@ -1101,7 +1100,7 @@ function finishQuiz(auto, quit){
   const right = Q.asked.filter(a => a.ok).length;
   const att = {id:"q"+Date.now(), course:Q.cid, chapter:Q.chid, topic:Q.topic||null, mode:Q.mode, ts:Q.ts, right, total:Q.asked.length,
                maxLevel:LEVELS[Q.maxLevel], auto, quit:!!quit, answers:Q.asked, incidents:Q.incidents};
-  const u = me(); if (u){ u.attempts = u.attempts || []; if (att.total) u.attempts.push(att); Store.saveUser(u); }
+  const u = me(); if (u && att.total){ u.attempts.push(att); Store.saveAttempt(att).catch(e => { console.error(e); toast("Couldn't save this result online. Check your internet."); }); }
   VIEW = {name:"report", att}; render(); window.scrollTo(0,0);
 }
 function reportHTML(att, forTeacher){
@@ -1127,7 +1126,7 @@ function reportHTML(att, forTeacher){
 }
 Views.report = () => { const a = VIEW.att, u = me(); const pct = a.total ? a.right/a.total : 0;
   return `<div class="card"><h1>${pct>=.8?"🏆":pct>=.5?"👍":"📚"} Well done, ${esc(u?u.name.split(" ")[0]:"")}!</h1>
-    <p class="muted small">Saved to your history.</p>${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
+    <p class="muted small">Saved to your account.</p>${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
     <div class="row" style="justify-content:flex-start"><button class="btn" id="again">Practise again</button><button class="btn ghost" id="share">Copy result for teacher</button><button class="btn ghost" id="toCourse">Back to course</button></div></div>`; };
 Views.report.after = () => { const a = VIEW.att;
   $("again").onclick = () => go("chapter",{cid:a.course, chid:a.chapter});
@@ -1141,53 +1140,72 @@ Views.report.after = () => { const a = VIEW.att;
    6. TEACHER DASHBOARD
    ===================================================================== */
 let TEACHER = false;
-Views.teacherLock = () => { const set = !Store.teacherPass(); return `
+Views.teacherLock = () => {
+  if (!AUTH_USER) return `
   <button class="back" id="bk">← Back</button>
-  <div class="card"><h1>Teacher login</h1>
-    <p class="muted">${set ? "First time here: create a teacher passcode." : "Enter your teacher passcode."}</p>
-    <label for="tp">Passcode</label><input id="tp" type="password" autocomplete="off">
-    ${set ? '<label for="tp2">Confirm passcode</label><input id="tp2" type="password" autocomplete="off">' : ""}
-    <div class="err" id="tp_err"></div><button class="btn block" id="tp_go">${set ? "Set passcode" : "Open dashboard"}</button></div>`; };
-Views.teacherLock.after = () => {
-  $("bk").onclick = () => go(me() ? "home" : "welcome");
-  $("tp_go").onclick = () => { const p = $("tp").value;
-    if (!Store.teacherPass()){ if (p.length < 4) return $("tp_err").textContent = "Use at least 4 characters."; if (p !== $("tp2").value) return $("tp_err").textContent = "The passcodes don't match."; Store.setTeacherPass(p); }
-    else if (p !== Store.teacherPass()) return $("tp_err").textContent = "Wrong passcode.";
-    TEACHER = true; go("teacher"); };
+  <div class="card"><h1>Teacher login</h1><p class="muted">Sign in with the ACE POINT teacher Google account.</p>
+    <button class="btn block" id="tIn">${GOOGLE_BTN}</button></div>`;
+  if (!isTeacher()) return `
+  <button class="back" id="bk">← Back</button>
+  <div class="card"><h1>Teachers only</h1><p class="muted">This page is only for the ACE POINT teacher. You're signed in as ${esc(AUTH_USER.email)}.</p>
+    <button class="btn ghost block" id="tOut">Sign out</button></div>`;
+  return `<div class="card" style="text-align:center"><p class="muted">Loading your students…</p></div>`;
 };
-Views.teacher = () => { if (!TEACHER) return Views.teacherLock();
-  const us = Store.allUsers(); const at = us.flatMap(u => (u.attempts||[]));
+Views.teacherLock.after = async () => {
+  const leave = () => { try { history.replaceState(null, "", location.pathname); } catch(e) {} go(me() ? "home" : "welcome"); };
+  if ($("bk")) $("bk").onclick = leave;
+  if ($("tIn")) $("tIn").onclick = e => doSignIn(e.currentTarget);
+  if ($("tOut")) $("tOut").onclick = () => Store.signOut();
+  if (isTeacher()){
+    try { await Store.loadAllUsers(); TEACHER = true; go("teacher"); }
+    catch(e){ console.error(e); $("app").innerHTML = `<div class="card"><h1>Couldn't load students</h1><p class="muted">Check that the database rules are published, then refresh.</p></div>`; }
+  }
+};
+Views.teacher = () => { if (!TEACHER || !isTeacher()) return Views.teacherLock();
+  const us = TUSERS; const at = us.flatMap(u => (u.attempts||[]));
   return `
   <button class="back" id="bk">← Leave dashboard</button>
   <div class="card"><h1>Teacher dashboard</h1>
-    <div class="stat"><div><b>${us.length}</b><span>Students</span></div><div><b>${at.length}</b><span>Quizzes</span></div><div><b>${at.reduce((s,a)=>s+a.incidents.length,0)}</b><span>Warnings</span></div></div>
-    <div class="note">This shows students who used the app on this device. Once the online database is connected, every student will show here from any device.</div></div>
+    <div class="stat"><div><b>${us.length}</b><span>Students</span></div><div><b>${at.length}</b><span>Quizzes</span></div><div><b>${at.reduce((s,a)=>s+(a.incidents||[]).length,0)}</b><span>Warnings</span></div></div>
+    <button class="btn ghost" id="tRefresh">↻ Refresh</button></div>
   <h2>Students</h2>
-  <div class="grid">${us.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0);
-    return `<button class="tile" data-u="${esc(u.email)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
-      <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">${a.length} quiz(zes) · ${n?Math.round(r/n*100):0}% accuracy · ${u.courses.map(c=>esc(COURSE[c]?.name||c)).join(", ")||"No course"}</div></button>`; }).join("") || '<p class="muted">No students yet.</p>'}</div>
+  <div class="grid">${us.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0); const last = a.at(-1);
+    return `<button class="tile" data-u="${esc(u.uid)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
+      <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">${a.length} quiz(zes) · ${n?Math.round(r/n*100):0}% accuracy${last?" · last quiz "+fmtDate(last.ts):""}</div>
+      <div class="d">${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join(", ")||"No course"}</div></button>`; }).join("") || '<p class="muted">No students yet.</p>'}</div>
   <h2>Question bank</h2>
   <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
   ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => ch.qs.length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}</tr>`)).join("")}</table></div>`; };
-Views.teacher.after = () => { $("bk").onclick = () => { TEACHER = false; try { history.replaceState(null, "", location.pathname); } catch(e) {} go(me() ? "home" : "welcome"); };
-  document.querySelectorAll(".tile[data-u]").forEach(t => t.onclick = () => go("tStudent",{email:t.dataset.u})); };
-Views.tStudent = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.email); const a = u.attempts||[];
-  const byCourse = u.courses.filter(c => COURSE[c]).map(cid => { const ts = topicStats(a.filter(x=>x.course===cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>c.topics))];
+Views.teacher.after = () => { if (!$("tRefresh")) return Views.teacherLock.after();
+  $("bk").onclick = () => { TEACHER = false; try { history.replaceState(null, "", location.pathname); } catch(e) {} go(me() ? "home" : "welcome"); };
+  $("tRefresh").onclick = async () => { $("tRefresh").disabled = true; try { await Store.loadAllUsers(); } catch(e) { toast("Couldn't refresh."); } go("teacher"); };
+  document.querySelectorAll(".tile[data-u]").forEach(t => t.onclick = () => go("tStudent",{uid:t.dataset.u})); };
+Views.tStudent = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const a = u.attempts||[];
+  const byCourse = (u.courses||[]).filter(c => COURSE[c]).map(cid => { const ts = topicStats(a.filter(x=>x.course===cid && chapterOf(x.course,x.chapter))); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>liveTopics(c)))];
     return `<h2>${esc(COURSE[cid].name)}</h2><table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th></th></tr>${topics.map(t => { const s = ts[t];
       return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${s?quickTag(s.r,s.n):'<span class="tag na">Not started</span>'}</td></tr>`; }).join("")}</table>`; }).join("");
   return `<button class="back" id="bk">← Dashboard</button>
   <div class="card"><h1>${esc(u.name)}</h1><p class="muted">${esc(u.cls||"")} · ${esc(u.email)} · ${esc(u.phone)}</p>${byCourse}</div>
   <h2>Quizzes</h2>${a.length ? a.slice().reverse().map((x,i) => `<button class="tile" data-i="${a.length-1-i}" style="margin-bottom:8px">
-    <div class="t">${x.right}/${x.total} · ${esc(chapterOf(x.course,x.chapter)?.name||"")}${x.incidents.length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}</div>
-    <div class="d">${fmtDate(x.ts)} · Highest level ${LN[x.maxLevel]}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}`; };
+    <div class="t">${x.right}/${x.total} · ${esc(chapterOf(x.course,x.chapter)?.name||"")}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}</div>
+    <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}`; };
 Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
-  document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{email:VIEW.email, i:+t.dataset.i})); };
-Views.tAttempt = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.email); const at = u.attempts[VIEW.i];
+  document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{uid:VIEW.uid, i:+t.dataset.i})); };
+Views.tAttempt = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const at = u.attempts[VIEW.i];
   return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s quiz</h1><p class="muted">${esc(chapterOf(at.course,at.chapter)?.name||"")} · ${MODE_NAME[at.mode]||"Adaptive quiz"}</p>${reportHTML(at,true)}</div>`; };
-Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{email:VIEW.email}); };
+Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{uid:VIEW.uid}); };
 
 /* ---------- Boot ---------- */
-if (location.hash === "#teacher") go("teacherLock"); else go(me() ? "home" : "welcome");
+function routeAfterAuth(){
+  if (Q && Q.active) return;
+  if (location.hash === "#teacher") return go("teacherLock");
+  if (!AUTH_USER) return go("welcome");
+  if (ME && ME.profileMissing) return go("profile");
+  if (!ME) return go("offline");
+  go(ME.courses.length ? "home" : "catalogue", {onboarding: !ME.courses.length});
+}
+go("loading");
+Store.init(routeAfterAuth).catch(e => { console.error(e); go("offline"); });
 </script>
 </body>
 </html>
