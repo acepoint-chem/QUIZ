@@ -117,6 +117,37 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
 .stat div{background:var(--sky);border-radius:10px;padding:10px;text-align:center}
 .stat b{display:block;font-size:20px;color:var(--navy)}
 .stat span{font-size:12px;color:var(--muted)}
+.banner{background:var(--redbg);border:1px solid #f3c1bb;color:#7a1f16;border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.ana{margin-top:12px;padding:12px;border:2px solid var(--navy);border-radius:12px;background:#fff}
+.ana-h{font-weight:700;color:var(--navy);margin-bottom:8px;font-size:15px}
+.etypes{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.etype,#repReasons button{background:#fff;border:1.5px solid var(--line);padding:10px 8px;font-size:14px;font-weight:600;color:var(--ink);text-align:left;border-radius:10px}
+.etype.on,#repReasons button.on{border-color:var(--navy);background:var(--navy);color:#fff}
+.enote{margin-top:8px;font-size:15px;padding:10px}
+.ana-tip{margin-top:8px;background:var(--sky);color:var(--navy);border-radius:10px;padding:8px 10px;font-size:14px}
+.etag{display:inline-block;margin-top:8px;background:var(--sky);color:var(--navy);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
+.ebar{display:grid;grid-template-columns:minmax(150px,1.3fr) 2fr 34px;gap:8px;align-items:center;font-size:14px;margin:6px 0}
+.ebar>div{height:10px;background:var(--line);border-radius:6px;overflow:hidden}.ebar i{display:block;height:100%;background:var(--navy)}
+.ebar b{text-align:right;color:var(--navy)}
+.palette{display:flex;flex-wrap:wrap;gap:6px}
+.palette button{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-weight:700;color:var(--muted);font-size:14px}
+.palette button.ans{background:var(--greenbg);color:var(--green);border-color:var(--green)}
+.palette button.mark{background:var(--amberbg);color:var(--amber);border-color:var(--amber)}
+.palette button.ans.mark{background:linear-gradient(135deg,var(--greenbg) 50%,var(--amberbg) 50%)}
+.palette button.cur{outline:3px solid var(--navy);outline-offset:1px}
+.opt.sel{border-color:var(--navy);background:var(--sky)}
+.btn.ghost:disabled{background:#fff;opacity:.4}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:70px;background:#fff;border:1.5px solid var(--line);padding:10px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+label.chk{display:flex;align-items:center;gap:8px;font-weight:500;margin:6px 0;font-size:15px}
+label.chk input{width:20px;height:20px;flex:none}
+.cqch{border-bottom:1px solid var(--line);padding:6px 0}.cqtops{padding-left:28px}
+.switchrow{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--sky);border-radius:12px;padding:12px;margin:10px 0}
+.toggle{width:54px;height:30px;border-radius:999px;background:#c5cfdd;position:relative;flex:none}
+.toggle span{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle.on{background:var(--green)}.toggle.on span{left:27px}
+#rep textarea,#rep input{margin-top:10px}
 </style>
 </head>
 <body>
@@ -138,6 +169,13 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
   <h3 style="color:var(--navy)" id="confTitle">Leave the quiz?</h3>
   <p class="muted" id="confText">Your answers so far will be saved as a finished quiz.</p>
   <div class="row" style="justify-content:center"><button class="btn ghost" id="confNo">Stay</button><button class="btn" id="confYes">Leave</button></div>
+</div></div>
+<div id="rep" class="modal" style="background:rgba(20,40,75,.5)"><div class="box" style="text-align:left;max-width:420px">
+  <h3 style="color:var(--navy)">⚑ Report this question</h3>
+  <p class="muted small" id="repQ"></p>
+  <div id="repReasons" class="etypes" style="grid-template-columns:1fr"><button data-r="wrong">The answer is wrong</button><button data-r="unclear">The question is unclear</button><button data-r="other">Something else</button></div>
+  <input id="repText" placeholder="Tell your teacher more (optional)" maxlength="300">
+  <div class="row"><button class="btn ghost" id="repNo">Cancel</button><button class="btn" id="repYes" disabled>Send</button></div>
 </div></div>
 <div id="toast" class="toast"></div>
 
@@ -685,6 +723,7 @@ let FB = null;          // firebase handles
 let AUTH_USER = null;   // signed-in Google account
 let ME = null;          // the student's profile + attempts
 let TUSERS = [];        // teacher view: all students
+let THW = [], TREP = [], TEXTRA_ERR = false; // teacher view: homework, reported questions
 const isTeacher = () => !!(AUTH_USER && AUTH_USER.email === TEACHER_EMAIL);
 
 const Store = {
@@ -705,22 +744,28 @@ const Store = {
     if (!snap.exists()){
       if (isTeacher()){ // the teacher never fills in the student details form
         const t = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"Gunjan", phone:"", cls:"Teacher", courses:[], created:Date.now()};
-        await Store.saveProfile(t); ME = {...t, attempts:[]}; return;
+        await Store.saveProfile(t); ME = {...t, attempts:[], homework:[]}; return;
       }
-      ME = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"", profileMissing:true, courses:[], attempts:[]}; return; }
+      ME = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"", profileMissing:true, courses:[], attempts:[], homework:[]}; return; }
     const at = await F.getDocs(F.collection(db, "users", uid, "attempts"));
-    ME = {...snap.data(), uid, attempts: at.docs.map(d => d.data()).sort((a,b) => a.ts - b.ts)};
+    ME = {...snap.data(), uid, attempts: at.docs.map(d => d.data()).sort((a,b) => a.ts - b.ts), homework:[]};
+    if (ME.acepoint){ // homework is only for ACE POINT students
+      try { const hs = await F.getDocs(F.query(F.collection(db, "homework"), F.where("students", "array-contains", uid)));
+            ME.homework = hs.docs.map(d => ({...d.data(), id:d.id})); }
+      catch(e){ console.warn("homework", e); }
+    }
   },
   async signIn(){
     const p = new FB.U.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
     await FB.U.signInWithPopup(FB.auth, p);
   },
-  signOut(){ TUSERS = []; return FB.U.signOut(FB.auth); },
+  signOut(){ TUSERS = []; THW = []; TREP = []; return FB.U.signOut(FB.auth); },
   saveProfile(u){
     const {F, db} = FB;
     return F.setDoc(F.doc(db, "users", u.uid), {name:u.name, email:u.email, phone:u.phone||"", cls:u.cls||"", courses:u.courses||[], created:u.created||Date.now()}, {merge:true});
   },
   saveAttempt(att){ const {F, db} = FB; return F.setDoc(F.doc(db, "users", ME.uid, "attempts", att.id), att); },
+  report(r){ const {F, db} = FB; return F.addDoc(F.collection(db, "reports"), r); },
   async loadAllUsers(){
     const {F, db} = FB;
     const us = await F.getDocs(F.collection(db, "users"));
@@ -729,7 +774,15 @@ const Store = {
       return {...d.data(), uid:d.id, attempts: at.docs.map(x => x.data()).sort((a,b) => a.ts - b.ts)};
     }));
     TUSERS.sort((a,b) => (b.attempts.at(-1)?.ts||b.created||0) - (a.attempts.at(-1)?.ts||a.created||0));
+    TEXTRA_ERR = false;
+    try { THW = (await F.getDocs(F.collection(db, "homework"))).docs.map(d => ({...d.data(), id:d.id})); } catch(e){ console.warn(e); THW = []; TEXTRA_ERR = true; }
+    try { TREP = (await F.getDocs(F.collection(db, "reports"))).docs.map(d => ({...d.data(), id:d.id})); } catch(e){ console.warn(e); TREP = []; TEXTRA_ERR = true; }
   },
+  setAcepoint(uid, on){ const {F, db} = FB; return F.updateDoc(F.doc(db, "users", uid), {acepoint:on}); },
+  async addHomework(h){ const {F, db} = FB; const ref = await F.addDoc(F.collection(db, "homework"), h); return ref.id; },
+  deleteHomework(id){ const {F, db} = FB; return F.deleteDoc(F.doc(db, "homework", id)); },
+  setReport(id, status){ const {F, db} = FB; return F.updateDoc(F.doc(db, "reports", id), {status}); },
+  deleteReport(id){ const {F, db} = FB; return F.deleteDoc(F.doc(db, "reports", id)); },
   getUser: uid => TUSERS.find(u => u.uid === uid)
 };
 
@@ -740,11 +793,17 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const LEVELS = ["easy","medium","hard"], LN = {easy:"Easy",medium:"Medium",hard:"Hard"};
 const me = () => (ME && !ME.profileMissing) ? ME : null;
+const DAY = 864e5, REVISE_DAYS = 15;
 function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove("show"), 6000); }
 function chapterOf(cid, chid){ return (CHAPTERS[cid]||[]).find(c => c.id === chid); }
-function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid && chapterOf(a.course, a.chapter)); }
-function topicStats(attempts){
-  const t = {}; attempts.forEach(a => a.answers.forEach(x => { t[x.topic] = t[x.topic] || {r:0,n:0}; t[x.topic].n++; if (x.ok) t[x.topic].r++; })); return t;
+// Every question knows its chapter; QIDX finds any question in a course by its id
+const QIDX = {};
+Object.entries(CHAPTERS).forEach(([cid, chs]) => { QIDX[cid] = {}; chs.forEach(ch => ch.qs.forEach(q => { q.ch = ch.id; QIDX[cid][q.id] = q; })); });
+const qOf = (cid, id) => (QIDX[cid] || {})[id];
+const ansCh = (a, x) => x.ch || a.chapter;
+function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid && COURSE[cid]); }
+function topicStats(attempts, chid){
+  const t = {}; attempts.forEach(a => a.answers.forEach(x => { if (chid && ansCh(a,x) !== chid) return; t[x.topic] = t[x.topic] || {r:0,n:0}; t[x.topic].n++; if (x.ok) t[x.topic].r++; })); return t;
 }
 function strengthTag(st){
   if (!st || st.n < 10) return `<span class="tag na">${st ? 10 - st.n : 10} more to unlock</span>`;
@@ -752,6 +811,176 @@ function strengthTag(st){
 }
 function quickTag(r,n){ const p = n ? r/n : 0; return p >= .75 ? '<span class="tag ok">Strong</span>' : p >= .5 ? '<span class="tag mid">Okay</span>' : '<span class="tag weak">Needs work</span>'; }
 function fmtDate(ts){ const d = new Date(ts); return d.toLocaleDateString(undefined,{day:"numeric",month:"short"}) + ", " + d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}); }
+function fmtDay(ts){ return new Date(ts).toLocaleDateString(undefined,{day:"numeric",month:"short"}); }
+const pad = n => String(n).padStart(2,"0");
+const localDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dueTs = s => new Date(s + "T23:59:59").getTime();
+function attTitle(a){ return a.title || chapterOf(a.course, a.chapter)?.name || MODE_NAME[a.mode] || "Quiz"; }
+function liveTopics(ch){ return ch.topics.filter(t => ch.qs.some(q => q.topic === t)); }
+
+// Test pace copies the real exam: NEET about 1 minute per question; Grade 8 is 20 questions in 25 minutes
+const PACE = {sci8:75, math8:75}; const pace = cid => PACE[cid] || 60;
+const TEST_N = 20;
+
+// Error analysis types
+const ETYPES = [
+  {k:"concept", e:"🧩", n:"Concept error",            tip:"Go back to your notes for this idea and explain it in your own words before trying again."},
+  {k:"reading", e:"👀", n:"Reading error",            tip:"Underline key words (NOT, EXCEPT, units, what is asked) before you choose an answer."},
+  {k:"calc",    e:"🧮", n:"Calculation error",        tip:"Write every step, keep the units, and redo the arithmetic once before you pick."},
+  {k:"unknown", e:"📖", n:"Didn't know the topic",    tip:"Study this topic from your notes first, then practise its Easy questions."},
+  {k:"forgot",  e:"🧠", n:"Forgot a fact or formula", tip:"Keep a short list of facts and formulas and revise it for 5 minutes every day."},
+  {k:"silly",   e:"⚡", n:"Silly mistake or rushed",  tip:"Slow down: read all four options and check your choice once before you answer."}
+];
+const ET = Object.fromEntries(ETYPES.map(t => [t.k, t]));
+
+// Pick n questions; "mixed" takes about a third from each level
+function pickBalanced(pool, n, level){
+  if (level && level !== "mixed") return shuffle(pool.filter(q => q.level === level)).slice(0, n);
+  const by = LEVELS.map(l => shuffle(pool.filter(q => q.level === l)));
+  const base = Math.floor(n/3), rem = n % 3; const want = [0,1,2].map(i => base + (i < rem ? 1 : 0));
+  const out = []; by.forEach((arr, i) => out.push(...arr.splice(0, want[i])));
+  let k = 0; while (out.length < n && by.some(a => a.length)){ if (by[k%3].length) out.push(by[k%3].shift()); k++; }
+  return out.sort((a,b) => LEVELS.indexOf(a.level) - LEVELS.indexOf(b.level));
+}
+// Latest result for every question the student has answered in a course
+function lastResults(u, cid){
+  const last = {}; attemptsFor(u, cid).slice().sort((a,b) => a.ts - b.ts).forEach(a => a.answers.forEach((x,i) => { if (qOf(cid, x.id)) last[x.id] = {x, a, i}; })); return last;
+}
+// My Mistakes: questions whose latest answer was wrong or timed out
+function mistakesOf(u, cid, chid){ return Object.values(lastResults(u, cid)).filter(r => !r.x.ok && (!chid || qOf(cid, r.x.id).ch === chid)); }
+// Wrong answers still waiting for an error type (only quizzes from this version onwards)
+function pendingOf(u){ const out = []; (u.attempts||[]).forEach(a => { if (!a.v || !COURSE[a.course]) return; a.answers.forEach((x,i) => { if (!x.ok && !x.err) out.push({a, i}); }); }); return out; }
+// Chapters last practised 15 or more days ago
+function revisionDue(u){
+  const out = [];
+  (u.courses||[]).filter(c => COURSE[c]).forEach(cid => { const last = {};
+    attemptsFor(u, cid).forEach(a => a.answers.forEach(x => { const ch = ansCh(a, x); if (chapterOf(cid, ch)) last[ch] = Math.max(last[ch]||0, a.ts); }));
+    Object.entries(last).forEach(([ch, ts]) => { if (Date.now() - ts >= REVISE_DAYS*DAY) out.push({cid, ch, ts}); }); });
+  return out.sort((a,b) => a.ts - b.ts);
+}
+function hwDone(h, u){ return (u.attempts||[]).find(a => a.hw === h.id && !a.quit); }
+function homeworkFor(u){
+  if (!u.acepoint) return [];
+  return (u.homework||[]).filter(h => chapterOf(h.course, h.chapter)).map(h => ({h, done: hwDone(h, u)}))
+    .filter(x => !x.done || Date.now() - dueTs(x.h.due) < 7*DAY).sort((a,b) => dueTs(a.h.due) - dueTs(b.h.due));
+}
+function hwTitle(h){ const ch = chapterOf(h.course, h.chapter); return (ch ? ch.name : "") + (h.topic ? " · " + h.topic : ""); }
+// Every analysed wrong answer
+function errRows(users){
+  const out = []; users.forEach(u => (u.attempts||[]).forEach(a => { if (!COURSE[a.course]) return; a.answers.forEach((x,i) => { if (!x.ok && x.err && ET[x.err]) out.push({u, a, i, x}); }); }));
+  return out.sort((p,q) => p.a.ts - q.a.ts);
+}
+
+/* ---------- Error analysis box ---------- */
+function anaBox(attId, i, x){
+  return `<div class="ana" data-att="${esc(attId)}" data-i="${i}">
+    <div class="ana-h">🔍 Error analysis: why did you get this wrong?</div>
+    <div class="etypes">${ETYPES.map(t => `<button class="etype ${x.err===t.k?"on":""}" data-t="${t.k}">${t.e} ${t.n}</button>`).join("")}</div>
+    <input class="enote" placeholder="What will I do differently next time? (optional)" value="${esc(x.note||"")}" maxlength="200">
+    ${x.err ? `<div class="ana-tip">💡 ${esc(ET[x.err].tip)}</div>` : ""}
+  </div>`;
+}
+function anaTarget(box){
+  const i = +box.dataset.i;
+  if (box.dataset.att === "live") return Q && Q.asked[i];
+  const a = me() && me().attempts.find(a => a.id === box.dataset.att); return a && a.answers[i];
+}
+const anaSaving = {};
+function saveAna(attId){
+  const a = me() && me().attempts.find(a => a.id === attId); if (!a) return;
+  clearTimeout(anaSaving[attId]);
+  anaSaving[attId] = setTimeout(() => Store.saveAttempt(a).catch(e => { console.error(e); toast("Couldn't save your error analysis. Check your internet."); }), 400);
+}
+function pendText(n){ return n ? `${n} question${n>1?"s":""} left. Pick why you got each one wrong. You can start a new quiz when all are done.` : "All done! ✅ You can start a new quiz now."; }
+function updatePendingUI(){ const u = me(); if (!u) return; const n = pendingOf(u).length; if ($("pendTxt")) $("pendTxt").textContent = pendText(n); if ($("pendBanner")) $("pendBanner").style.display = n ? "" : "none"; }
+document.addEventListener("click", e => {
+  const b = e.target.closest(".etype"); if (!b) return;
+  const box = b.closest(".ana"); const x = anaTarget(box); if (!x) return;
+  x.err = b.dataset.t; x.note = box.querySelector(".enote").value.trim();
+  box.querySelectorAll(".etype").forEach(o => o.classList.toggle("on", o === b));
+  let tip = box.querySelector(".ana-tip"); if (!tip){ tip = document.createElement("div"); tip.className = "ana-tip"; box.appendChild(tip); }
+  tip.textContent = "💡 " + ET[x.err].tip;
+  if (box.dataset.att === "live"){ if ($("nextBtn")) $("nextBtn").disabled = false; }
+  else { saveAna(box.dataset.att); updatePendingUI(); }
+});
+document.addEventListener("change", e => {
+  if (!e.target.classList.contains("enote")) return;
+  const box = e.target.closest(".ana"); const x = anaTarget(box); if (!x) return;
+  x.note = e.target.value.trim(); if (box.dataset.att !== "live" && x.err) saveAna(box.dataset.att);
+});
+
+/* ---------- Report a question ---------- */
+let REP = null;
+function openReport(cid, qid){
+  const q = qOf(cid, qid); if (!q) return;
+  REP = {cid, qid, reason:null}; $("repQ").textContent = q.q; $("repText").value = "";
+  document.querySelectorAll("#repReasons button").forEach(b => b.classList.remove("on")); $("repYes").disabled = true;
+  $("rep").classList.add("show");
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-flag]"); if (!b) return; const [cid, qid] = b.dataset.flag.split("|"); openReport(cid, qid); });
+document.querySelectorAll("#repReasons button").forEach(b => b.onclick = () => {
+  REP.reason = b.dataset.r; document.querySelectorAll("#repReasons button").forEach(o => o.classList.toggle("on", o === b)); $("repYes").disabled = false; });
+$("repNo").onclick = () => { $("rep").classList.remove("show"); if (Q) Q.grace = Date.now() + 1000; };
+$("repYes").onclick = async () => {
+  const u = me(), q = qOf(REP.cid, REP.qid); $("repYes").disabled = true;
+  const r = {uid:AUTH_USER.uid, name:u ? u.name : "", email:AUTH_USER.email, course:REP.cid, chapter:q.ch, qid:REP.qid, reason:REP.reason, text:$("repText").value.trim(), ts:Date.now(), status:"open"};
+  try { await Store.report(r); $("rep").classList.remove("show"); toast("Thank you! Your teacher will check this question."); }
+  catch(e){ console.error(e); $("repYes").disabled = false; toast("Couldn't send the report. Please try again."); }
+};
+const REASON = {wrong:"Answer is wrong", unclear:"Question is unclear", other:"Other"};
+
+/* ---------- Confirm box ---------- */
+let CONF = null;
+function confirmBox(title, text, yes, onYes, no = "Stay"){
+  $("confTitle").textContent = title; $("confText").textContent = text; $("confYes").textContent = yes; $("confNo").textContent = no;
+  CONF = onYes; $("confirm").classList.add("show");
+}
+$("confNo").onclick = () => { $("confirm").classList.remove("show"); CONF = null; if (Q) Q.grace = Date.now() + 1000; };
+$("confYes").onclick = () => { $("confirm").classList.remove("show"); const f = CONF; CONF = null; if (f) f(); };
+
+/* ---------- Spreadsheet download ---------- */
+function downloadCSV(name, rows){
+  const csv = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const blob = new Blob(["﻿" + csv], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+/* ---------- Review card (one wrong answer) ---------- */
+function reviewCard(a, i, o = {}){
+  const x = a.answers[i]; const q = qOf(a.course, x.id) || {q:"(question removed)", options:["","","",""], answer:0, explain:"", mistakes:{}};
+  const none = a.style === "test" ? "Not answered" : "No answer (time ran out)";
+  const tag = x.err && ET[x.err] ? `<div class="etag">${ET[x.err].e} ${ET[x.err].n}${x.note ? ` · “${esc(x.note)}”` : ""}</div>` : "";
+  let ana = "";
+  if (o.teacher || o.readonly) ana = tag || (a.v ? '<div class="muted small" style="margin-top:6px">Error analysis not done yet</div>' : "");
+  else if (a.v) ana = anaBox(a.id, i, x);
+  return `<div class="review">
+    ${o.ctx ? `<div class="muted small" style="margin-bottom:4px">${o.who ? `<b>${esc(o.who)}</b> · ` : ""}${esc(COURSE[a.course]?.name||"")} · ${esc(chapterOf(a.course, ansCh(a,x))?.name||"")} · ${esc(x.topic)} · ${fmtDay(a.ts)}</div>` : ""}
+    <div class="q">${esc(q.q)}</div>
+    <div>${o.teacher ? "Answer given" : "Your answer"}: ${x.chosen === -1 ? `<i>${none}</i>` : esc(q.options[x.chosen])}</div>
+    <div><b>Correct: ${esc(q.options[q.answer])}</b></div>
+    ${x.chosen !== -1 && q.mistakes[x.chosen] ? `<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[x.chosen])}</div>` : ""}
+    <div class="muted small" style="margin-top:4px">${esc(q.explain)}</div>
+    ${ana}
+    ${o.teacher ? "" : `<div style="margin-top:6px"><button class="link small" data-flag="${esc(a.course)}|${esc(x.id)}">⚑ Report this question</button></div>`}
+  </div>`;
+}
+
+/* ---------- Error summary (student and teacher) ---------- */
+function errorSummaryHTML(rows){
+  if (!rows.length) return '<p class="muted">No analysed mistakes yet. After each wrong answer you pick why it happened, and it shows up here.</p>';
+  const cnt = {}; ETYPES.forEach(t => cnt[t.k] = 0); rows.forEach(r => cnt[r.x.err]++);
+  const max = Math.max(1, ...Object.values(cnt));
+  const topics = {}; rows.forEach(r => { const k = r.x.topic; topics[k] = topics[k] || {n:0}; topics[k].n++; topics[k][r.x.err] = (topics[k][r.x.err]||0) + 1; });
+  const ranked = ETYPES.filter(t => cnt[t.k]).sort((a,b) => cnt[b.k] - cnt[a.k]);
+  return `<h3>Overall (${rows.length} question${rows.length>1?"s":""})</h3>
+    ${ETYPES.map(t => `<div class="ebar"><span>${t.e} ${t.n}</span><div><i style="width:${cnt[t.k]/max*100}%"></i></div><b>${cnt[t.k]}</b></div>`).join("")}
+    <h3 style="margin-top:14px">By topic</h3>
+    <table><tr><th>Topic</th><th>Mistakes</th><th>Types</th></tr>
+    ${Object.entries(topics).sort((a,b) => b[1].n - a[1].n).map(([k,v]) => `<tr><td>${esc(k)}</td><td>${v.n}</td><td class="small">${ETYPES.filter(t => v[t.k]).map(t => `${t.e} ${t.n} ${v[t.k]}`).join("<br>")}</td></tr>`).join("")}</table>
+    <h3 style="margin-top:14px">Tips</h3>
+    ${ranked.map(t => `<div class="ana-tip" style="margin:6px 0">${t.e} <b>${t.n}</b> (${cnt[t.k]}): ${esc(t.tip)}</div>`).join("")}`;
+}
 
 /* =====================================================================
    4. ROUTER / VIEWS
@@ -769,7 +998,7 @@ function header(){
   const db = $("dashBtn"); if (db) db.onclick = () => { location.hash = "#teacher"; go("teacherLock"); };
   $("foot").style.display = VIEW.name === "quiz" ? "none" : "";
 }
-const NEEDS_STUDENT = ["catalogue","pay","home","course","chapter","report"];
+const NEEDS_STUDENT = ["catalogue","pay","home","course","chapter","report","analysis","errors"];
 function render(){
   if (NEEDS_STUDENT.includes(VIEW.name) && !me()) VIEW = {name: AUTH_USER ? (ME && ME.profileMissing ? "profile" : "loading") : "welcome"};
   header(); const app = $("app");
@@ -847,7 +1076,7 @@ Views.profile.after = () => {
     else if (!cls) e = "Please choose your class or year.";
     $("su_err").textContent = e; if (e) return;
     const btn = $("su_go"); btn.disabled = true;
-    const u = {uid:ME.uid, email:ME.email, name, phone: cc + " " + phone, cls, courses:[], created:Date.now(), attempts:[]};
+    const u = {uid:ME.uid, email:ME.email, name, phone: cc + " " + phone, cls, courses:[], created:Date.now(), attempts:[], homework:[]};
     try { await Store.saveProfile(u); ME = u; go("catalogue", {onboarding:true}); }
     catch(err){ console.error(err); btn.disabled = false; $("su_err").textContent = "Couldn't save. Please check your internet and try again."; }
   };
@@ -882,15 +1111,15 @@ Views.catalogue.after = () => {
 Views.pay = () => { const c = COURSE[VIEW.cid]; return `
   <button class="back" id="bk">← Back to courses</button>
   <div class="card">
-    
     <h1>${esc(c.name)}</h1>
     <p class="muted">${esc(c.desc)}</p>
     <h2>What you get</h2>
     <ul class="small" style="padding-left:20px;margin:6px 0">
       <li>Adaptive topic quizzes: Easy, Medium and Hard</li>
+      <li>Exam-style chapter tests and your own custom quizzes</li>
       <li>Explanations and "where you went wrong" for every question</li>
-      <li>Strengths and weaknesses by topic</li>
-      <li>Your full quiz history</li>
+      <li>My Mistakes list and error analysis</li>
+      <li>Strengths and weaknesses by topic, and revision reminders</li>
       <li>Mock tests, past papers and revision notes (coming soon)</li>
     </ul>
     <h2>Price</h2>
@@ -908,27 +1137,60 @@ Views.pay.after = () => {
 
 /* ---------- Home: my courses ---------- */
 Views.home = () => { const u = me(); if (!u) return Views.welcome();
-  const all = u.attempts||[], right = all.reduce((s,a)=>s+a.right,0), tot = all.reduce((s,a)=>s+a.total,0);
+  const all = (u.attempts||[]).filter(a => COURSE[a.course]), right = all.reduce((s,a)=>s+a.right,0), tot = all.reduce((s,a)=>s+a.total,0);
+  const pend = pendingOf(u).length, hw = homeworkFor(u), rev = revisionDue(u);
   return `
   <div class="card">
     <h1>Welcome back, ${esc(u.name.split(" ")[0])} 👋</h1>
     <div class="stat"><div><b>${all.length}</b><span>Quizzes</span></div><div><b>${tot}</b><span>Questions</span></div><div><b>${tot?Math.round(right/tot*100):0}%</b><span>Accuracy</span></div></div>
   </div>
+  ${pend ? `<div class="banner" id="pendBanner"><b>📝 ${pend} error analysis${pend>1?" questions":" question"} to finish</b><div class="small">Pick why you got each one wrong. You can start a new quiz after that.</div><button class="btn" id="goAna" style="margin-top:8px">Finish now</button></div>` : ""}
+  ${hw.length ? `<h2>Homework 📚</h2><div class="grid">${hw.map(({h, done}) => { const late = !done && Date.now() > dueTs(h.due);
+      return `<button class="tile" data-hw="${esc(h.id)}" ${done?"disabled":""}><div class="t">${esc(hwTitle(h))} ${done ? `<span class="badge live">Done ${done.right}/${done.total}</span>` : late ? '<span class="badge" style="background:var(--redbg);color:var(--red)">Overdue</span>' : `<span class="badge soon">Due ${fmtDay(dueTs(h.due))}</span>`}</div>
+        <div class="d">${esc(COURSE[h.course]?.name||"")} · ${h.n} questions${done ? "" : " · tap to start"}</div></button>`; }).join("")}</div>` : ""}
+  ${rev.length ? `<h2>Time to revise 🔁</h2><div class="grid">${rev.map(r => `<button class="tile" data-rev="${r.cid}|${r.ch}"><div class="t">${esc(chapterOf(r.cid, r.ch).name)} <span class="badge soon">${Math.floor((Date.now()-r.ts)/DAY)} days ago</span></div>
+      <div class="d">${esc(COURSE[r.cid].name)} · Quick Revision: about 10 questions in 10 minutes</div></button>`).join("")}</div>` : ""}
   <h2>My courses</h2>
-  <div class="grid">${u.courses.filter(c => COURSE[c]).map(cid => { const c = COURSE[cid]; const at = attemptsFor(u,cid);
-     return `<button class="tile" data-c="${cid}"><div class="t">${esc(c.name)}</div><div class="d">${(CHAPTERS[cid]||[]).length} chapter(s) · ${at.length} quiz(zes) taken</div></button>`; }).join("") || '<p class="muted">No courses yet.</p>'}</div>
+  <div class="grid">${u.courses.filter(c => COURSE[c]).map(cid => { const c = COURSE[cid]; const at = attemptsFor(u,cid); const m = mistakesOf(u,cid).length;
+     return `<button class="tile" data-c="${cid}"><div class="t">${esc(c.name)}</div><div class="d">${(CHAPTERS[cid]||[]).length} chapter(s) · ${at.length} quiz(zes) taken${m?` · ${m} mistake(s) to fix`:""}</div></button>`; }).join("") || '<p class="muted">No courses yet.</p>'}</div>
+  <button class="btn ghost block" id="myErr">🔍 My Error Analysis</button>
   <button class="btn ghost block" id="addCourse">+ Add another course</button>`; };
 Views.home.after = () => {
   document.querySelectorAll(".tile[data-c]").forEach(t => t.onclick = () => go("course",{cid:t.dataset.c, tab:"practice"}));
+  document.querySelectorAll(".tile[data-hw]").forEach(t => t.onclick = () => startHomework(t.dataset.hw));
+  document.querySelectorAll(".tile[data-rev]").forEach(t => t.onclick = () => { const [cid, ch] = t.dataset.rev.split("|"); startRevision(cid, ch); });
+  if ($("goAna")) $("goAna").onclick = () => go("analysis");
+  $("myErr").onclick = () => go("errors");
   $("addCourse").onclick = () => go("catalogue");
 };
 
+/* ---------- Pending error analysis ---------- */
+Views.analysis = () => { const u = me(); const p = pendingOf(u);
+  return `<button class="back" id="bk">← Home</button>
+  <div class="card"><h1>🔍 Error analysis</h1><p class="muted" id="pendTxt">${pendText(p.length)}</p></div>
+  ${p.map(({a, i}) => reviewCard(a, i, {ctx:true})).join("")}
+  <button class="btn block" id="anaDone">Done</button>`; };
+Views.analysis.after = () => { $("bk").onclick = () => go("home");
+  $("anaDone").onclick = () => { const n = pendingOf(me()).length; if (n) toast(`${n} still to do. You can come back to them any time.`); go("home"); }; };
+
+/* ---------- My Error Analysis (student) ---------- */
+Views.errors = () => { const u = me(); const cid = VIEW.cid || "";
+  let rows = errRows([u]); if (cid) rows = rows.filter(r => r.a.course === cid);
+  return `<button class="back" id="bk">← Home</button>
+  <div class="card"><h1>🔍 My Error Analysis</h1><p class="muted">Every question you got wrong, and why. See which kind of mistake you make most and work on it.</p>
+    <label for="eCourse">Course</label><select id="eCourse"><option value="">All my courses</option>${u.courses.filter(c => COURSE[c]).map(c => `<option value="${c}" ${c===cid?"selected":""}>${esc(COURSE[c].name)}</option>`).join("")}</select></div>
+  <div class="card">${errorSummaryHTML(rows)}</div>
+  ${rows.length ? `<h2>All analysed questions (${rows.length})</h2>` + rows.slice().reverse().map(r => reviewCard(r.a, r.i, {ctx:true, readonly:true})).join("") : ""}`; };
+Views.errors.after = () => { $("bk").onclick = () => go("home"); $("eCourse").onchange = e => go("errors", {cid:e.target.value}); };
+
 /* ---------- Course home ---------- */
+const TABS = [["practice","Practice"],["create","Create a Quiz"],["mistakes","My Mistakes"],["strengths","Strengths & weaknesses"],["history","History"],["more","More"]];
+let CQ = null; // Create a Quiz choices
 Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c = COURSE[VIEW.cid]; const chs = CHAPTERS[VIEW.cid]||[];
   const at = attemptsFor(u, VIEW.cid); const tab = VIEW.tab || "practice";
   let body = "";
   if (tab === "practice"){
-    body = chs.length ? chs.map(ch => { const done = new Set(); at.filter(a=>a.chapter===ch.id).forEach(a=>a.answers.forEach(x=>done.add(x.id)));
+    body = chs.length ? chs.map(ch => { const done = new Set(); at.forEach(a => a.answers.forEach(x => { if (ansCh(a,x) === ch.id) done.add(x.id); }));
       if (!ch.qs.length) return `<button class="tile" disabled><div class="t">${esc(ch.name)} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.join(" · ")}</div></button>`;
       const pct = Math.min(100, Math.round(done.size/ch.qs.length*100));
       return `<button class="tile" data-ch="${ch.id}"><div class="t">${esc(ch.name)}</div>
@@ -936,52 +1198,122 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
         <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
       : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
     body = `<div class="grid">${body}</div>`;
+  } else if (tab === "create"){
+    body = cqHTML(VIEW.cid);
+  } else if (tab === "mistakes"){
+    const ms = mistakesOf(u, VIEW.cid);
+    if (!ms.length) body = `<div class="card"><h3>No mistakes to fix 🎉</h3><p class="muted">When you get a question wrong or run out of time, it shows up here. It leaves the list once you answer it right, and comes back if you get it wrong again.</p></div>`;
+    else {
+      const byCh = {}; ms.forEach(r => { const ch = qOf(VIEW.cid, r.x.id).ch; (byCh[ch] = byCh[ch] || []).push(r); });
+      body = `<div class="card"><h3>${ms.length} question${ms.length>1?"s":""} to fix</h3><p class="muted small">A question leaves this list once you answer it right, and comes back if you get it wrong again.</p>
+        <button class="btn block" id="msAll">Practise all my mistakes (${ms.length})</button></div>
+        ${chs.filter(ch => byCh[ch.id]).map(ch => { const rs = byCh[ch.id]; const byT = {}; rs.forEach(r => (byT[r.x.topic] = byT[r.x.topic] || []).push(r));
+          return `<div class="card"><div class="bar" style="margin:0"><h3 style="margin:0">${esc(ch.name)} (${rs.length})</h3><button class="btn ghost" data-msch="${ch.id}" style="padding:8px 14px;font-size:14px">Practise these</button></div>
+            ${Object.entries(byT).map(([t, list]) => `<h3 style="margin-top:12px;font-size:15px;color:var(--navy)">${esc(t)}</h3>${list.map(r => { const q = qOf(VIEW.cid, r.x.id);
+              return `<div class="review"><div class="q">${esc(q.q)}</div><div class="small">Your answer: ${r.x.chosen === -1 ? `<i>${r.a.style==="test"?"Not answered":"Time ran out"}</i>` : esc(q.options[r.x.chosen])}</div>
+                <div class="small muted">${fmtDay(r.a.ts)} · <span class="pill ${q.level}" style="font-size:11px;padding:2px 8px">${LN[q.level]}</span> · ${r.x.err && ET[r.x.err] ? ET[r.x.err].e + " " + ET[r.x.err].n : "Not analysed"}</div></div>`; }).join("")}`).join("")}</div>`; }).join("")}`;
+    }
   } else if (tab === "strengths"){
     const ts = topicStats(at); const topics = [...new Set(chs.flatMap(ch => liveTopics(ch)))];
     body = `<div class="card"><p class="muted">Answer at least 10 questions in a topic to get your strength score.</p>
       <table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th>Strength</th></tr>
       ${topics.map(t => { const s = ts[t]; return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${strengthTag(s)}</td></tr>`; }).join("")}</table></div>`;
   } else if (tab === "history"){
-    body = at.length ? `<div class="card"><table><tr><th>When</th><th>Chapter</th><th>Score</th><th>Level</th></tr>
-      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(chapterOf(a.course,a.chapter)?.name||"")}<div class="muted small">${MODE_NAME[a.mode]||"Adaptive"}${a.topic?" · "+esc(a.topic):""}</div></td><td>${a.right}/${a.total}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}</td><td>${LN[a.maxLevel]}</td></tr>`).join("")}</table></div>`
+    body = at.length ? `<div class="card"><table><tr><th>When</th><th>Quiz</th><th>Score</th><th>Level</th></tr>
+      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(attTitle(a))}<div class="muted small">${MODE_NAME[a.mode]||"Adaptive"}${a.topic?" · "+esc(a.topic):""}</div></td><td>${a.right}/${a.total}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}</td><td>${LN[a.maxLevel]||""}</td></tr>`).join("")}</table></div>`
       : '<p class="muted">No quizzes yet. Start one from Practice.</p>';
   } else {
     body = `<div class="grid two">
-      ${[["🎯","Target tests","Timed tests on the topics you choose."],["📝","Mock exams","Full-length exam-style papers."],["📄","Past papers","Real past papers with solutions."],["📘","Revision notes","ACE POINT notes for every chapter."]]
+      ${[["📝","Mock exams","Full-length exam-style papers."],["📄","Past papers","Real past papers with solutions."],["📘","Revision notes","ACE POINT notes for every chapter."]]
         .map(x => `<div class="tile" style="cursor:default"><div class="t">${x[0]} ${x[1]} <span class="badge soon">Coming soon</span></div><div class="d">${x[2]}</div></div>`).join("")}</div>`;
   }
   return `
   <button class="back" id="bk">← My courses</button>
   <div class="card"><h1>${esc(c.name)}</h1><p class="muted">${esc(c.desc)}</p></div>
-  <div class="tabs">${[["practice","Practice"],["strengths","Strengths & weaknesses"],["history","History"],["more","More"]].map(t => `<button data-t="${t[0]}" class="${tab===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>
+  <div class="tabs">${TABS.map(t => `<button data-t="${t[0]}" class="${tab===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>
   ${body}`; };
 Views.course.after = () => {
   $("bk").onclick = () => go("home");
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => go("course",{cid:VIEW.cid, tab:b.dataset.t}));
   document.querySelectorAll(".tile[data-ch]").forEach(t => t.onclick = () => go("chapter",{cid:VIEW.cid, chid:t.dataset.ch}));
+  const cid = VIEW.cid;
+  const mlist = chid => shuffle(mistakesOf(me(), cid, chid).map(r => qOf(cid, r.x.id)));
+  if ($("msAll")) $("msAll").onclick = () => startQuiz({cid, mode:"mistakes", list:mlist(), title:"My Mistakes"});
+  document.querySelectorAll("[data-msch]").forEach(b => b.onclick = () => startQuiz({cid, chid:b.dataset.msch, mode:"mistakes", list:mlist(b.dataset.msch), title:"My Mistakes · " + chapterOf(cid, b.dataset.msch).name}));
+  if (VIEW.tab === "create") cqBind();
 };
 
+/* ---------- Create a Quiz ---------- */
+function cqHTML(cid){
+  const chs = (CHAPTERS[cid]||[]).filter(ch => ch.qs.length);
+  if (!chs.length) return '<p class="muted">Questions for this course are being added. Check back soon!</p>';
+  if (!CQ || CQ.cid !== cid) CQ = {cid, picked:new Set(), n:10, level:"mixed", style:"practice"};
+  const seg = (k, opts) => `<div class="seg" data-seg="${k}">${opts.map(([v,l]) => `<button data-v="${v}" class="${String(CQ[k])===String(v)?"on":""}">${l}</button>`).join("")}</div>`;
+  return `<div class="card">
+    <h3>1. Choose chapters or topics</h3>
+    ${chs.map(ch => `<div class="cqch"><label class="chk"><input type="checkbox" data-cqch="${ch.id}"> <b>${esc(ch.name)}</b></label>
+      <div class="cqtops">${liveTopics(ch).map(t => `<label class="chk"><input type="checkbox" data-cqt="${ch.id}|${esc(t)}" ${CQ.picked.has(ch.id+"|"+t)?"checked":""}> ${esc(t)}</label>`).join("")}</div></div>`).join("")}
+    <h3 style="margin-top:16px">2. How many questions?</h3>${seg("n", [[10,"10"],[20,"20"],[30,"30"]])}
+    <h3 style="margin-top:16px">3. Level</h3>${seg("level", [["mixed","Mixed"],["easy","Easy"],["medium","Medium"],["hard","Hard"]])}
+    <h3 style="margin-top:16px">4. Style</h3>${seg("style", [["practice","Practice"],["test","Test"]])}
+    <p class="muted small" id="cqStyle"></p>
+    <p class="small" id="cqInfo" style="font-weight:600"></p>
+    <button class="btn block" id="cqGo">Start my quiz</button></div>`;
+}
+function cqPool(){
+  const out = []; CQ.picked.forEach(k => { const p = k.indexOf("|"), chid = k.slice(0,p), t = k.slice(p+1); const ch = chapterOf(CQ.cid, chid); if (ch) ch.qs.forEach(q => { if (q.topic === t) out.push(q); }); });
+  return out;
+}
+function cqUpdate(){
+  document.querySelectorAll("[data-cqch]").forEach(b => { const ch = chapterOf(CQ.cid, b.dataset.cqch); const ts = liveTopics(ch); const k = ts.filter(t => CQ.picked.has(ch.id+"|"+t)).length;
+    b.checked = k === ts.length; b.indeterminate = k > 0 && k < ts.length; });
+  document.querySelectorAll("[data-cqt]").forEach(b => b.checked = CQ.picked.has(b.dataset.cqt));
+  document.querySelectorAll(".seg[data-seg]").forEach(s => s.querySelectorAll("button").forEach(b => b.classList.toggle("on", String(CQ[s.dataset.seg]) === b.dataset.v)));
+  const pool = cqPool(); const avail = CQ.level === "mixed" ? pool.length : pool.filter(q => q.level === CQ.level).length; const n = Math.min(+CQ.n, avail);
+  $("cqInfo").textContent = !CQ.picked.size ? "Tick at least one chapter or topic." : !avail ? `No ${LN[CQ.level]||""} questions in what you picked.` : `${n} question${n>1?"s":""} ready${avail < +CQ.n ? ` (only ${avail} available)` : ""}.`;
+  $("cqStyle").textContent = CQ.style === "practice" ? "Practice: answer and explanation after every question; 45 seconds each (1 minute for calculations)."
+    : `Test: one timer for the whole quiz (${Math.max(1, Math.round((n||+CQ.n) * pace(CQ.cid) / 60))} minutes). Jump between questions and change answers; answers are shown at the end.`;
+  $("cqGo").disabled = !avail;
+}
+function cqBind(){
+  if (!$("cqGo")) return;
+  document.querySelectorAll("[data-cqch]").forEach(b => b.onchange = () => { const ch = chapterOf(CQ.cid, b.dataset.cqch); liveTopics(ch).forEach(t => b.checked ? CQ.picked.add(ch.id+"|"+t) : CQ.picked.delete(ch.id+"|"+t)); cqUpdate(); });
+  document.querySelectorAll("[data-cqt]").forEach(b => b.onchange = () => { b.checked ? CQ.picked.add(b.dataset.cqt) : CQ.picked.delete(b.dataset.cqt); cqUpdate(); });
+  document.querySelectorAll(".seg[data-seg] button").forEach(b => b.onclick = () => { CQ[b.parentElement.dataset.seg] = b.dataset.v; cqUpdate(); });
+  $("cqGo").onclick = () => {
+    const pool = cqPool(); let list = pickBalanced(pool, +CQ.n, CQ.level); if (!list.length) return;
+    const chs = [...new Set(list.map(q => q.ch))], tps = [...new Set(list.map(q => q.topic))];
+    const title = "Create a Quiz · " + (chs.length === 1 ? chapterOf(CQ.cid, chs[0]).name : chs.length + " chapters");
+    if (CQ.style === "test") list = shuffle(list);
+    startQuiz({cid:CQ.cid, chid: chs.length === 1 ? chs[0] : null, topic: tps.length === 1 ? tps[0] : null, mode:"custom", style:CQ.style, list, title});
+  };
+  cqUpdate();
+}
+
 /* ---------- Chapter: choose topic and mode ---------- */
-function liveTopics(ch){ return ch.topics.filter(t => ch.qs.some(q => q.topic === t)); }
-Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid).filter(a=>a.chapter===ch.id));
+function testSize(ch){ return Math.min(TEST_N, ch.qs.length); }
+Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid), ch.id);
   const topic = VIEW.topic || ""; const pool = ch.qs.filter(q => !topic || q.topic === topic);
-  const n = l => pool.filter(q => q.level === l).length;
+  const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch);
   return `
   <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
   <div class="card">
     <h1>${esc(ch.name)}</h1>
     <p class="muted">${ch.qs.length} questions across ${liveTopics(ch).length} topics</p>
+    <h2>📝 Chapter test</h2>
+    <button class="tile" id="chTest"><div class="t">Chapter test (exam style) <span class="badge own">${tn} questions · ${Math.round(tn*pace(VIEW.cid)/60)} min</span></div>
+      <div class="d">Whole chapter, about a third Easy, Medium and Hard. One timer for the whole test; jump between questions, change answers, mark for review. Answers at the end.</div></button>
+    <h2>Practice</h2>
     <label for="topicSel">What do you want to practise?</label>
     <select id="topicSel"><option value="">Whole chapter (all topics)</option>${liveTopics(ch).map(t => `<option ${t===topic?"selected":""}>${esc(t)}</option>`).join("")}</select>
-    <h2>Choose a quiz</h2>
-    <div class="grid">
+    <div class="grid" style="margin-top:12px">
       <button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
         <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>
       <button class="tile" data-m="easy" ${n("easy")?"":"disabled"}><div class="t">🟢 All Easy questions</div><div class="d">${n("easy")} questions</div></button>
       <button class="tile" data-m="medium" ${n("medium")?"":"disabled"}><div class="t">🟠 All Medium questions</div><div class="d">${n("medium")} questions</div></button>
       <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d">${n("hard")} questions</div></button>
     </div>
-    <p class="muted small" style="margin-top:12px">45 seconds per question, 1 minute for calculations. The quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning, and 3 warnings submits the quiz. You can end any quiz early, and your result is saved.</p>
+    <p class="muted small" style="margin-top:12px">Practice: 45 seconds per question, 1 minute for calculations. After a wrong answer, pick why it happened before going on. The quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning, and 3 warnings submits the quiz.</p>
   </div>
   <div class="card"><h3>Your topics in this chapter</h3>
     <table><tr><th>Topic</th><th>Answered</th><th>Strength</th></tr>
@@ -989,43 +1321,82 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
 Views.chapter.after = () => {
   $("bk").onclick = () => go("course",{cid:VIEW.cid, tab:"practice"});
   $("topicSel").onchange = e => go("chapter",{cid:VIEW.cid, chid:VIEW.chid, topic:e.target.value});
-  document.querySelectorAll(".tile[data-m]").forEach(t => t.onclick = () => startQuiz(VIEW.cid, VIEW.chid, $("topicSel").value, t.dataset.m));
+  $("chTest").onclick = () => startChapterTest(VIEW.cid, VIEW.chid);
+  document.querySelectorAll(".tile[data-m]").forEach(t => t.onclick = () => {
+    const cid = VIEW.cid, chid = VIEW.chid, topic = $("topicSel").value, m = t.dataset.m; const ch = chapterOf(cid, chid);
+    if (m === "adaptive") return startQuiz({cid, chid, topic, mode:m});
+    startQuiz({cid, chid, topic, mode:m, list: shuffle(ch.qs.filter(q => (!topic || q.topic === topic) && q.level === m))});
+  });
 };
+
+/* ---------- Quiz starters ---------- */
+function startChapterTest(cid, chid){
+  const ch = chapterOf(cid, chid); const list = shuffle(pickBalanced(ch.qs, TEST_N, "mixed"));
+  startQuiz({cid, chid, mode:"test", style:"test", list, secs: list.length * pace(cid), title: ch.name + " · Chapter test"});
+}
+function startRevision(cid, chid){
+  const u = me(), ch = chapterOf(cid, chid);
+  const inCh = Object.values(lastResults(u, cid)).filter(r => qOf(cid, r.x.id).ch === chid);
+  const wrong = shuffle(inCh.filter(r => !r.x.ok)).map(r => qOf(cid, r.x.id)), right = shuffle(inCh.filter(r => r.x.ok)).map(r => qOf(cid, r.x.id));
+  let list = wrong.slice(0, 7); list = list.concat(right.slice(0, 10 - list.length)); list = list.concat(wrong.slice(7, 7 + 10 - list.length));
+  if (list.length < 10){ const have = new Set(list.map(q => q.id)); list = list.concat(shuffle(ch.qs.filter(q => !have.has(q.id))).slice(0, 10 - list.length)); }
+  startQuiz({cid, chid, mode:"revision", style:"test", list: shuffle(list), secs: list.length * 60, title: ch.name + " · Quick Revision"});
+}
+function startHomework(id){
+  const u = me(); const h = (u.homework||[]).find(x => x.id === id); if (!h) return;
+  const ch = chapterOf(h.course, h.chapter); const pool = ch.qs.filter(q => !h.topic || q.topic === h.topic);
+  startQuiz({cid:h.course, chid:h.chapter, topic:h.topic||null, mode:"homework", list: pickBalanced(pool, h.n, "mixed"), hw:h.id, title:"Homework · " + hwTitle(h)});
+}
 
 /* =====================================================================
    5. QUIZ ENGINE
    ===================================================================== */
 const SECONDS = 45, MAX_WARN = 3, NEED = {0:5, 1:10};
-const MODE_NAME = {adaptive:"Adaptive quiz", easy:"All Easy", medium:"All Medium", hard:"All Hard"};
+const MODE_NAME = {adaptive:"Adaptive quiz", easy:"All Easy", medium:"All Medium", hard:"All Hard", test:"Chapter test", custom:"Create a Quiz",
+  mistakes:"My Mistakes", revision:"Quick Revision", homework:"Homework"};
 const CHEERS = [["🎯","Bullseye!","Spot on."],["🚀","Nailed it!","Keep going."],["🧪","Chemistry champ!","That's correct."],["😎","Too easy for you!","Correct answer."],
   ["⚗️","Perfect reaction!","Right answer."],["⭐","Superstar!","Correct."],["🙌","Yes!","Well done."],["🧠","Big brain!","Correct."]];
 const LEVELUP = ["🏆","Level up!","Questions get harder now."];
 const OOPS = [["🤏","Almost!","Read the explanation below."],["💪","No worries!","Check what went wrong below."],["🧐","Not quite!","Let's see why."]];
 let Q = null;
 
-async function startQuiz(cid, chid, topic, mode){
-  const ch = chapterOf(cid, chid); const pool = ch.qs.filter(q => !topic || q.topic === topic);
-  const fixed = mode !== "adaptive";
-  const queue = fixed ? shuffle(pool.filter(q => q.level === mode)) : null;
-  Q = {cid, chid, topic, mode, pool, queue, fixed, total: fixed ? queue.length : null,
-       level: fixed ? LEVELS.indexOf(mode) : 0, maxLevel: fixed ? LEVELS.indexOf(mode) : 0, rs:0, asked:[], used:new Set(), wrong:new Set(),
+// spec: {cid, chid, topic, mode, style:"practice"|"test", list (fixed questions), secs (test time), title, hw}
+async function startQuiz(spec){
+  const u = me(); if (!u) return;
+  if (pendingOf(u).length){ toast("Finish your error analysis first. Then you can start a new quiz."); return go("analysis"); }
+  const {cid, chid = null, topic = null, mode, style = "practice"} = spec;
+  const ch = chid ? chapterOf(cid, chid) : null;
+  const pool = mode === "adaptive" ? ch.qs.filter(q => !topic || q.topic === topic) : [];
+  const queue = mode === "adaptive" ? null : (spec.list || []);
+  if ((queue && !queue.length) || (!queue && !pool.length)){ toast("No questions here yet."); return; }
+  Q = {cid, chid, topic: topic || null, mode, style, title: spec.title || (ch ? ch.name : ""), hw: spec.hw || null,
+       pool, queue, fixed: !!queue, total: queue ? queue.length : null,
+       level: 0, maxLevel: 0, rs:0, asked:[], used:new Set(), wrong:new Set(),
        warnings:0, incidents:[], cur:null, timerId:null, left:0, limit:0, answered:false, active:true,
        ts:Date.now(), lastInc:0, grace:Date.now()+2000, baseW:window.innerWidth};
-  if (!pool.length || (fixed && !queue.length)) { toast("No questions here yet."); Q = null; return; }
+  if (style === "test"){ Q.list = queue; Q.sel = queue.map(() => -1); Q.marked = new Set(); Q.idx = 0; Q.orders = queue.map(() => shuffle([0,1,2,3])); Q.spent = queue.map(() => 0); Q.secs = spec.secs || queue.length * pace(cid); }
   try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {}
   Q.baseW = window.innerWidth; Q.grace = Date.now() + 1500;
-  VIEW = {name:"quiz"}; header(); $("app").innerHTML = quizShell(); $("app").classList.add("quizmode");
-  $("nextBtn").onclick = nextQ; $("quitBtn").onclick = () => $("confirm").classList.add("show");
-  nextQ();
+  VIEW = {name:"quiz"}; header(); $("app").classList.add("quizmode");
+  if (style === "test"){
+    $("app").innerHTML = testShell(); bindTest(); Q.deadline = Date.now() + Q.secs*1000; Q.qStart = Date.now();
+    drawTestQ(); tickTest(); Q.timerId = setInterval(tickTest, 1000);
+  } else {
+    $("app").innerHTML = quizShell();
+    $("nextBtn").onclick = nextQ;
+    $("quitBtn").onclick = () => confirmBox("Leave the quiz?", "Your answers so far will be saved as a finished quiz.", "Leave", () => finishQuiz(false, true));
+    $("flagBtn").onclick = () => { if (Q.cur) openReport(Q.cid, Q.cur.id); };
+    nextQ();
+  }
 }
 function shuffle(a){ a = a.slice(); for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
-function quizShell(){ const ch = chapterOf(Q.cid,Q.chid); return `
+function quizShell(){ return `
   <div class="card">
-    <div class="muted small" style="margin-bottom:8px">${esc(ch.name)}${Q.topic?" · "+esc(Q.topic):""} · ${MODE_NAME[Q.mode]}</div>
+    <div class="muted small" style="margin-bottom:8px">${esc(Q.title)}${Q.topic && Q.mode !== "custom" ? " · "+esc(Q.topic) : ""} · ${MODE_NAME[Q.mode]}</div>
     <div class="bar"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy">Easy</span><span id="streak" class="pill">Streak: 0</span><span id="warnPill" class="pill warn" style="display:none"></span></div>
     <div id="timer" class="timer"><div></div></div><div id="timeLeft" class="muted small" style="margin-bottom:8px"></div>
     <div id="topic" class="muted small"></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="feedback"></div>
-    <div class="row" style="justify-content:space-between"><button class="link" id="quitBtn">End quiz</button><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
+    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="quitBtn">End quiz</button> · <button class="link" id="flagBtn">⚑ Report question</button></span><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
   </div>`; }
 function pickQ(){
   if (Q.fixed) return Q.queue[Q.asked.length] || null;
@@ -1044,13 +1415,15 @@ function pickQ(){
 }
 function streakText(){ if (Q.fixed) return `Streak: ${Q.rs}`; return Q.level < 2 ? `${Q.rs} / ${NEED[Q.level]} in a row` : `Streak: ${Q.rs}`; }
 function nextQ(){
+  const last = Q.asked.at(-1);
+  if (Q.answered && last && !last.ok && !last.err) return toast("First pick why you got it wrong.");
   const q = pickQ(); if (!q) return finishQuiz(false);
   Q.used.add(q.id); Q.cur = q; Q.answered = false;
   $("qnum").textContent = Q.fixed ? `Question ${Q.asked.length+1} of ${Q.total}` : `Question ${Q.asked.length+1}`;
   $("lvl").textContent = LN[q.level]; $("lvl").className = "pill " + q.level;
   $("streak").textContent = streakText();
   $("topic").textContent = "Topic: " + q.topic + (q.time ? " · Calculation: 1 minute" : "");
-  $("qtext").textContent = q.q; $("feedback").innerHTML = ""; $("nextBtn").style.display = "none";
+  $("qtext").textContent = q.q; $("feedback").innerHTML = ""; $("nextBtn").style.display = "none"; $("nextBtn").disabled = false;
   const box = $("opts"); box.innerHTML = "";
   Q.order = shuffle([0,1,2,3]); // show options in a random order so the answer is not always in the same place
   Q.order.forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt"; b.dataset.i = i; b.innerHTML = `<b>${"ABCD"[pos]}</b>`; b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => answerQ(i); box.appendChild(b); });
@@ -1063,7 +1436,8 @@ function answerQ(i){
   if (Q.answered || !Q.active) return; Q.answered = true; clearInterval(Q.timerId);
   const q = Q.cur, ok = i === q.answer;
   document.querySelectorAll(".opt").forEach(b => { const k = +b.dataset.i; b.disabled = true; if (k===q.answer) b.classList.add("correct"); if (k===i && !ok) b.classList.add("wrong"); });
-  Q.asked.push({id:q.id, topic:q.topic, level:q.level, chosen:i, ok, secs:Q.limit - Q.left});
+  const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:i, ok, secs:Q.limit - Q.left};
+  Q.asked.push(entry);
   let msg = "", up = false;
   if (ok){ Q.rs++; } else { Q.rs = 0; Q.wrong.add(q.id); }
   if (!Q.fixed && Q.level < 2 && Q.rs >= NEED[Q.level]){ Q.level++; Q.rs = 0; up = true; msg = `Level up! ${NEED[Q.level-1]} in a row. Next questions are ${LN[LEVELS[Q.level]]}.`; }
@@ -1071,8 +1445,10 @@ function answerQ(i){
   $("feedback").innerHTML = ok
     ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${esc(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
     : `<div class="feedback bad"><h3>${i===-1?"⏰ Time's up!":"❌ Not quite."}</h3><p><b>Correct answer: ${"ABCD"[Q.order.indexOf(q.answer)]}) ${esc(q.options[q.answer])}</b></p><p>${esc(q.explain)}</p>
-       <div class="mist"><b>Where it went wrong:</b> ${i===-1?"You ran out of time on this one.":esc(q.mistakes[i]||"")}</div>${msg?`<p><b>${msg}</b></p>`:""}</div>`;
+       <div class="mist"><b>Where it went wrong:</b> ${i===-1?"You ran out of time on this one.":esc(q.mistakes[i]||"")}</div>${msg?`<p><b>${msg}</b></p>`:""}</div>
+       ${anaBox("live", Q.asked.length-1, entry)}`;
   $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = "";
+  $("nextBtn").disabled = !ok;
   if (ok) celebrate(up ? LEVELUP : CHEERS[Math.floor(Math.random()*CHEERS.length)], up);
   else if (i !== -1) celebrate(OOPS[Math.floor(Math.random()*OOPS.length)], false);
 }
@@ -1086,12 +1462,52 @@ function burst(){ const col = ["#ffcc33","#1f5fbf","#16834a","#c0392b","#8e44ad"
     d.style.animationDelay = (Math.random()*1.5)+"s"; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); } }
 $("cheer").onclick = () => $("cheer").classList.remove("show");
 
+/* ---------- Test style (chapter test, Quick Revision, Create a Quiz test) ---------- */
+function testShell(){ return `
+  <div class="card">
+    <div class="muted small" style="margin-bottom:8px">${esc(Q.title)}</div>
+    <div class="bar"><span id="tClock" class="pill">--:--</span><span id="tCount" class="pill"></span><span id="warnPill" class="pill warn" style="display:none"></span></div>
+    <div id="palette" class="palette"></div>
+    <div class="bar" style="margin:14px 0 0"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy"></span></div>
+    <div id="topic" class="muted small" style="margin-top:8px"></div><div id="qtext" class="qtext"></div><div id="opts"></div>
+    <div class="row" style="justify-content:space-between"><button class="btn ghost" id="prevBtn">← Back</button><button class="btn ghost" id="markBtn">☆ Mark for review</button><button class="btn" id="nextBtn">Next →</button></div>
+    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="clearBtn">Clear answer</button> · <button class="link" id="flagBtn">⚑ Report question</button></span><button class="btn" id="submitBtn" style="background:var(--green)">Submit test</button></div>
+    <p class="muted small" style="margin-top:10px">You can change answers until you submit. Answers and explanations are shown at the end. The test submits itself when time is up.</p>
+  </div>`; }
+function bindTest(){
+  $("prevBtn").onclick = () => moveTest(Q.idx-1);
+  $("nextBtn").onclick = () => moveTest(Q.idx+1);
+  $("markBtn").onclick = () => { Q.marked.has(Q.idx) ? Q.marked.delete(Q.idx) : Q.marked.add(Q.idx); drawTestQ(); };
+  $("clearBtn").onclick = () => { Q.sel[Q.idx] = -1; drawTestQ(); };
+  $("flagBtn").onclick = () => openReport(Q.cid, Q.list[Q.idx].id);
+  $("submitBtn").onclick = () => { const left = Q.sel.filter(s => s < 0).length, mk = Q.marked.size;
+    confirmBox("Submit the test?", (left ? `${left} question${left>1?"s":""} not answered. ` : "All questions answered. ") + (mk ? `${mk} marked for review. ` : "") + "You can't change answers after submitting.", "Submit", () => finishQuiz(false), "Keep working"); };
+  $("palette").onclick = e => { const b = e.target.closest("button[data-k]"); if (b) moveTest(+b.dataset.k); };
+}
+function moveTest(k){ if (k < 0 || k >= Q.list.length) return; const now = Date.now(); Q.spent[Q.idx] += (now - Q.qStart)/1000; Q.qStart = now; Q.idx = k; drawTestQ(); window.scrollTo(0,0); }
+function drawTestQ(){
+  const q = Q.list[Q.idx], n = Q.list.length;
+  $("palette").innerHTML = Q.list.map((x,k) => `<button data-k="${k}" class="${k===Q.idx?"cur ":""}${Q.sel[k]>=0?"ans ":""}${Q.marked.has(k)?"mark":""}">${k+1}</button>`).join("");
+  $("qnum").textContent = `Question ${Q.idx+1} of ${n}`; $("lvl").textContent = LN[q.level]; $("lvl").className = "pill " + q.level;
+  $("topic").textContent = "Topic: " + q.topic; $("qtext").textContent = q.q;
+  const box = $("opts"); box.innerHTML = "";
+  Q.orders[Q.idx].forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt" + (Q.sel[Q.idx] === i ? " sel" : ""); b.innerHTML = `<b>${"ABCD"[pos]}</b>`; b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => { Q.sel[Q.idx] = i; drawTestQ(); }; box.appendChild(b); });
+  $("markBtn").textContent = Q.marked.has(Q.idx) ? "★ Marked" : "☆ Mark for review";
+  $("prevBtn").disabled = Q.idx === 0; $("nextBtn").disabled = Q.idx === n-1;
+  $("tCount").textContent = `Answered ${Q.sel.filter(s => s >= 0).length}/${n}${Q.marked.size ? ` · ${Q.marked.size} marked` : ""}`;
+}
+function tickTest(){
+  if (!Q || !Q.active) return; const left = Math.max(0, Math.round((Q.deadline - Date.now())/1000)); const el = $("tClock"); if (!el) return;
+  el.textContent = `⏱ ${Math.floor(left/60)}:${pad(left%60)} left`; el.classList.toggle("warn", left <= 60);
+  if (left <= 0){ Q.timeUp = true; $("confirm").classList.remove("show"); CONF = null; finishQuiz(false); }
+}
+
 /* ---------- Anti-cheat ---------- */
 function incident(reason){
   if (!Q || !Q.active) return; const now = Date.now();
   if (now < Q.grace || now - Q.lastInc < 2500 || $("confirm").classList.contains("show")) return;
   Q.lastInc = now; Q.warnings++;
-  Q.incidents.push({time:new Date().toLocaleTimeString(), reason, q:Q.asked.length + (Q.answered?0:1)});
+  Q.incidents.push({time:new Date().toLocaleTimeString(), reason, q: Q.style === "test" ? Q.idx + 1 : Q.asked.length + (Q.answered?0:1)});
   $("warnPill").style.display = ""; $("warnPill").textContent = `Warnings: ${Q.warnings}/${MAX_WARN}`;
   if (Q.warnings >= MAX_WARN){ $("warn").classList.remove("show"); return finishQuiz(true); }
   $("warnCount").textContent = Q.warnings; $("warnText").textContent = reason + "."; $("warn").classList.add("show");
@@ -1104,49 +1520,53 @@ document.addEventListener("copy", e => { if (Q && Q.active) e.preventDefault(); 
 document.addEventListener("contextmenu", e => { if (Q && Q.active) e.preventDefault(); });
 $("warnBtn").onclick = async () => { $("warn").classList.remove("show"); Q.grace = Date.now() + 1500;
   try { if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {} };
-$("confNo").onclick = () => { $("confirm").classList.remove("show"); if (Q) Q.grace = Date.now() + 1000; };
-$("confYes").onclick = () => { $("confirm").classList.remove("show"); finishQuiz(false, true); };
 
 /* ---------- Finish + save ---------- */
 function finishQuiz(auto, quit){
-  Q.active = false; clearInterval(Q.timerId); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode");
+  if (!Q || !Q.active) return;
+  Q.active = false; clearInterval(Q.timerId); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); $("rep").classList.remove("show");
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
+  if (Q.style === "test"){
+    Q.spent[Q.idx] += (Date.now() - Q.qStart)/1000;
+    Q.asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(Q.spent[k]), marked:Q.marked.has(k) || undefined}));
+  }
   const right = Q.asked.filter(a => a.ok).length;
-  const att = {id:"q"+Date.now(), course:Q.cid, chapter:Q.chid, topic:Q.topic||null, mode:Q.mode, ts:Q.ts, right, total:Q.asked.length,
-               maxLevel:LEVELS[Q.maxLevel], auto, quit:!!quit, answers:Q.asked, incidents:Q.incidents};
+  const maxL = Q.fixed ? Math.max(0, ...Q.asked.map(a => LEVELS.indexOf(a.level))) : Q.maxLevel;
+  const chs = [...new Set(Q.asked.map(a => a.ch))];
+  const att = {v:2, id:"q"+Date.now(), course:Q.cid, chapter: Q.chid || (chs.length === 1 ? chs[0] : null), topic:Q.topic, mode:Q.mode, style:Q.style, title:Q.title, hw:Q.hw || undefined,
+               ts:Q.ts, right, total:Q.asked.length, maxLevel:LEVELS[maxL], auto, quit:!!quit, timeUp:!!Q.timeUp, secs: Q.style === "test" ? Q.secs : undefined,
+               answers:Q.asked, incidents:Q.incidents};
   const u = me(); if (u && att.total){ u.attempts.push(att); Store.saveAttempt(att).catch(e => { console.error(e); toast("Couldn't save this result online. Check your internet."); }); }
   VIEW = {name:"report", att}; render(); window.scrollTo(0,0);
 }
 function reportHTML(att, forTeacher){
-  const ch = chapterOf(att.course, att.chapter); if (!ch) return '<p class="muted">This quiz was from an older version of the course.</p>';
-  const byId = id => ch.qs.find(q => q.id === id) || {q:"(question removed)", options:["","","",""], answer:0, explain:"", mistakes:{}};
   const pct = att.total ? Math.round(att.right/att.total*100) : 0;
   const t = {}; att.answers.forEach(a => { t[a.topic] = t[a.topic]||{r:0,n:0}; t[a.topic].n++; if (a.ok) t[a.topic].r++; });
-  const wrong = att.answers.filter(a => !a.ok).map(a => { const q = byId(a.id); return `
-    <div class="review"><div class="q">${esc(q.q)}</div>
-    <div>${forTeacher?"Answer given":"Your answer"}: ${a.chosen===-1?"<i>No answer (time ran out)</i>":esc(q.options[a.chosen])}</div>
-    <div><b>Correct: ${esc(q.options[q.answer])}</b></div>
-    ${a.chosen!==-1?`<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[a.chosen])}</div>`:""}
-    <div class="muted small" style="margin-top:4px">${esc(q.explain)}</div></div>`; }).join("");
+  const wrongIdx = att.answers.map((x,i) => i).filter(i => !att.answers[i].ok);
+  const wrong = wrongIdx.map(i => reviewCard(att, i, {teacher:forTeacher})).join("");
+  const pend = !forTeacher && att.v && wrongIdx.some(i => !att.answers[i].err);
   return `
     <div class="big">${att.right} / ${att.total}</div>
-    <p class="muted">${pct}% correct · Highest level: <b>${LN[att.maxLevel]}</b> · ${fmtDate(att.ts)}</p>
+    <p class="muted">${pct}% correct · Highest level: <b>${LN[att.maxLevel]||""}</b> · ${fmtDate(att.ts)}</p>
     ${att.auto?`<p style="color:var(--red);font-weight:600">Submitted automatically after ${MAX_WARN} warnings.</p>`:""}
+    ${att.timeUp?`<p style="color:var(--red);font-weight:600">Time ran out, so the test was submitted automatically.</p>`:""}
     ${att.quit?`<p class="muted">Quiz ended early.</p>`:""}
     <h2>By topic</h2><table><tr><th>Topic</th><th>Score</th><th></th></tr>${Object.entries(t).map(([k,v]) => `<tr><td>${esc(k)}</td><td>${v.r}/${v.n}</td><td>${quickTag(v.r,v.n)}</td></tr>`).join("")}</table>
     <h2>By level</h2><table><tr><th>Level</th><th>Score</th></tr>${LEVELS.map(l => { const a = att.answers.filter(x=>x.level===l); return a.length?`<tr><td>${LN[l]}</td><td>${a.filter(x=>x.ok).length}/${a.length}</td></tr>`:""; }).join("")}</table>
-    <h2>Questions to review</h2>${wrong || '<p class="muted">Every question right! 🏆</p>'}
+    <h2>Questions to review</h2>
+    ${pend ? `<div class="banner" id="pendBanner"><b>📝 Error analysis</b><div class="small">For each question below, pick why you got it wrong. You can start a new quiz when all are done.</div></div>` : ""}
+    ${wrong || '<p class="muted">Every question right! 🏆</p>'}
     <h2>Focus log</h2>${att.incidents.length ? `<table><tr><th>Time</th><th>Q</th><th>What happened</th></tr>${att.incidents.map(x => `<tr><td>${x.time}</td><td>${x.q}</td><td>${esc(x.reason)}</td></tr>`).join("")}</table>` : '<p class="muted">No warnings. Great focus!</p>'}`;
 }
 Views.report = () => { const a = VIEW.att, u = me(); const pct = a.total ? a.right/a.total : 0;
   return `<div class="card"><h1>${pct>=.8?"🏆":pct>=.5?"👍":"📚"} Well done, ${esc(u?u.name.split(" ")[0]:"")}!</h1>
-    <p class="muted small">Saved to your account.</p>${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
+    <p class="muted small">${esc(attTitle(a))} · Saved to your account.</p>${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
     <div class="row" style="justify-content:flex-start"><button class="btn" id="again">Practise again</button><button class="btn ghost" id="share">Copy result for teacher</button><button class="btn ghost" id="toCourse">Back to course</button></div></div>`; };
 Views.report.after = () => { const a = VIEW.att;
-  $("again").onclick = () => go("chapter",{cid:a.course, chid:a.chapter});
+  $("again").onclick = () => a.chapter && a.mode !== "custom" ? go("chapter",{cid:a.course, chid:a.chapter}) : go("course",{cid:a.course, tab: a.mode === "custom" ? "create" : a.mode === "mistakes" ? "mistakes" : "practice"});
   $("toCourse").onclick = () => go("course",{cid:a.course, tab:"practice"});
-  $("share").onclick = async () => { const u = me(); const ch = chapterOf(a.course,a.chapter);
-    const txt = `ACE POINT result\n${u.name} (${u.email})\n${COURSE[a.course].name} · ${ch.name}\nScore: ${a.right}/${a.total} · Highest level: ${LN[a.maxLevel]}\nWarnings: ${a.incidents.length}${a.auto?" (auto-submitted)":""}\n${fmtDate(a.ts)}`;
+  $("share").onclick = async () => { const u = me();
+    const txt = `ACE POINT result\n${u.name} (${u.email})\n${COURSE[a.course].name} · ${attTitle(a)}\nScore: ${a.right}/${a.total} · Highest level: ${LN[a.maxLevel]||""}\nWarnings: ${a.incidents.length}${a.auto?" (auto-submitted)":""}\n${fmtDate(a.ts)}`;
     try { await navigator.clipboard.writeText(txt); toast("Copied! Paste it on WhatsApp to your teacher."); } catch(e) { toast("Couldn't copy on this device."); } };
 };
 
@@ -1154,6 +1574,7 @@ Views.report.after = () => { const a = VIEW.att;
    6. TEACHER DASHBOARD
    ===================================================================== */
 let TEACHER = false;
+const tOnly = () => !TEACHER || !isTeacher();
 Views.teacherLock = () => {
   if (!AUTH_USER) return `
   <button class="back" id="bk">← Back</button>
@@ -1175,16 +1596,23 @@ Views.teacherLock.after = async () => {
     catch(e){ console.error(e); $("app").innerHTML = `<div class="card"><h1>Couldn't load students</h1><p class="muted">Check that the database rules are published, then refresh.</p></div>`; }
   }
 };
-Views.teacher = () => { if (!TEACHER || !isTeacher()) return Views.teacherLock();
+Views.teacher = () => { if (tOnly()) return Views.teacherLock();
   const us = TUSERS; const at = us.flatMap(u => (u.attempts||[]));
+  const openRep = TREP.filter(r => r.status !== "done").length;
   return `
   <button class="back" id="bk">← Leave dashboard</button>
   <div class="card"><h1>Teacher dashboard</h1>
     <div class="stat"><div><b>${us.length}</b><span>Students</span></div><div><b>${at.length}</b><span>Quizzes</span></div><div><b>${at.reduce((s,a)=>s+(a.incidents||[]).length,0)}</b><span>Warnings</span></div></div>
-    <button class="btn ghost" id="tRefresh">↻ Refresh</button></div>
+    <button class="btn ghost" id="tRefresh">↻ Refresh</button>
+    ${TEXTRA_ERR ? '<div class="note">Homework and reported questions need the new database rules. Please publish them in Firebase, then refresh.</div>' : ""}</div>
+  <div class="grid two">
+    <button class="tile" id="goHw"><div class="t">📚 Homework</div><div class="d">${THW.length} set · ${us.filter(u=>u.acepoint).length} ACE POINT student(s)</div></button>
+    <button class="tile" id="goErr"><div class="t">🔍 Error analysis</div><div class="d">All students · filters · download as spreadsheet</div></button>
+    <button class="tile" id="goRep"><div class="t">⚑ Reported questions ${openRep?`<span class="badge" style="background:var(--redbg);color:var(--red)">${openRep} open</span>`:""}</div><div class="d">${TREP.length} report(s) from students</div></button>
+  </div>
   <h2>Students</h2>
   <div class="grid">${us.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0); const last = a.at(-1);
-    return `<button class="tile" data-u="${esc(u.uid)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
+    return `<button class="tile" data-u="${esc(u.uid)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span>${u.acepoint?' <span class="badge live">ACE POINT</span>':""}</div>
       <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">${a.length} quiz(zes) · ${n?Math.round(r/n*100):0}% accuracy${last?" · last quiz "+fmtDate(last.ts):""}</div>
       <div class="d">${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join(", ")||"No course"}</div></button>`; }).join("") || '<p class="muted">No students yet.</p>'}</div>
   <h2>Question bank</h2>
@@ -1193,21 +1621,134 @@ Views.teacher = () => { if (!TEACHER || !isTeacher()) return Views.teacherLock()
 Views.teacher.after = () => { if (!$("tRefresh")) return Views.teacherLock.after();
   $("bk").onclick = () => { TEACHER = false; try { history.replaceState(null, "", location.pathname); } catch(e) {} go(me() ? "home" : "welcome"); };
   $("tRefresh").onclick = async () => { $("tRefresh").disabled = true; try { await Store.loadAllUsers(); } catch(e) { toast("Couldn't refresh."); } go("teacher"); };
+  $("goHw").onclick = () => go("tHomework"); $("goErr").onclick = () => go("tErrors"); $("goRep").onclick = () => go("tReports");
   document.querySelectorAll(".tile[data-u]").forEach(t => t.onclick = () => go("tStudent",{uid:t.dataset.u})); };
-Views.tStudent = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const a = u.attempts||[];
-  const byCourse = (u.courses||[]).filter(c => COURSE[c]).map(cid => { const ts = topicStats(a.filter(x=>x.course===cid && chapterOf(x.course,x.chapter))); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>liveTopics(c)))];
+
+/* ---------- One student ---------- */
+Views.tStudent = () => { if (tOnly()) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const a = u.attempts||[];
+  const byCourse = (u.courses||[]).filter(c => COURSE[c]).map(cid => { const ts = topicStats(attemptsFor(u, cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>liveTopics(c)))];
     return `<h2>${esc(COURSE[cid].name)}</h2><table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th></th></tr>${topics.map(t => { const s = ts[t];
       return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${s?quickTag(s.r,s.n):'<span class="tag na">Not started</span>'}</td></tr>`; }).join("")}</table>`; }).join("");
+  const hws = THW.filter(h => (h.students||[]).includes(u.uid)).sort((p,q) => dueTs(q.due) - dueTs(p.due));
+  const rows = errRows([u]);
   return `<button class="back" id="bk">← Dashboard</button>
-  <div class="card"><h1>${esc(u.name)}</h1><p class="muted">${esc(u.cls||"")} · ${esc(u.email)} · ${esc(u.phone)}</p>${byCourse}</div>
+  <div class="card"><h1>${esc(u.name)}</h1><p class="muted">${esc(u.cls||"")} · ${esc(u.email)} · ${esc(u.phone)}</p>
+    <div class="switchrow"><div><b>ACE POINT student</b><div class="muted small">Only ACE POINT students get homework. Students can't change this.</div></div>
+      <button class="toggle ${u.acepoint?"on":""}" id="apTog" aria-pressed="${!!u.acepoint}"><span></span></button></div>
+    ${byCourse}</div>
+  ${hws.length ? `<h2>Homework</h2><div class="card"><table><tr><th>Homework</th><th>Due</th><th>Status</th></tr>${hws.map(h => `<tr><td>${esc(hwTitle(h))}<div class="muted small">${h.n} questions</div></td><td>${fmtDay(dueTs(h.due))}</td><td>${hwStatusHTML(h, u)}</td></tr>`).join("")}</table></div>` : ""}
+  <h2>Error analysis</h2><div class="card">${errorSummaryHTML(rows)}</div>
   <h2>Quizzes</h2>${a.length ? a.slice().reverse().map((x,i) => `<button class="tile" data-i="${a.length-1-i}" style="margin-bottom:8px">
-    <div class="t">${x.right}/${x.total} · ${esc(chapterOf(x.course,x.chapter)?.name||"")}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}</div>
-    <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}`; };
+    <div class="t">${x.right}/${x.total} · ${esc(attTitle(x))}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}</div>
+    <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]||""}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}`; };
 Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
+  $("apTog").onclick = async () => { const u = Store.getUser(VIEW.uid); const on = !u.acepoint; $("apTog").disabled = true;
+    try { await Store.setAcepoint(u.uid, on); u.acepoint = on; toast(on ? `${u.name} is now an ACE POINT student.` : `${u.name} is no longer marked as an ACE POINT student.`); }
+    catch(e){ console.error(e); toast("Couldn't change it. Please publish the new database rules, then try again."); }
+    go("tStudent", {uid:VIEW.uid}); };
   document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{uid:VIEW.uid, i:+t.dataset.i})); };
-Views.tAttempt = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const at = u.attempts[VIEW.i];
-  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s quiz</h1><p class="muted">${esc(chapterOf(at.course,at.chapter)?.name||"")} · ${MODE_NAME[at.mode]||"Adaptive quiz"}</p>${reportHTML(at,true)}</div>`; };
+Views.tAttempt = () => { if (tOnly()) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const at = u.attempts[VIEW.i];
+  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s quiz</h1><p class="muted">${esc(attTitle(at))} · ${MODE_NAME[at.mode]||"Adaptive quiz"}</p>${reportHTML(at,true)}</div>`; };
 Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{uid:VIEW.uid}); };
+
+/* ---------- Homework ---------- */
+function hwStatusHTML(h, u){
+  const d = hwDone(h, u);
+  if (d) return `<span class="tag ok">Done ${d.right}/${d.total}</span>${d.ts > dueTs(h.due) ? ' <span class="tag mid">Late</span>' : ""}<div class="muted small">${fmtDate(d.ts)}</div>`;
+  const started = (u.attempts||[]).some(a => a.hw === h.id);
+  return Date.now() > dueTs(h.due) ? '<span class="tag weak">Not done</span>' : `<span class="tag na">${started ? "Started" : "Not yet"}</span>`;
+}
+Views.tHomework = () => { if (tOnly()) return Views.teacherLock();
+  const live = Object.keys(CHAPTERS).filter(cid => COURSE[cid] && CHAPTERS[cid].some(ch => ch.qs.length));
+  const cid = live.includes(VIEW.hwc) ? VIEW.hwc : live[0]; const chs = (CHAPTERS[cid]||[]).filter(ch => ch.qs.length);
+  const ch = chs.find(c => c.id === VIEW.hwch) || chs[0];
+  const aps = TUSERS.filter(u => u.acepoint);
+  const list = THW.slice().sort((p,q) => dueTs(q.due) - dueTs(p.due));
+  return `<button class="back" id="bk">← Dashboard</button>
+  <div class="card"><h1>📚 Set homework</h1>
+    <label for="hwC">Course</label><select id="hwC">${live.map(c => `<option value="${c}" ${c===cid?"selected":""}>${esc(COURSE[c].name)}</option>`).join("")}</select>
+    <label for="hwCh">Chapter</label><select id="hwCh">${chs.map(c => `<option value="${c.id}" ${c===ch?"selected":""}>${esc(c.name)}</option>`).join("")}</select>
+    <label for="hwT">Topic</label><select id="hwT"><option value="">Whole chapter</option>${ch ? liveTopics(ch).map(t => `<option>${esc(t)}</option>`).join("") : ""}</select>
+    <label for="hwN">Number of questions</label><select id="hwN">${[5,10,15,20,30].map(n => `<option ${n===10?"selected":""}>${n}</option>`).join("")}</select>
+    <label for="hwDue">Due date</label><input id="hwDue" type="date" value="${localDate(new Date(Date.now()+3*DAY))}">
+    <label>Students</label>
+    ${aps.length ? aps.map(u => `<label class="chk"><input type="checkbox" data-hwu="${esc(u.uid)}"> ${esc(u.name)} <span class="muted small">${esc((u.courses||[]).map(c => COURSE[c]?.name||c).join(", "))}</span></label>`).join("")
+      : '<p class="muted small">No ACE POINT students yet. Open a student from the dashboard and turn on "ACE POINT student".</p>'}
+    <div class="err" id="hwErr"></div>
+    <button class="btn block" id="hwSave" ${aps.length?"":"disabled"}>Set homework</button></div>
+  <h2>Homework set (${list.length})</h2>
+  ${list.map(h => `<div class="card"><div class="bar" style="margin:0"><div><b>${esc(hwTitle(h))}</b><div class="muted small">${esc(COURSE[h.course]?.name||"")} · ${h.n} questions · due ${fmtDay(dueTs(h.due))}</div></div>
+      <button class="link" data-hwdel="${esc(h.id)}" style="color:var(--red)">Delete</button></div>
+      <table><tr><th>Student</th><th>Status</th></tr>${(h.students||[]).map(uid => { const u = Store.getUser(uid); return u ? `<tr><td>${esc(u.name)}</td><td>${hwStatusHTML(h, u)}</td></tr>` : ""; }).join("")}</table></div>`).join("") || '<p class="muted">No homework set yet.</p>'}`; };
+Views.tHomework.after = () => { $("bk").onclick = () => go("teacher");
+  $("hwC").onchange = e => go("tHomework", {hwc:e.target.value});
+  $("hwCh").onchange = e => go("tHomework", {hwc:$("hwC").value, hwch:e.target.value});
+  $("hwSave").onclick = async () => {
+    const students = [...document.querySelectorAll("[data-hwu]")].filter(b => b.checked).map(b => b.dataset.hwu);
+    const due = $("hwDue").value;
+    if (!students.length) return $("hwErr").textContent = "Tick at least one student.";
+    if (!due) return $("hwErr").textContent = "Choose a due date.";
+    const h = {course:$("hwC").value, chapter:$("hwCh").value, topic:$("hwT").value || null, n:+$("hwN").value, due, students, created:Date.now()};
+    $("hwSave").disabled = true;
+    try { const id = await Store.addHomework(h); THW.push({...h, id}); toast("Homework set! Students will see it on their home page."); go("tHomework", {hwc:h.course, hwch:h.chapter}); }
+    catch(e){ console.error(e); $("hwSave").disabled = false; $("hwErr").textContent = "Couldn't save. Please publish the new database rules, then try again."; }
+  };
+  document.querySelectorAll("[data-hwdel]").forEach(b => b.onclick = () => confirmBox("Delete this homework?", "Students will no longer see it. Their quiz results stay saved.", "Delete", async () => {
+    try { await Store.deleteHomework(b.dataset.hwdel); THW = THW.filter(h => h.id !== b.dataset.hwdel); go("tHomework", {hwc:VIEW.hwc, hwch:VIEW.hwch}); }
+    catch(e){ console.error(e); toast("Couldn't delete. Please try again."); } }, "Cancel"));
+};
+
+/* ---------- Error analysis: all students ---------- */
+function tErrFiltered(){
+  let rows = errRows(TUSERS);
+  if (VIEW.fs) rows = rows.filter(r => r.u.uid === VIEW.fs);
+  if (VIEW.fc) rows = rows.filter(r => r.a.course === VIEW.fc);
+  if (VIEW.ft) rows = rows.filter(r => r.x.err === VIEW.ft);
+  return rows;
+}
+Views.tErrors = () => { if (tOnly()) return Views.teacherLock();
+  const rows = tErrFiltered(); const courses = [...new Set(errRows(TUSERS).map(r => r.a.course))];
+  const sel = (id, all, opts, v) => `<select id="${id}"><option value="">${all}</option>${opts.map(([k,l]) => `<option value="${esc(k)}" ${k===v?"selected":""}>${esc(l)}</option>`).join("")}</select>`;
+  return `<button class="back" id="bk">← Dashboard</button>
+  <div class="card"><h1>🔍 Error analysis</h1><p class="muted">Every analysed wrong answer from all students.</p>
+    <label>Student</label>${sel("fS", "All students", TUSERS.map(u => [u.uid, u.name]), VIEW.fs)}
+    <label>Course</label>${sel("fC", "All courses", courses.map(c => [c, COURSE[c].name]), VIEW.fc)}
+    <label>Error type</label>${sel("fT", "All types", ETYPES.map(t => [t.k, t.n]), VIEW.ft)}
+    <button class="btn block" id="dl" ${rows.length?"":"disabled"}>⬇ Download as spreadsheet (${rows.length} rows)</button></div>
+  <div class="card">${errorSummaryHTML(rows)}</div>
+  ${rows.length ? `<h2>Questions (${rows.length}${rows.length > 100 ? ", latest 100 shown" : ""})</h2>` + rows.slice().reverse().slice(0,100).map(r => reviewCard(r.a, r.i, {teacher:true, ctx:true, who:r.u.name})).join("") : ""}`; };
+Views.tErrors.after = () => { $("bk").onclick = () => go("teacher");
+  const f = () => go("tErrors", {fs:$("fS").value, fc:$("fC").value, ft:$("fT").value});
+  $("fS").onchange = f; $("fC").onchange = f; $("fT").onchange = f;
+  $("dl").onclick = () => {
+    const rows = tErrFiltered().slice().reverse();
+    const head = ["Date","Student","Email","Course","Chapter","Topic","Level","Question","Student's answer","Correct answer","Error type","What I will do differently","Quiz"];
+    const data = rows.map(r => { const q = qOf(r.a.course, r.x.id) || {q:"", options:[], answer:0}; const d = new Date(r.a.ts);
+      return [localDate(d), r.u.name, r.u.email, COURSE[r.a.course]?.name, chapterOf(r.a.course, ansCh(r.a, r.x))?.name, r.x.topic, LN[r.x.level], q.q,
+        r.x.chosen === -1 ? "No answer" : q.options[r.x.chosen], q.options[q.answer], ET[r.x.err].n, r.x.note || "", attTitle(r.a)]; });
+    downloadCSV(`ACE POINT error analysis ${localDate(new Date())}.csv`, [head, ...data]);
+  };
+};
+
+/* ---------- Reported questions ---------- */
+Views.tReports = () => { if (tOnly()) return Views.teacherLock();
+  const list = TREP.slice().sort((a,b) => (a.status === "done") - (b.status === "done") || b.ts - a.ts);
+  return `<button class="back" id="bk">← Dashboard</button>
+  <div class="card"><h1>⚑ Reported questions</h1><p class="muted">Questions students flagged. Tell Claude which ones to fix, then mark them as fixed.</p></div>
+  ${list.map(r => { const q = qOf(r.course, r.qid);
+    return `<div class="review" style="background:#fff;${r.status==="done"?"opacity:.6":""}">
+      <div class="muted small">${esc(COURSE[r.course]?.name||r.course)} · ${esc(chapterOf(r.course, r.chapter)?.name||"")} · Question ${esc(r.qid)} · ${fmtDate(r.ts)}</div>
+      <div class="q" style="margin-top:4px">${q ? esc(q.q) : "(question no longer in the bank)"}</div>
+      ${q ? `<div class="small">Correct answer in the bank: <b>${esc(q.options[q.answer])}</b></div>` : ""}
+      <div style="margin-top:6px"><span class="tag ${r.status==="done"?"ok":"weak"}">${r.status==="done"?"Fixed":esc(REASON[r.reason]||r.reason)}</span> ${r.text ? `“${esc(r.text)}”` : ""}</div>
+      <div class="muted small" style="margin-top:4px">From ${esc(r.name)} (${esc(r.email)})</div>
+      <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn ghost" style="padding:8px 14px;font-size:14px" data-rs="${esc(r.id)}">${r.status==="done"?"Reopen":"Mark as fixed"}</button><button class="link" style="color:var(--red)" data-rd="${esc(r.id)}">Delete</button></div></div>`; }).join("") || '<p class="muted">No reports yet.</p>'}`; };
+Views.tReports.after = () => { $("bk").onclick = () => go("teacher");
+  document.querySelectorAll("[data-rs]").forEach(b => b.onclick = async () => { const r = TREP.find(x => x.id === b.dataset.rs); const s = r.status === "done" ? "open" : "done";
+    try { await Store.setReport(r.id, s); r.status = s; go("tReports"); } catch(e){ console.error(e); toast("Couldn't update. Please try again."); } });
+  document.querySelectorAll("[data-rd]").forEach(b => b.onclick = async () => {
+    try { await Store.deleteReport(b.dataset.rd); TREP = TREP.filter(x => x.id !== b.dataset.rd); go("tReports"); } catch(e){ console.error(e); toast("Couldn't delete. Please try again."); } });
+};
 
 /* ---------- Boot ---------- */
 function routeAfterAuth(){
