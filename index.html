@@ -125,7 +125,7 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
   <div class="hdr-right" id="hdrRight"></div>
 </header>
 <main id="app"></main>
-<footer id="foot">ACE POINT Chemistry · By Gunjan, IIT Madras alumna · Testing version · <button id="teacherLink">Teacher login</button></footer>
+<footer id="foot">ACE POINT Chemistry · By Gunjan, IIT Madras alumna · <button id="teacherLink">Teacher login</button></footer>
 
 <div id="cheer"><div class="box"><div class="emo"></div><div class="msg"></div><div class="sm"></div><div class="tap">Tap to continue</div></div></div>
 <div id="warn" class="modal"><div class="box">
@@ -599,7 +599,7 @@ Views.otp = () => `
     <div class="steps"><span class="on"></span><span class="on"></span><span></span><span></span></div>
     <h1>Verify your number</h1>
     <p class="muted">Step 2 of 4 · We sent a 6-digit code to <b>${esc(VIEW.pending.phone)}</b></p>
-    <div class="note">Testing version: no SMS is sent yet. Use code <b>123456</b>.</div>
+    <div class="note">Enter the code <b>123456</b> to continue.</div>
     <input id="otp" class="otp" inputmode="numeric" maxlength="6" placeholder="••••••">
     <div class="err" id="otp_err"></div>
     <button class="btn block" id="otp_go">Verify</button>
@@ -637,7 +637,7 @@ Views.loginOtp = () => `
   <div class="card">
     <h1>Enter your code</h1>
     <p class="muted">We sent a 6-digit code to <b>${esc(VIEW.phone)}</b></p>
-    <div class="note">Testing version: no SMS is sent yet. Use code <b>123456</b>.</div>
+    <div class="note">Enter the code <b>123456</b> to continue.</div>
     <input id="otp" class="otp" inputmode="numeric" maxlength="6" placeholder="••••••">
     <div class="err" id="otp_err"></div>
     <button class="btn block" id="otp_go">Log in</button>
@@ -692,7 +692,7 @@ Views.pay = () => { const c = COURSE[VIEW.cid]; return `
     </ul>
     <h2>Price</h2>
     <div class="price">Free <s>${PRICE.default.later}</s></div>
-    <div class="note">Testing version: this course is free while ACE POINT is being tested. Online payment (UPI and cards) will be added here.</div>
+    <div class="note">Free for early ACE POINT students. Online payment (UPI and cards) is coming soon.</div>
     <button class="btn block" id="payGo">Start learning</button>
   </div>`; };
 Views.pay.after = () => {
@@ -946,7 +946,7 @@ Views.teacher = () => { if (!TEACHER) return Views.teacherLock();
   <button class="back" id="bk">← Leave dashboard</button>
   <div class="card"><h1>Teacher dashboard</h1>
     <div class="stat"><div><b>${us.length}</b><span>Students</span></div><div><b>${at.length}</b><span>Quizzes</span></div><div><b>${at.reduce((s,a)=>s+a.incidents.length,0)}</b><span>Warnings</span></div></div>
-    <div class="note">Testing version: this shows students who used the app on this device. Once the online database is connected, every student will show here from any device.</div></div>
+    <div class="note">This shows students who used the app on this device. Once the online database is connected, every student will show here from any device.</div></div>
   <h2>Students</h2>
   <div class="grid">${us.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0);
     return `<button class="tile" data-u="${esc(u.email)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
