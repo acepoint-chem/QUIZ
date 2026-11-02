@@ -184,8 +184,9 @@ const CATALOGUE = [
     {id:"ib-hl",name:"IB Chemistry HL",desc:"Diploma Programme",status:"soon"},
     {id:"ib-sl",name:"IB Chemistry SL",desc:"Diploma Programme",status:"soon"}
   ]},
-  {group:"ACE POINT class practice", courses:[
-    {id:"class8",name:"Class 8 Practice",desc:"Sets made for ACE POINT classes",status:"live"}
+  {group:"UAE · Grade 8 (American curriculum)", courses:[
+    {id:"sci8",name:"Grade 8 Science (UAE)",desc:"The Science of Global Survival",status:"live"},
+    {id:"math8",name:"Grade 8 Maths (UAE)",desc:"Upper Middle School Maths",status:"live"}
   ]}
 ];
 const COURSE = {}; CATALOGUE.forEach(g => g.courses.forEach(c => COURSE[c.id] = {...c, group:g.group}));
@@ -193,194 +194,383 @@ const PRICE = {default:{now:0, later:"Price to be announced"}};
 
 // Chapters per course. Each chapter: id, name, topics, questions.
 const CHAPTERS = {
-  "class8": [{id:"maps", name:"Maps: Latitudes and Longitudes",
-              topics:["Latitudes","Longitudes","Heat Zones","Longitude and Time"], qs:[
-  // ---------- EASY ----------
-  {id:"E1",level:"easy",topic:"Latitudes",q:"Which line of latitude is at 0°?",
-   options:["Tropic of Cancer","Equator","Prime Meridian","Arctic Circle"],answer:1,
-   explain:"The Equator is the 0° line of latitude. It divides the Earth into the Northern and Southern Hemispheres.",
-   mistakes:{0:"The Tropic of Cancer is at 23½°N, not 0°. You mixed up the major parallels.",
-             2:"The Prime Meridian is 0° longitude, not latitude. Latitude lines run east–west; longitude lines run north–south.",
-             3:"The Arctic Circle is at 66½°N, far from 0°."}},
-  {id:"E2",level:"easy",topic:"Longitudes",q:"Which line is 0° longitude?",
-   options:["Equator","International Date Line","Prime Meridian","Tropic of Capricorn"],answer:2,
-   explain:"The Prime Meridian is 0° longitude. It passes through Greenwich, near London.",
-   mistakes:{0:"The Equator is 0° latitude. Remember: latitude is the 'ladder' going up and down the globe; longitude is the 'long' lines from pole to pole.",
-             1:"The International Date Line is roughly at 180° longitude, on the opposite side of the Earth.",
-             3:"The Tropic of Capricorn is a line of latitude at 23½°S."}},
-  {id:"E3",level:"easy",topic:"Latitudes",q:"Lines of latitude are also called:",
-   options:["Meridians","Parallels","Contours","Isobars"],answer:1,
-   explain:"Lines of latitude are called parallels because they run parallel to the Equator and never meet.",
-   mistakes:{0:"Meridians are lines of longitude, not latitude.",
-             2:"Contours join places of equal height on a map. They are not latitude lines.",
-             3:"Isobars join places of equal air pressure on weather maps."}},
-  {id:"E4",level:"easy",topic:"Longitudes",q:"Lines of longitude are also called:",
+  "sci8": [
+    {id:"nav", name:"Navigation & Tracking",
+     topics:["Maps and Globes","Latitude","Longitude","Writing Coordinates","Degrees, Minutes and Seconds","Distance on the Earth"], qs:[
+  // ===== TOPIC: Maps and Globes =====
+  {id:"N101",level:"easy",topic:"Maps and Globes",q:"What is a globe?",
+   options:["A small, round model of the Earth","A flat drawing of the Earth","A photo of the Earth taken from space","A list of coordinates"],answer:0,
+   explain:"A globe is a small model of the Earth. Because it is round like the Earth, it shows true shapes and sizes.",
+   mistakes:{1:"That describes a map. A map is flat; a globe is round.",2:"A photo is not a model. A globe is a 3D model you can hold and turn.",3:"Coordinates describe positions; they are not a model of the Earth."}},
+  {id:"N102",level:"easy",topic:"Maps and Globes",q:"Which part of a map explains what its symbols and colours mean?",
+   options:["Scale","Compass rose","Legend (key)","Title"],answer:2,
+   explain:"The legend, also called the key, tells you what each symbol and colour on the map stands for.",
+   mistakes:{0:"The scale tells you real distances, not what symbols mean.",1:"The compass rose shows directions.",3:"The title tells you what the map is about."}},
+  {id:"N103",level:"easy",topic:"Maps and Globes",q:"Which part of a map helps you work out real distances?",
+   options:["Legend","Scale","Title","Compass rose"],answer:1,
+   explain:"The scale links a distance on the map to the real distance on the ground, for example 1 cm = 20 km.",
+   mistakes:{0:"The legend explains symbols and colours, not distances.",2:"The title only names the map.",3:"The compass rose shows direction, not distance."}},
+  {id:"N104",level:"easy",topic:"Maps and Globes",q:"North, east, south and west are called the:",
+   options:["Intermediate directions","Cardinal directions","Meridians","Parallels"],answer:1,
+   explain:"The four main directions, N, E, S and W, are the cardinal directions.",
+   mistakes:{0:"Intermediate directions are the ones in between, like NE and SW.",2:"Meridians are lines of longitude.",3:"Parallels are lines of latitude."}},
+  {id:"N105",level:"easy",topic:"Maps and Globes",q:"Which direction is exactly halfway between north and east?",
+   options:["North-east","South-east","North-west","East-north"],answer:0,
+   explain:"Halfway between north and east is north-east (NE). Intermediate directions always say north or south first.",
+   mistakes:{1:"South-east is between south and east.",2:"North-west is between north and west.",3:"We never say east-north. North or south always comes first."}},
+  {id:"N106",level:"easy",topic:"Maps and Globes",q:"What is one advantage of a flat map over a globe?",
+   options:["It shows true shapes and sizes","It shows the whole Earth at once","Nothing is stretched on it","It is round like the Earth"],answer:1,
+   explain:"A flat map lets you see the whole Earth at once. A globe only shows about half the Earth at a time.",
+   mistakes:{0:"That is an advantage of a globe. Flat maps stretch some shapes and sizes.",2:"Flat maps do stretch some areas, especially near the poles.",3:"A flat map is flat, not round."}},
+  {id:"N107",level:"medium",topic:"Maps and Globes",q:"On a Mercator map, Greenland looks about as big as Africa. What is true in real life?",
+   options:["They are the same size","Greenland is bigger","Africa is about 14 times bigger","Africa is about 2 times bigger"],answer:2,
+   explain:"The Mercator map stretches places far from the equator. In real life Africa is about 14 times bigger than Greenland.",
+   mistakes:{0:"They only look the same because the map stretches Greenland.",1:"Greenland only looks big on the stretched map.",3:"The real difference is much bigger: about 14 times."}},
+  {id:"N108",level:"medium",time:60,topic:"Maps and Globes",q:"A map's scale is 1 : 1,000,000. What does 1 cm on the map stand for?",
+   options:["1 km","10 km","100 km","1,000 km"],answer:1,
+   explain:"1 cm on the map = 1,000,000 cm in real life. 1,000,000 cm = 10,000 m = 10 km.",
+   mistakes:{0:"Check the conversion: 100,000 cm is 1 km, so 1,000,000 cm is 10 km.",2:"You added an extra zero. 1,000,000 cm is 10 km.",3:"Change cm to m (÷100), then m to km (÷1,000): 10 km."}},
+  {id:"N109",level:"medium",time:60,topic:"Maps and Globes",q:"On a map, 1 cm represents 20 km. Two islands are 3.5 cm apart on the map. How far apart are they really?",
+   options:["23.5 km","35 km","70 km","700 km"],answer:2,
+   explain:"Multiply the map distance by the scale: 3.5 × 20 = 70 km.",
+   mistakes:{0:"You added 3.5 and 20. You need to multiply.",1:"You used 10 km per cm. The scale is 20 km per cm.",3:"Check the decimal: 3.5 × 20 = 70, not 700."}},
+  {id:"N110",level:"medium",topic:"Maps and Globes",q:"Dubai is ______ of Abu Dhabi.",
+   options:["South-west","North-east","South-east","North-west"],answer:1,
+   explain:"Dubai lies along the coast to the north-east of Abu Dhabi.",
+   mistakes:{0:"South-west is the opposite direction. Abu Dhabi is south-west of Dubai.",2:"South-east of Abu Dhabi is inland, towards Al Ain.",3:"North-west of Abu Dhabi is out in the Gulf, towards Qatar."}},
+  {id:"N111",level:"medium",topic:"Maps and Globes",q:"Al Ain is ______ of Dubai.",
+   options:["North-east","South-east","North-west","West"],answer:1,
+   explain:"Al Ain is inland, to the south-east of Dubai.",
+   mistakes:{0:"North-east of Dubai is towards Sharjah and Ras Al Khaimah.",2:"North-west of Dubai is the sea.",3:"West of Dubai is towards Abu Dhabi's coast and the Gulf."}},
+  {id:"N112",level:"medium",topic:"Maps and Globes",q:"Why is a globe not useful for finding a small street in your city?",
+   options:["A globe shows the wrong shapes","A globe is too small to show tiny details like streets","A globe has no oceans","A globe only shows the Southern Hemisphere"],answer:1,
+   explain:"A globe shows the whole planet on a small ball, so small details like streets and tiny islands are too small to show.",
+   mistakes:{0:"A globe actually shows true shapes. Its problem is the small size.",2:"Globes do show oceans.",3:"A globe shows the whole Earth, both hemispheres."}},
+  {id:"N113",level:"hard",time:60,topic:"Maps and Globes",q:"On a map, 1 cm represents 50 km. Two nesting beaches are 4.5 cm apart. How far apart are they in real life?",
+   options:["54.5 km","200 km","225 km","2,250 km"],answer:2,
+   explain:"Real distance = map distance × scale = 4.5 × 50 = 225 km.",
+   mistakes:{0:"You added 4.5 and 50. Multiply instead.",1:"You used only the 4 cm (4 × 50). Don't forget the 0.5 cm: another 25 km.",3:"Check the decimal: 4.5 × 50 = 225."}},
+  {id:"N114",level:"hard",time:60,topic:"Maps and Globes",q:"A map's scale is 1 : 500,000. Two towns are 6 cm apart on it. How far apart are they really?",
+   options:["3 km","30 km","300 km","5 km"],answer:1,
+   explain:"1 cm = 500,000 cm = 5 km. So 6 cm = 6 × 5 = 30 km.",
+   mistakes:{0:"Check the conversion: 500,000 cm is 5 km, not 0.5 km.",2:"You added an extra zero. 6 × 5 = 30 km.",3:"5 km is only what 1 cm stands for. Multiply by 6."}},
+  {id:"N115",level:"hard",time:60,topic:"Maps and Globes",q:"Two oases are 120 km apart. On a map where 1 cm = 40 km, how far apart will they be drawn?",
+   options:["3 cm","4.8 cm","80 cm","160 cm"],answer:0,
+   explain:"To go from real distance to map distance, divide: 120 ÷ 40 = 3 cm.",
+   mistakes:{1:"You divided by 25. The scale is 40 km per cm: 120 ÷ 40 = 3.",2:"You subtracted (120 − 40). Divide instead.",3:"You added (120 + 40). Divide instead."}},
+  {id:"N116",level:"hard",topic:"Maps and Globes",q:"On a map with north at the top, a turtle moves from the bottom-left corner to the top-right corner. Which way did it travel?",
+   options:["South-west","North-west","North-east","South-east"],answer:2,
+   explain:"Moving up the map is north and moving right is east, so up-and-right is north-east.",
+   mistakes:{0:"South-west would be down and to the left, the opposite way.",1:"North-west would be up and to the left. Right on a map is east.",3:"South-east would be down and to the right. Up on the map is north."}},
+  {id:"N117",level:"hard",topic:"Maps and Globes",q:"Why does Greenland look so big on a Mercator map?",
+   options:["Greenland is really the biggest country","The map stretches places that are far from the equator","The map shrinks places near the poles","Greenland is close to the equator"],answer:1,
+   explain:"Turning a round Earth into a flat map stretches areas far from the equator, near the poles. Greenland is far north, so it is stretched a lot.",
+   mistakes:{0:"Greenland is much smaller than it looks. Africa is about 14 times bigger.",2:"It is the opposite: places near the poles get stretched, not shrunk.",3:"Greenland is far north, near the North Pole, not near the equator."}},
+
+  // ===== TOPIC: Latitude =====
+  {id:"N201",level:"easy",topic:"Latitude",q:"Lines of latitude run:",
+   options:["From pole to pole","East–west around the Earth","Diagonally","Only in the Northern Hemisphere"],answer:1,
+   explain:"Lines of latitude go east–west around the Earth, like rings around a ball.",
+   mistakes:{0:"Lines that run pole to pole are longitude lines (meridians).",2:"Latitude lines never run diagonally; they are flat rings.",3:"Latitude lines are in both hemispheres, north and south of the equator."}},
+  {id:"N202",level:"easy",topic:"Latitude",q:"What is the latitude of the equator?",
+   options:["0°","90°","180°","23.4°"],answer:0,
+   explain:"The equator is the starting line for latitude, so it is 0°.",
+   mistakes:{1:"90° is the latitude of the poles.",2:"180° is a longitude value. Latitude never goes above 90°.",3:"23.4° is the Tropic of Cancer or Capricorn."}},
+  {id:"N203",level:"easy",topic:"Latitude",q:"What is the latitude of the South Pole?",
+   options:["0°","90°S","180°S","360°"],answer:1,
+   explain:"Latitude goes from 0° at the equator to 90° at each pole, so the South Pole is 90°S.",
+   mistakes:{0:"0° is the equator.",2:"Latitude never goes above 90°.",3:"360° is a full circle, not a latitude."}},
+  {id:"N204",level:"easy",topic:"Latitude",q:"Lines of latitude are also called:",
+   options:["Meridians","Parallels","Grids","Scales"],answer:1,
+   explain:"Lines of latitude are called parallels because they are parallel to each other and never meet.",
+   mistakes:{0:"Meridians are lines of longitude.",2:"A grid is the pattern made by both sets of lines together.",3:"A scale is the part of a map that shows distance."}},
+  {id:"N205",level:"easy",topic:"Latitude",q:"Which is the longest line of latitude?",
+   options:["Tropic of Cancer","Arctic Circle","Equator","Tropic of Capricorn"],answer:2,
+   explain:"The equator goes around the widest part of the Earth, about 40,000 km. Parallels get shorter towards the poles.",
+   mistakes:{0:"The Tropic of Cancer is shorter, because it is further from the middle of the Earth.",1:"The Arctic Circle is near the pole, so it is much shorter.",3:"The Tropic of Capricorn is shorter than the equator."}},
+  {id:"N206",level:"easy",topic:"Latitude",q:"The equator divides the Earth into the:",
+   options:["Eastern and Western Hemispheres","Northern and Southern Hemispheres","Arctic and Antarctic","Land and sea"],answer:1,
+   explain:"The equator runs around the middle of the Earth, splitting it into a northern half and a southern half.",
+   mistakes:{0:"East and West are split by the prime meridian and the 180° line.",2:"The Arctic and Antarctic are regions near the poles.",3:"The equator crosses both land and sea; it doesn't separate them."}},
+  {id:"N207",level:"medium",topic:"Latitude",q:"Which special line of latitude crosses the southern part of the UAE?",
+   options:["The equator","The Tropic of Capricorn","The Tropic of Cancer","The Arctic Circle"],answer:2,
+   explain:"The Tropic of Cancer (23.4°N) passes through the southern part of the UAE.",
+   mistakes:{0:"The equator (0°) is far south of the UAE.",1:"The Tropic of Capricorn is in the Southern Hemisphere, at 23.4°S.",3:"The Arctic Circle is far north, at 66.6°N."}},
+  {id:"N208",level:"medium",topic:"Latitude",q:"The Arctic Circle is at about:",
+   options:["23.4°N","45°N","66.6°N","90°N"],answer:2,
+   explain:"The Arctic Circle is at about 66.6°N.",
+   mistakes:{0:"23.4°N is the Tropic of Cancer.",1:"45°N is halfway between the equator and the North Pole; no special line there.",3:"90°N is the North Pole itself."}},
+  {id:"N209",level:"medium",topic:"Latitude",q:"The Tropic of Capricorn is at about:",
+   options:["23.4°N","23.4°S","66.6°S","0°"],answer:1,
+   explain:"The Tropic of Capricorn is 23.4° south of the equator, so 23.4°S.",
+   mistakes:{0:"23.4°N is the Tropic of Cancer, in the north.",2:"66.6°S is the Antarctic Circle.",3:"0° is the equator."}},
+  {id:"N210",level:"medium",topic:"Latitude",q:"What is the largest possible value of latitude?",
+   options:["45°","90°","180°","360°"],answer:1,
+   explain:"Latitude goes from 0° at the equator up to 90° at the North or South Pole. It can never be more than 90°.",
+   mistakes:{0:"45° is only halfway to a pole.",2:"180° is the largest longitude, not latitude.",3:"360° is a full circle; latitude stops at 90°."}},
+  {id:"N211",level:"medium",topic:"Latitude",q:"Why are lines of latitude called parallels?",
+   options:["They all meet at the poles","They are always the same distance apart and never meet","They all have the same length","They run from pole to pole"],answer:1,
+   explain:"Lines of latitude are parallel to each other: they stay the same distance apart and never meet.",
+   mistakes:{0:"Lines that meet at the poles are meridians (longitude).",2:"Parallels are different lengths; they get shorter towards the poles.",3:"Pole to pole lines are meridians."}},
+  {id:"N212",level:"medium",topic:"Latitude",q:"As you move from the equator towards a pole, lines of latitude:",
+   options:["Get longer","Get shorter","Stay the same length","Disappear"],answer:1,
+   explain:"The equator is the longest parallel. The circles get smaller and smaller as you move towards the poles.",
+   mistakes:{0:"It is the other way round. The longest is the equator.",2:"Only meridians are all the same length.",3:"They don't disappear; they just get smaller until the pole, which is a point."}},
+  {id:"N213",level:"hard",topic:"Latitude",q:"Oslo (about 60°N) is much colder than Abu Dhabi (about 24°N). Why?",
+   options:["Oslo is closer to the Sun","At high latitudes the Sun is lower in the sky, so its heat is spread over a bigger area","Oslo has more hours of sunlight every day","Abu Dhabi is on the equator"],answer:1,
+   explain:"Near the equator the Sun is high and its rays are concentrated. At high latitudes the rays come in at a low angle and spread over a larger area, so the ground heats up less.",
+   mistakes:{0:"The distance to the Sun is almost the same for both cities.",2:"Sunlight hours change through the year; the main reason is the angle of the Sun's rays.",3:"Abu Dhabi is at about 24°N, not on the equator."}},
+  {id:"N214",level:"hard",topic:"Latitude",q:"The Tropic of Cancer is the farthest point north where:",
+   options:["It snows every year","The Sun can be directly overhead","The Sun never sets","The day is always 12 hours long"],answer:1,
+   explain:"The Tropic of Cancer (23.4°N) is the farthest north the Sun can be directly overhead, which happens around 21 June.",
+   mistakes:{0:"The Tropic of Cancer runs through hot deserts, including the UAE.",2:"Places where the Sun doesn't set for a day are north of the Arctic Circle.",3:"Day length changes through the year away from the equator."}},
+  {id:"N215",level:"hard",topic:"Latitude",q:"What is special about places north of the Arctic Circle?",
+   options:["The Sun is directly overhead at noon","At least one day a year, the Sun does not set","They are always in the Southern Hemisphere","They have no seasons"],answer:1,
+   explain:"North of the Arctic Circle (66.6°N), there is at least one day a year when the Sun does not set.",
+   mistakes:{0:"The Sun is only directly overhead between the two Tropics.",2:"The Arctic Circle is in the Northern Hemisphere.",3:"Polar places have very strong seasons."}},
+  {id:"N216",level:"hard",time:60,topic:"Latitude",q:"How many degrees of latitude are there between the Tropic of Cancer (23.4°N) and the Arctic Circle (66.6°N)?",
+   options:["90°","43.2°","66.6°","23.4°"],answer:1,
+   explain:"Both are in the north, so subtract: 66.6 − 23.4 = 43.2°.",
+   mistakes:{0:"90° is from the equator to the pole.",2:"66.6° is the Arctic Circle's own latitude. Subtract the Tropic's 23.4°.",3:"23.4° is the Tropic's own latitude, not the gap."}},
+  {id:"N217",level:"hard",topic:"Latitude",q:"What does \"25° north\" mean?",
+   options:["25 km north of the equator","An angle of 25° measured at the centre of the Earth, north from the equator","25° east of Greenwich","25 lines above the equator on a map"],answer:1,
+   explain:"Latitude is an angle. Draw a line from the centre of the Earth to the equator and another to the place: the angle between them is 25°.",
+   mistakes:{0:"Latitude is measured in degrees, not km. 25° north is about 2,775 km from the equator.",2:"East and west are longitude, measured from Greenwich.",3:"Latitude is an angle, not a count of drawn lines."}},
+
+  // ===== TOPIC: Longitude =====
+  {id:"N301",level:"easy",topic:"Longitude",q:"Lines of longitude are also called:",
    options:["Parallels","Meridians","Tropics","Circles"],answer:1,
-   explain:"Lines of longitude are called meridians. They run from the North Pole to the South Pole.",
-   mistakes:{0:"Parallels are lines of latitude.",
-             2:"The Tropics (of Cancer and Capricorn) are two special lines of latitude.",
-             3:"Polar circles are lines of latitude, and 'circles' is not the name for longitude lines."}},
-  {id:"E5",level:"easy",topic:"Latitudes",q:"What is the latitude of the North Pole?",
-   options:["0°","90°N","180°","66½°N"],answer:1,
-   explain:"Latitude goes from 0° at the Equator to 90° at each pole. So the North Pole is 90°N.",
-   mistakes:{0:"0° is the Equator, the middle of the Earth, not the pole.",
-             2:"180° is a longitude value. Latitude never goes above 90°.",
-             3:"66½°N is the Arctic Circle, which is near the pole but not the pole itself."}},
-  {id:"E6",level:"easy",topic:"Latitudes",q:"The Tropic of Cancer is at:",
-   options:["23½°N","23½°S","66½°N","0°"],answer:0,
-   explain:"The Tropic of Cancer is at 23½° north of the Equator. It passes through the middle of India.",
-   mistakes:{1:"23½°S is the Tropic of Capricorn, in the Southern Hemisphere. Tip: Cancer is in the North.",
-             2:"66½°N is the Arctic Circle.",
-             3:"0° is the Equator."}},
-  {id:"E7",level:"easy",topic:"Latitudes",q:"The Equator divides the Earth into:",
-   options:["Eastern and Western Hemispheres","Northern and Southern Hemispheres","Arctic and Antarctic regions","Torrid and Frigid Zones"],answer:1,
-   explain:"The Equator runs east–west around the middle of the Earth, so it splits it into a northern half and a southern half.",
-   mistakes:{0:"The Prime Meridian (with the 180° line) divides the Earth into Eastern and Western Hemispheres.",
-             2:"Arctic and Antarctic regions are near the poles; the Equator does not separate them directly.",
-             3:"Heat zones are made by the Tropics and Polar Circles, not by the Equator."}},
-  {id:"E8",level:"easy",topic:"Longitudes",q:"The Prime Meridian passes through:",
-   options:["Greenwich, near London","New Delhi","Paris","Tokyo"],answer:0,
-   explain:"The Prime Meridian passes through the Royal Observatory at Greenwich, near London, UK.",
-   mistakes:{1:"New Delhi is at about 77°E, not 0°.",
-             2:"Paris was once used by France for its own meridian, but the world agreed on Greenwich.",
-             3:"Tokyo is around 140°E, far from 0°."}},
-  {id:"E9",level:"easy",topic:"Longitudes",q:"If meridians are drawn at every 1°, how many meridians are there in total?",
-   options:["180","90","360","181"],answer:2,
-   explain:"There are 180 meridians east and 180 west of Greenwich. The 0° and 180° lines are counted once each, so the total is 360.",
-   mistakes:{0:"180 is only the number on one side (east or west). Add both sides.",
-             1:"90 is the highest value of latitude, not the number of meridians.",
-             3:"181 is close to the count used for parallels including the poles. Meridians go all the way round: 360."}},
-  {id:"E10",level:"easy",topic:"Heat Zones",q:"Which heat zone gets the most heat from the Sun?",
-   options:["Frigid Zone","Temperate Zone","Torrid Zone","Polar Zone"],answer:2,
-   explain:"The Torrid Zone, between the Tropic of Cancer and the Tropic of Capricorn, gets the Sun overhead at least once a year, so it is the hottest.",
-   mistakes:{0:"'Frigid' means very cold. This zone is near the poles.",
-             1:"'Temperate' means moderate. These zones get slanting rays, so they are not the hottest.",
-             3:"Polar areas are the coldest; the Sun's rays fall at a very low angle there."}},
+   explain:"Lines of longitude are called meridians.",
+   mistakes:{0:"Parallels are lines of latitude.",2:"The Tropics are two special lines of latitude.",3:"The Arctic and Antarctic Circles are lines of latitude."}},
+  {id:"N302",level:"easy",topic:"Longitude",q:"Lines of longitude run:",
+   options:["East–west around the Earth","From the North Pole to the South Pole","Only along the equator","Diagonally across maps"],answer:1,
+   explain:"Every meridian runs from the North Pole to the South Pole.",
+   mistakes:{0:"East–west rings are lines of latitude.",2:"Meridians cross the equator; they don't run along it.",3:"Meridians run straight north–south."}},
+  {id:"N303",level:"easy",topic:"Longitude",q:"The prime meridian (0° longitude) passes through:",
+   options:["Greenwich, London","Dubai, UAE","New York, USA","Cairo, Egypt"],answer:0,
+   explain:"The prime meridian passes through Greenwich in London. It was agreed at an international meeting in 1884.",
+   mistakes:{1:"Dubai is at about 55°E.",2:"New York is at about 74°W.",3:"Cairo is at about 31°E."}},
+  {id:"N304",level:"easy",topic:"Longitude",q:"What is the longitude of the prime meridian?",
+   options:["0°","90°","180°","360°"],answer:0,
+   explain:"The prime meridian is the starting line for longitude, so it is 0°.",
+   mistakes:{1:"90° is a quarter of the way around; nothing special for longitude.",2:"180° is the line on the opposite side of the Earth.",3:"360° would bring you all the way back round to 0°."}},
+  {id:"N305",level:"easy",topic:"Longitude",q:"What is the largest possible value of longitude?",
+   options:["90°","180°","270°","360°"],answer:1,
+   explain:"Longitude goes from 0° up to 180° east and 180° west.",
+   mistakes:{0:"90° is the largest latitude, not longitude.",2:"Longitude stops at 180° in each direction.",3:"360° is a full circle, but we count only up to 180° east or west."}},
+  {id:"N306",level:"medium",topic:"Longitude",q:"Which statement about meridians is correct?",
+   options:["They are all the same length, each running from pole to pole","The prime meridian is the longest","They are longest at the equator","They are shorter in the Southern Hemisphere"],answer:0,
+   explain:"Every meridian runs from the North Pole to the South Pole, so all meridians are the same length.",
+   mistakes:{1:"The prime meridian is special only because it is 0°, not because it is longer.",2:"You are thinking of parallels; the equator is the longest parallel.",3:"Each meridian covers both hemispheres equally."}},
+  {id:"N307",level:"medium",topic:"Longitude",q:"In which year was Greenwich chosen as the prime meridian at an international meeting?",
+   options:["1784","1884","1984","1948"],answer:1,
+   explain:"Countries agreed at an international meeting in 1884 to use the line through Greenwich as 0° longitude.",
+   mistakes:{0:"That is 100 years too early.",2:"That is 100 years too late.",3:"The digits are mixed up. It was 1884."}},
+  {id:"N308",level:"medium",topic:"Longitude",q:"Places east of the prime meridian have longitudes from:",
+   options:["0° to 90°E","0° to 180°E","0° to 360°E","0° to 90°N"],answer:1,
+   explain:"Going east from Greenwich, longitude goes from 0° up to 180°E.",
+   mistakes:{0:"90° is the limit for latitude, not longitude.",2:"Longitude stops at 180°, then it becomes the western side.",3:"N is used for latitude, not longitude."}},
+  {id:"N309",level:"medium",topic:"Longitude",q:"Where are meridians furthest apart?",
+   options:["At the North Pole","At the South Pole","At the equator","They are always the same distance apart"],answer:2,
+   explain:"Meridians are furthest apart at the equator and come together until they meet at the poles.",
+   mistakes:{0:"All meridians meet at the North Pole, so they are closest there.",1:"All meridians meet at the South Pole too.",3:"That is true for parallels, not meridians."}},
+  {id:"N310",level:"medium",topic:"Longitude",q:"What can you say about 180°E and 180°W?",
+   options:["They are on opposite sides of the Earth","They are the same line","180°W does not exist","180°E is in Greenwich"],answer:1,
+   explain:"Going 180° east or 180° west from Greenwich brings you to the same line, on the opposite side of the Earth from Greenwich.",
+   mistakes:{0:"They are opposite Greenwich, but they are the same line as each other.",2:"It exists; it is just the same line as 180°E.",3:"Greenwich is at 0°."}},
+  {id:"N311",level:"hard",topic:"Longitude",q:"Why are lines of longitude NOT called parallels?",
+   options:["They are too short","They all meet at the poles","They only exist in the east","They run east–west"],answer:1,
+   explain:"Parallel lines never meet. Meridians all meet at the North and South Poles, so they are not parallel.",
+   mistakes:{0:"Meridians are all the same length; length isn't the reason.",2:"Meridians exist in both east and west.",3:"East–west lines are latitude. Meridians run north–south."}},
+  {id:"N312",level:"hard",topic:"Longitude",q:"The prime meridian and the 180° line together divide the Earth into the:",
+   options:["Northern and Southern Hemispheres","Eastern and Western Hemispheres","Tropics and the Arctic","Land and ocean"],answer:1,
+   explain:"Together, 0° and 180° make one big circle from pole to pole, splitting the Earth into Eastern and Western Hemispheres.",
+   mistakes:{0:"North and South are split by the equator.",2:"The Tropics and Arctic are latitude zones.",3:"These lines cross both land and ocean."}},
+  {id:"N313",level:"hard",time:60,topic:"Longitude",q:"Place A is at 179°E and place B is at 179°W. How many degrees of longitude apart are they, going across the 180° line?",
+   options:["358°","2°","0°","180°"],answer:1,
+   explain:"From 179°E to 180° is 1°, and from 180° to 179°W is another 1°. So they are only 2° apart.",
+   mistakes:{0:"358° is the long way round, through Greenwich.",2:"They are on different sides of the 180° line, so not the same place.",3:"180° would be from Greenwich to the 180° line."}},
+  {id:"N314",level:"hard",time:60,topic:"Longitude",q:"A student writes a longitude as 200°E. What should it be?",
+   options:["It is correct","160°W","20°E","200°W"],answer:1,
+   explain:"Longitude never goes past 180°. Going 200° east means going 20° past the 180° line, which is 180 − 20 = 160°W.",
+   mistakes:{0:"Longitude cannot be more than 180°.",2:"You just dropped a digit. Subtract from 360: 360 − 200 = 160°W.",3:"Longitude can't be 200° west either."}},
 
-  // ---------- MEDIUM ----------
-  {id:"M1",time:60,level:"medium",topic:"Longitude and Time",q:"Two places are 15° of longitude apart. What is the time difference between them?",
-   options:["15 minutes","30 minutes","1 hour","4 hours"],answer:2,
-   explain:"The Earth turns 1° every 4 minutes. So 15° × 4 minutes = 60 minutes = 1 hour.",
-   mistakes:{0:"You took 1° = 1 minute. It is 1° = 4 minutes.",
-             1:"Check the multiplication: 15 × 4 = 60 minutes, not 30.",
-             3:"You used '4' as hours. It is 4 minutes per degree."}},
-  {id:"M2",level:"medium",topic:"Heat Zones",q:"The Torrid Zone lies between:",
-   options:["The Equator and the Tropic of Cancer","The Tropic of Cancer and the Tropic of Capricorn","The Tropic of Cancer and the Arctic Circle","The Arctic Circle and the North Pole"],answer:1,
-   explain:"The Torrid Zone stretches from the Tropic of Cancer (23½°N) to the Tropic of Capricorn (23½°S), with the Equator in its middle.",
-   mistakes:{0:"That is only the northern half of the Torrid Zone. It also goes south to the Tropic of Capricorn.",
-             2:"That is the North Temperate Zone.",
-             3:"That is the North Frigid Zone."}},
-  {id:"M3",level:"medium",topic:"Latitudes",q:"The Arctic Circle is at:",
-   options:["23½°N","66½°S","66½°N","90°N"],answer:2,
-   explain:"The Arctic Circle is at 66½° north of the Equator. The Antarctic Circle is at 66½°S.",
-   mistakes:{0:"23½°N is the Tropic of Cancer.",
-             1:"66½°S is the Antarctic Circle, in the south. 'Arctic' is the north.",
-             3:"90°N is the North Pole itself."}},
-  {id:"M4",time:60,level:"medium",topic:"Longitude and Time",q:"The Earth rotates 360° in 24 hours. How long does it take to turn through 1°?",
-   options:["1 minute","4 minutes","15 minutes","1 hour"],answer:1,
-   explain:"24 hours = 1440 minutes. 1440 ÷ 360 = 4 minutes for every 1°.",
-   mistakes:{0:"1 minute per degree would mean a day lasts only 6 hours.",
-             2:"15 is the number of degrees covered in 1 hour, not minutes per degree.",
-             3:"1 hour is the time for 15°, not 1°."}},
-  {id:"M5",level:"medium",topic:"Longitude and Time",q:"India's Standard Meridian is:",
-   options:["0°","77°E","82½°E","23½°N"],answer:2,
-   explain:"Indian Standard Time is based on the 82½°E meridian, which passes near Mirzapur in Uttar Pradesh.",
-   mistakes:{0:"0° is the Prime Meridian at Greenwich.",
-             1:"77°E passes near Delhi, but IST is not based on Delhi.",
-             3:"23½°N is a latitude (the Tropic of Cancer), not a meridian."}},
-  {id:"M6",time:60,level:"medium",topic:"Longitude and Time",q:"Indian Standard Time (IST) is ahead of Greenwich Mean Time (GMT) by:",
-   options:["5 hours 30 minutes","4 hours 30 minutes","6 hours","5 hours"],answer:0,
-   explain:"82½ × 4 minutes = 330 minutes = 5 hours 30 minutes. India is east of Greenwich, so IST is ahead.",
-   mistakes:{1:"Check the calculation: 82.5 × 4 = 330 minutes, which is 5 h 30 min.",
-             2:"6 hours would be 90°E, not 82½°E.",
-             3:"5 hours is 75°E. You dropped the extra 7½°, which adds 30 minutes."}},
-  {id:"M7",level:"medium",topic:"Longitude and Time",q:"Compared with Greenwich, the local time at a place east of the Prime Meridian is:",
-   options:["Behind","Ahead","The same","It depends on the latitude"],answer:1,
-   explain:"The Earth rotates from west to east, so places to the east see the Sun first. Their time is ahead of Greenwich.",
-   mistakes:{0:"'Behind' is for places west of Greenwich.",
-             2:"Only places on the same meridian share the same local time.",
-             3:"Time depends on longitude, not latitude."}},
-  {id:"M8",level:"medium",topic:"Heat Zones",q:"The North Frigid Zone lies between:",
-   options:["The Equator and the Tropic of Cancer","The Tropic of Cancer and the Arctic Circle","The Arctic Circle and the North Pole","The Tropic of Capricorn and the Antarctic Circle"],answer:2,
-   explain:"The North Frigid Zone is the very cold area from the Arctic Circle (66½°N) up to the North Pole (90°N).",
-   mistakes:{0:"That is part of the Torrid Zone, the hottest area.",
-             1:"That is the North Temperate Zone.",
-             3:"That is the South Temperate Zone."}},
-  {id:"M9",level:"medium",topic:"Longitudes",q:"Which lines are all equal in length?",
-   options:["Parallels of latitude","Meridians of longitude","The Tropics and the Equator","The Polar Circles and the Equator"],answer:1,
-   explain:"Every meridian runs from the North Pole to the South Pole, so all meridians are the same length. Parallels get smaller towards the poles.",
-   mistakes:{0:"Parallels get shorter as you move from the Equator to the poles.",
-             2:"The Tropics are shorter circles than the Equator.",
-             3:"The Polar Circles are much smaller than the Equator."}},
-  {id:"M10",level:"medium",topic:"Heat Zones",q:"The North Temperate Zone lies between:",
-   options:["The Tropic of Cancer and the Arctic Circle","The Equator and the Arctic Circle","The Tropic of Capricorn and the Antarctic Circle","The Arctic Circle and the North Pole"],answer:0,
-   explain:"The North Temperate Zone runs from the Tropic of Cancer (23½°N) to the Arctic Circle (66½°N). It has moderate temperatures.",
-   mistakes:{1:"That would include part of the Torrid Zone too. The Temperate Zone starts at the Tropic of Cancer.",
-             2:"That is the South Temperate Zone.",
-             3:"That is the North Frigid Zone."}},
+  // ===== TOPIC: Writing Coordinates =====
+  {id:"N401",level:"easy",topic:"Writing Coordinates",q:"What are coordinates?",
+   options:["A pair of numbers that give the exact position of a place on Earth","The name of a city","The scale of a map","The colours in a map's legend"],answer:0,
+   explain:"Coordinates are a pair of numbers, latitude and longitude, that pin down an exact position on Earth.",
+   mistakes:{1:"A city name is not a pair of numbers.",2:"The scale is for distances on a map.",3:"The legend explains symbols."}},
+  {id:"N402",level:"easy",topic:"Writing Coordinates",q:"When writing a pair of coordinates, which comes first?",
+   options:["Longitude","Latitude","Whichever is bigger","It does not matter"],answer:1,
+   explain:"Latitude always comes first, then longitude. For example, Abu Dhabi is 24.45°N, 54.38°E.",
+   mistakes:{0:"Longitude comes second.",2:"The order is fixed, whatever the numbers.",3:"It matters: swapping them gives a completely different place."}},
+  {id:"N403",level:"easy",topic:"Writing Coordinates",q:"Abu Dhabi is at 24.45°N, 54.38°E. Which hemispheres is it in?",
+   options:["Northern and Eastern","Southern and Eastern","Northern and Western","Southern and Western"],answer:0,
+   explain:"N means the Northern Hemisphere and E means the Eastern Hemisphere.",
+   mistakes:{1:"S would be south. Abu Dhabi's latitude is N.",2:"W would be west. Abu Dhabi's longitude is E.",3:"Both letters are wrong. Read N and E."}},
+  {id:"N404",level:"easy",topic:"Writing Coordinates",q:"In the coordinates 24.45°N, 54.38°E, what is the latitude?",
+   options:["54.38°E","24.45°N","24.45°E","54.38°N"],answer:1,
+   explain:"Latitude is written first and uses N or S. Here it is 24.45°N.",
+   mistakes:{0:"54.38°E is the longitude; E and W go with longitude.",2:"Latitude uses N or S, not E.",3:"The numbers and letters have been mixed up."}},
+  {id:"N405",level:"easy",topic:"Writing Coordinates",q:"In decimal coordinates, a negative (−) latitude means:",
+   options:["North","South","East","West"],answer:1,
+   explain:"For latitude, + means north and − means south.",
+   mistakes:{0:"North is positive (+).",2:"East and west are for longitude.",3:"East and west are for longitude."}},
+  {id:"N406",level:"medium",topic:"Writing Coordinates",q:"Sydney is at 33.87°S, 151.21°E. Which hemispheres is Sydney in?",
+   options:["Northern and Eastern","Southern and Western","Southern and Eastern","Northern and Western"],answer:2,
+   explain:"S means Southern Hemisphere and E means Eastern Hemisphere.",
+   mistakes:{0:"The latitude is S, so it's the Southern Hemisphere.",1:"The longitude is E, so it's the Eastern Hemisphere.",3:"Both letters are wrong: read S and E."}},
+  {id:"N407",level:"medium",topic:"Writing Coordinates",q:"A website shows a position as (−12.50, −38.50), latitude first. This means:",
+   options:["12.50°N, 38.50°E","12.50°S, 38.50°W","12.50°S, 38.50°E","12.50°N, 38.50°W"],answer:1,
+   explain:"Negative latitude is south and negative longitude is west, so it's 12.50°S, 38.50°W.",
+   mistakes:{0:"Negative numbers mean south and west, not north and east.",2:"The longitude is negative too, so it's west.",3:"The latitude is negative, so it's south."}},
+  {id:"N408",level:"medium",topic:"Writing Coordinates",q:"New York is at 40.71°N, 74.01°W. How is this written with + and − signs?",
+   options:["(40.71, 74.01)","(−40.71, 74.01)","(40.71, −74.01)","(−40.71, −74.01)"],answer:2,
+   explain:"North is + and west is −, so it becomes (40.71, −74.01).",
+   mistakes:{0:"West longitude needs a minus sign.",1:"North latitude is positive; it's the west longitude that is negative.",3:"Only the west longitude is negative. North is positive."}},
+  {id:"N409",level:"medium",topic:"Writing Coordinates",q:"A student writes a turtle's position as \"25°, 55°\" with no letters. What is the problem?",
+   options:["Nothing, it is fine","It could mean four different places","It must be in the UAE","The numbers are too big"],answer:1,
+   explain:"Without N/S and E/W it could be 25°N 55°E, 25°N 55°W, 25°S 55°E or 25°S 55°W: four different places.",
+   mistakes:{0:"Without letters we don't know which hemisphere it's in.",2:"25°N, 55°E is near the UAE, but without letters we can't be sure.",3:"25° and 55° are fine values; the missing letters are the problem."}},
+  {id:"N410",level:"medium",topic:"Writing Coordinates",q:"What is found at 0°, 0°, where the equator meets the prime meridian?",
+   options:["London","The North Pole","Open ocean in the Atlantic, off West Africa","The UAE"],answer:2,
+   explain:"The equator and prime meridian cross in the Atlantic Ocean, in the Gulf of Guinea off West Africa.",
+   mistakes:{0:"London is on 0° longitude, but at about 51°N, not 0°.",1:"The North Pole is 90°N.",3:"The UAE is at about 24°N, 54°E."}},
+  {id:"N411",level:"hard",topic:"Writing Coordinates",q:"Which city is in the Southern and Western Hemispheres?",
+   options:["Rio de Janeiro (22.91°S, 43.17°W)","London (51.51°N, 0.13°W)","Tokyo (35.68°N, 139.69°E)","Cape Town (33.92°S, 18.42°E)"],answer:0,
+   explain:"Rio has S latitude and W longitude, so it's in the Southern and Western Hemispheres.",
+   mistakes:{1:"London is W, but its latitude is N, so it's Northern.",2:"Tokyo is N and E: Northern and Eastern.",3:"Cape Town is S, but its longitude is E, so it's Eastern."}},
+  {id:"N412",level:"hard",topic:"Writing Coordinates",q:"London is at 51.51°N, 0.13°W. Which is true?",
+   options:["London is far west of the prime meridian","London is just slightly west of the prime meridian","London is on the equator","London is in the Eastern Hemisphere"],answer:1,
+   explain:"0.13°W is very close to 0°, so London sits just a little west of the prime meridian.",
+   mistakes:{0:"0.13° is a tiny amount, so it's very close to the line.",2:"51.51°N is far north of the equator.",3:"The W tells us it's in the Western Hemisphere, just barely."}},
+  {id:"N413",level:"hard",topic:"Writing Coordinates",q:"A tag reads (−33.92, 18.42). Which city is this?",
+   options:["Sydney (33.87°S, 151.21°E)","Cape Town (33.92°S, 18.42°E)","Rio de Janeiro (22.91°S, 43.17°W)","Mumbai (19.08°N, 72.88°E)"],answer:1,
+   explain:"−33.92 means 33.92°S and +18.42 means 18.42°E: Cape Town.",
+   mistakes:{0:"Sydney has a similar latitude, but its longitude is 151.21°E.",2:"Rio's longitude is west (negative).",3:"Mumbai is in the north, so its latitude would be positive."}},
+  {id:"N414",level:"hard",topic:"Writing Coordinates",q:"Which of these could NOT be a real position on Earth?",
+   options:["95°N, 40°E","45°S, 170°W","10°N, 179°E","0°, 0°"],answer:0,
+   explain:"Latitude can never be more than 90°, so 95°N does not exist.",
+   mistakes:{1:"45°S and 170°W are both allowed values.",2:"10°N and 179°E are both allowed: longitude can go up to 180°.",3:"0°, 0° is real: it's in the Atlantic Ocean."}},
 
-  // ---------- HARD ----------
-  {id:"H1",time:60,level:"hard",topic:"Longitude and Time",q:"When it is 12 noon at Greenwich, what is the local time at a place at 82½°E?",
-   options:["6:30 AM","5:30 PM","3:30 PM","5:30 AM"],answer:1,
-   explain:"82½ × 4 = 330 minutes = 5 h 30 min. East is ahead, so add: 12 noon + 5:30 = 5:30 PM.",
-   mistakes:{0:"You subtracted the time. Places east of Greenwich are ahead, so add.",
-             2:"Check the minutes: 82.5 × 4 = 330 minutes, not 210.",
-             3:"You got 5:30 but wrote AM. 12 noon + 5 h 30 min is in the evening, so PM."}},
-  {id:"H2",time:60,level:"hard",topic:"Longitude and Time",q:"When it is 12 noon at Greenwich, what is the local time at a place at 60°W?",
-   options:["4:00 PM","8:00 AM","8:00 PM","4:00 AM"],answer:1,
-   explain:"60 × 4 = 240 minutes = 4 hours. West is behind, so subtract: 12 noon − 4 h = 8:00 AM.",
-   mistakes:{0:"You added the time. Places west of Greenwich are behind, so subtract.",
-             2:"8 is right, but 12 noon minus 4 hours is morning, so AM.",
-             3:"You subtracted 8 hours instead of 4. Check 60 × 4 = 240 minutes = 4 hours."}},
-  {id:"H3",time:60,level:"hard",topic:"Longitude and Time",q:"What is the time difference between a place at 30°E and a place at 45°W?",
-   options:["1 hour","5 hours","3 hours","2 hours"],answer:1,
-   explain:"They are on opposite sides of Greenwich, so add the degrees: 30 + 45 = 75°. 75 × 4 = 300 minutes = 5 hours.",
-   mistakes:{0:"You subtracted (45 − 30 = 15°). When one place is east and the other is west, add the degrees.",
-             2:"3 hours is only the 45°W part (45 × 4 = 180 min). Add the 30°E part too.",
-             3:"2 hours is only the 30°E part. Add both sides: 75° in total."}},
-  {id:"H4",time:60,level:"hard",topic:"Longitude and Time",q:"The local time at a place is 2:00 PM when it is 12 noon at Greenwich. What is its longitude?",
-   options:["30°W","30°E","60°E","120°E"],answer:1,
-   explain:"It is 2 hours ahead = 120 minutes. 120 ÷ 4 = 30°. Ahead means east, so 30°E.",
-   mistakes:{0:"The number is right but the side is wrong. Ahead of Greenwich means east.",
-             2:"You may have used 2 minutes per degree. It is 4 minutes per degree: 120 ÷ 4 = 30.",
-             3:"120 is the minutes, not the degrees. Divide by 4."}},
-  {id:"H5",time:60,level:"hard",topic:"Longitude and Time",q:"A ship's local time is 9:00 AM when it is 12 noon at Greenwich. Where is the ship?",
-   options:["45°E","45°W","3°W","90°W"],answer:1,
-   explain:"The ship is 3 hours behind = 180 minutes. 180 ÷ 4 = 45°. Behind means west, so 45°W.",
-   mistakes:{0:"The number is right but behind Greenwich means west, not east.",
-             2:"3 is the hours. Change to minutes (180) and divide by 4.",
-             3:"You may have used 2 minutes per degree. Use 4: 180 ÷ 4 = 45."}},
-  {id:"H6",level:"hard",topic:"Latitudes",q:"Where on Earth is the point 0° latitude, 0° longitude?",
-   options:["In London","In the Atlantic Ocean, in the Gulf of Guinea","In the Indian Ocean","At the North Pole"],answer:1,
-   explain:"The Equator and the Prime Meridian cross in the Atlantic Ocean, south of Ghana, in the Gulf of Guinea.",
-   mistakes:{0:"London is on 0° longitude, but its latitude is about 51°N, not 0°.",
-             2:"The Indian Ocean is east of Africa; 0° longitude is west of it.",
-             3:"The North Pole is 90°N. All meridians meet there, but it is not on the Equator."}},
-  {id:"H7",level:"hard",topic:"Longitude and Time",q:"Which of these places in India sees the sunrise first?",
-   options:["Gujarat","Arunachal Pradesh","Delhi","Kerala"],answer:1,
-   explain:"The Earth turns from west to east, so the easternmost part of India, Arunachal Pradesh, sees the Sun first.",
-   mistakes:{0:"Gujarat is in the far west of India, so it sees the sunrise last.",
-             2:"Delhi is in the north, but sunrise order depends on east–west position, not north–south.",
-             3:"Kerala is in the south-west. Sunrise depends on how far east a place is."}},
-  {id:"H8",time:60,level:"hard",topic:"Longitude and Time",q:"India stretches from about 68°E to 97°E. About how much does local time differ between its east and west ends?",
-   options:["About 30 minutes","About 2 hours","About 5 hours 30 minutes","About 4 hours"],answer:1,
-   explain:"97 − 68 ≈ 29°, and 29 × 4 ≈ 116 minutes, which is about 2 hours. That is why India uses one Standard Time.",
-   mistakes:{0:"You may have used 1 minute per degree. Use 4 minutes per degree.",
-             2:"5 h 30 min is the gap between IST and GMT, not across India.",
-             3:"Check the degrees: 97 − 68 ≈ 29°, not 60°."}},
-  {id:"H9",time:60,level:"hard",topic:"Latitudes",q:"How many degrees of latitude are there between the Tropic of Cancer and the Arctic Circle?",
-   options:["43°","90°","23½°","66½°"],answer:0,
-   explain:"Arctic Circle (66½°N) − Tropic of Cancer (23½°N) = 43°.",
-   mistakes:{1:"90° is the distance from the Equator to the pole.",
-             2:"23½° is the latitude of the Tropic of Cancer itself, not the gap.",
-             3:"66½° is the latitude of the Arctic Circle itself. Subtract the Tropic's 23½°."}},
-  {id:"H10",level:"hard",topic:"Longitude and Time",q:"Two places lie on the same meridian, one in the north and one in the south. Which is true?",
-   options:["They have the same local time","They have the same latitude","They have the same season","They have the same temperature"],answer:0,
-   explain:"Local time depends on longitude. Places on the same meridian have the same longitude, so the Sun is overhead at noon for both at the same moment.",
-   mistakes:{1:"Same meridian means same longitude, not same latitude. One is north and one is south.",
-             2:"Northern and Southern Hemispheres have opposite seasons.",
-             3:"Temperature depends mostly on latitude, which is different for these two places."}}
-]}],
+  // ===== TOPIC: Degrees, Minutes and Seconds =====
+  {id:"N501",level:"easy",topic:"Degrees, Minutes and Seconds",q:"One degree (1°) is divided into:",
+   options:["10 minutes","60 minutes","100 minutes","360 minutes"],answer:1,
+   explain:"1 degree = 60 minutes, written 1° = 60′.",
+   mistakes:{0:"It's 60, like minutes in an hour.",2:"Degrees don't use a 100 system.",3:"360 is the number of degrees in a circle."}},
+  {id:"N502",level:"easy",topic:"Degrees, Minutes and Seconds",q:"One minute (1′) is divided into:",
+   options:["60 seconds","100 seconds","10 seconds","3,600 seconds"],answer:0,
+   explain:"1 minute = 60 seconds, written 1′ = 60″.",
+   mistakes:{1:"It's 60, like seconds in a minute of time.",2:"It's 60, not 10.",3:"3,600 seconds is one whole degree."}},
+  {id:"N503",level:"easy",topic:"Degrees, Minutes and Seconds",q:"In 24°27′N, what does the symbol ′ stand for?",
+   options:["Degrees","Minutes","Seconds","Kilometres"],answer:1,
+   explain:"One mark (′) means minutes. Two marks (″) mean seconds. The small circle (°) means degrees.",
+   mistakes:{0:"Degrees use the small circle °.",2:"Seconds use two marks ″.",3:"These symbols are parts of an angle, not distances."}},
+  {id:"N504",level:"easy",topic:"Degrees, Minutes and Seconds",q:"Which position is written in decimal degrees?",
+   options:["24°27′N","24.45°N","24°27′0″N","24 degrees north"],answer:1,
+   explain:"Decimal degrees use a decimal point, like 24.45°N. Phones and computers use this form.",
+   mistakes:{0:"This uses minutes (′), so it's DMS.",2:"This uses minutes and seconds: DMS format.",3:"This is written in words, with no decimal."}},
+  {id:"N505",level:"medium",topic:"Degrees, Minutes and Seconds",q:"How many seconds (″) are in one degree?",
+   options:["60","360","3,600","100"],answer:2,
+   explain:"1° = 60′ and 1′ = 60″, so 1° = 60 × 60 = 3,600″.",
+   mistakes:{0:"60 is the minutes in a degree. Multiply by 60 again.",1:"360 is degrees in a circle.",3:"Degrees use 60s, not 100s."}},
+  {id:"N506",level:"medium",topic:"Degrees, Minutes and Seconds",q:"Which format do phones, computers and GPS devices usually use?",
+   options:["Decimal degrees","Degrees, minutes and seconds","Grid letters like B4","Kilometres from Greenwich"],answer:0,
+   explain:"Computers and phones use decimal degrees, like 24.45°N, because decimals are easier to calculate with.",
+   mistakes:{1:"DMS is common on paper maps, but devices use decimals.",2:"Grid letters are for simple flat maps.",3:"Positions are angles, not distances from Greenwich."}},
+  {id:"N507",level:"medium",time:60,topic:"Degrees, Minutes and Seconds",q:"Convert 24°30′N into decimal degrees.",
+   options:["24.30°N","24.5°N","24.03°N","25.30°N"],answer:1,
+   explain:"Divide the minutes by 60: 30 ÷ 60 = 0.5. So 24°30′ = 24.5°.",
+   mistakes:{0:"You just wrote the minutes after the point. Divide by 60 first.",2:"30 ÷ 60 = 0.5, not 0.03.",3:"The degrees stay 24; only the minutes become a decimal."}},
+  {id:"N508",level:"medium",time:60,topic:"Degrees, Minutes and Seconds",q:"Convert 54.25°E into degrees and minutes.",
+   options:["54°25′E","54°15′E","54°2.5′E","54°45′E"],answer:1,
+   explain:"Keep 54°. Multiply the decimal part by 60: 0.25 × 60 = 15′. So 54°15′E.",
+   mistakes:{0:"You copied the decimal digits. Multiply 0.25 by 60.",2:"Multiply by 60, not divide by 10.",3:"0.25 × 60 = 15, not 45."}},
+  {id:"N509",level:"hard",time:60,topic:"Degrees, Minutes and Seconds",q:"Convert 25°12′N, 55°16′E into decimal degrees (2 decimal places). Which UAE city is it?",
+   options:["25.12°N, 55.16°E: Abu Dhabi","25.20°N, 55.27°E: Dubai","25.20°N, 55.27°E: Al Ain","24.45°N, 54.38°E: Dubai"],answer:1,
+   explain:"12 ÷ 60 = 0.20 and 16 ÷ 60 = 0.27. So 25.20°N, 55.27°E, which is Dubai.",
+   mistakes:{0:"You copied the minutes as decimals. Divide each by 60. Abu Dhabi is at 24.45°N.",2:"The numbers are right, but Al Ain is inland at about 24.2°N, 55.8°E.",3:"24.45°N, 54.38°E is Abu Dhabi's position, not this one."}},
+  {id:"N510",level:"hard",time:60,topic:"Degrees, Minutes and Seconds",q:"Convert 24.45°N into degrees and minutes.",
+   options:["24°45′N","24°27′N","24°4.5′N","24°7′N"],answer:1,
+   explain:"Keep 24°. Then 0.45 × 60 = 27′. So 24.45° = 24°27′N.",
+   mistakes:{0:"You copied the decimal digits. Multiply 0.45 by 60.",2:"Multiply by 60, don't divide by 10.",3:"Check: 0.45 × 60 = 27."}},
+  {id:"N511",level:"hard",time:60,topic:"Degrees, Minutes and Seconds",q:"Convert 24°27′36″N into decimal degrees.",
+   options:["24.46°N","24.2736°N","24.45°N","24.63°N"],answer:0,
+   explain:"Decimal = degrees + minutes ÷ 60 + seconds ÷ 3,600 = 24 + 0.45 + 0.01 = 24.46°N.",
+   mistakes:{1:"You just joined the numbers. Divide minutes by 60 and seconds by 3,600.",2:"You forgot the seconds: 36 ÷ 3,600 = 0.01.",3:"You divided the seconds by 60. Seconds are divided by 3,600."}},
+  {id:"N512",level:"hard",time:60,topic:"Degrees, Minutes and Seconds",q:"Convert 19.72°N into degrees, minutes and seconds.",
+   options:["19°72′N","19°43′12″N","19°43′20″N","19°7′2″N"],answer:1,
+   explain:"0.72 × 60 = 43.2′, so 43′. Then 0.2 × 60 = 12″. Answer: 19°43′12″N.",
+   mistakes:{0:"Minutes only go up to 59. Multiply 0.72 by 60.",2:"The leftover 0.2′ becomes 0.2 × 60 = 12″, not 20″.",3:"You split the digits. Multiply the decimal part by 60."}},
+  {id:"N513",level:"hard",topic:"Degrees, Minutes and Seconds",q:"A position is written to 2 decimal places (for example 24.45°N). About how precise is it?",
+   options:["About 110 km","About 11 km","About 1 km","About 1 m"],answer:2,
+   explain:"1° of latitude is about 111 km, so 0.01° is about 1.1 km. Two decimal places pins a spot to about 1 km.",
+   mistakes:{0:"110 km is a whole degree (no decimals).",1:"11 km is one decimal place (0.1°).",3:"1 m needs about 5 decimal places."}},
+
+  // ===== TOPIC: Distance on the Earth =====
+  {id:"N601",level:"easy",topic:"Distance on the Earth",q:"About how long is 1° of latitude, anywhere on Earth?",
+   options:["11 km","111 km","1,111 km","40,000 km"],answer:1,
+   explain:"The Earth is about 40,000 km around, and 40,000 ÷ 360 ≈ 111 km for each degree.",
+   mistakes:{0:"11 km is about 0.1°.",2:"That is 10 times too big.",3:"40,000 km is the whole way around the Earth."}},
+  {id:"N602",level:"easy",topic:"Distance on the Earth",q:"One minute (1′) of latitude is equal to:",
+   options:["One kilometre","One nautical mile","One knot","One metre"],answer:1,
+   explain:"One minute of latitude is one nautical mile, used by sailors and pilots.",
+   mistakes:{0:"A nautical mile is longer than a kilometre: about 1.85 km.",2:"A knot is a speed, not a distance.",3:"It's much longer than a metre."}},
+  {id:"N603",level:"easy",topic:"Distance on the Earth",q:"A speed of one nautical mile per hour is called a:",
+   options:["Knot","Meridian","Degree","Minute"],answer:0,
+   explain:"Ships and planes measure speed in knots. 1 knot = 1 nautical mile per hour.",
+   mistakes:{1:"A meridian is a line of longitude.",2:"A degree is a unit of angle.",3:"A minute is part of a degree, or of an hour."}},
+  {id:"N604",level:"medium",topic:"Distance on the Earth",q:"About how long is one nautical mile?",
+   options:["1 km","1.85 km","11 km","111 km"],answer:1,
+   explain:"One nautical mile is about 1.85 km. That is 111 km ÷ 60.",
+   mistakes:{0:"It's a bit longer than 1 km.",2:"11 km is about 0.1° of latitude.",3:"111 km is a whole degree, which is 60 nautical miles."}},
+  {id:"N605",level:"medium",topic:"Distance on the Earth",q:"At which latitude is one degree of longitude the shortest distance?",
+   options:["0°","25°N","45°N","70°N"],answer:3,
+   explain:"Meridians get closer together towards the poles, so 1° of longitude is shortest at the highest latitude: 70°N.",
+   mistakes:{0:"At the equator, 1° of longitude is longest: about 111 km.",1:"25°N is still close to the equator, so the gap is still wide.",2:"45°N is closer to the pole than 25°N, but 70°N is closer still."}},
+  {id:"N606",level:"medium",topic:"Distance on the Earth",q:"How long is 1° of longitude at the North Pole?",
+   options:["111 km","55 km","0 km","1.85 km"],answer:2,
+   explain:"All meridians meet at the pole, so there is no gap between them: 0 km.",
+   mistakes:{0:"111 km is 1° of longitude at the equator.",1:"55 km is roughly what you'd get around 60°N, not at the pole.",3:"1.85 km is one nautical mile."}},
+  {id:"N607",level:"medium",topic:"Distance on the Earth",q:"Is 1° of latitude about the same distance everywhere?",
+   options:["Yes, about 111 km everywhere","No, it is 0 km at the poles","No, it is longest at the poles","No, it changes with longitude"],answer:0,
+   explain:"Parallels are evenly spaced, so 1° of latitude is about 111 km anywhere. It's longitude that shrinks towards the poles.",
+   mistakes:{1:"That is true for 1° of longitude, not latitude.",2:"Latitude spacing stays about the same.",3:"Latitude spacing doesn't depend on longitude."}},
+  {id:"N608",level:"hard",time:60,topic:"Distance on the Earth",q:"A whale shark swims due north from 23.0°N to 26.0°N without changing longitude. About how far did it swim?",
+   options:["3 km","111 km","333 km","2,886 km"],answer:2,
+   explain:"It moved 26.0 − 23.0 = 3° of latitude. 3 × 111 = 333 km.",
+   mistakes:{0:"3 is the number of degrees. Multiply by 111 km.",1:"111 km is only 1°. It moved 3°.",3:"You multiplied 26 × 111. Use the change in latitude: 3°."}},
+  {id:"N609",level:"hard",time:60,topic:"Distance on the Earth",q:"A turtle swims due south from 24°N to 20°N along the same meridian. About how far did it travel?",
+   options:["444 km","4 km","2,220 km","4,884 km"],answer:0,
+   explain:"Change in latitude = 24 − 20 = 4°. 4 × 111 = 444 km.",
+   mistakes:{1:"4 is the degrees. Multiply by 111 km.",2:"You used 20 × 111. Use the change: 4°.",3:"You added 24 + 20. Subtract to find the change."}},
+  {id:"N610",level:"hard",time:60,topic:"Distance on the Earth",q:"The distance around the Earth through both poles is about 40,000 km. Why is 1° of latitude about 111 km?",
+   options:["40,000 ÷ 360 ≈ 111","40,000 ÷ 90 ≈ 111","40,000 ÷ 180 ≈ 111","40,000 × 360 ≈ 111"],answer:0,
+   explain:"A full circle is 360°, so each degree is 40,000 ÷ 360 ≈ 111 km.",
+   mistakes:{1:"40,000 ÷ 90 ≈ 444. A full trip around is 360°, not 90°.",2:"40,000 ÷ 180 ≈ 222. A full circle is 360°.",3:"Multiplying makes a huge number. Divide by 360."}},
+  {id:"N611",level:"hard",time:60,topic:"Distance on the Earth",q:"A ship sails due north through 30′ of latitude. How far is that?",
+   options:["30 km","30 nautical miles (about 55.5 km)","3,330 km","0.5 nautical miles"],answer:1,
+   explain:"1′ of latitude = 1 nautical mile, so 30′ = 30 nautical miles. 30 × 1.85 ≈ 55.5 km.",
+   mistakes:{0:"A minute of latitude is a nautical mile, not a kilometre.",2:"You multiplied 30 by 111. That would be for 30 degrees, not 30 minutes.",3:"30′ is half a degree, but in nautical miles it's 30."}},
+  {id:"N612",level:"hard",time:60,topic:"Distance on the Earth",q:"A boat travels at 10 knots for 3 hours. How far does it go?",
+   options:["13 nautical miles","30 nautical miles","30 km","3.3 nautical miles"],answer:1,
+   explain:"10 knots = 10 nautical miles every hour. 10 × 3 = 30 nautical miles.",
+   mistakes:{0:"You added 10 + 3. Multiply speed by time.",2:"Knots measure nautical miles per hour, not km.",3:"You divided 10 by 3. Multiply instead."}},
+]},
+    {id:"homeo", name:"Homeostasis & Ocean Life", topics:["Temperature regulation","Energy in animals","Ocean life"], qs:[]},
+    {id:"quakes", name:"Earthquakes, Volcanoes & Waves", topics:["Plate tectonics","Seismic waves","Volcanoes","Tsunamis"], qs:[]},
+    {id:"weather", name:"Weather & Storms", topics:["Air pressure","Coriolis effect","Hurricanes"], qs:[]},
+    {id:"currents", name:"Ocean Currents & Climate", topics:["Ocean currents","El Niño and La Niña","Animal movement"], qs:[]},
+    {id:"human", name:"Human Impact", topics:["Microplastics","Ocean acidification","Oil spills","Water filtration"], qs:[]}
+  ],
+  "math8": [
+    {id:"num", name:"Numbers and Operations", topics:["Positive and negative numbers","Fractions and decimals","Rational and irrational numbers","Square and cube roots","Exponents","Scientific notation"], qs:[]},
+    {id:"ratio", name:"Ratios, Proportions and Lines", topics:["Ratios and rates","Percentages","Proportions","Coordinates and graphs","Slope","Linear relationships"], qs:[]},
+    {id:"alg", name:"Algebra", topics:["Expressions","Variables","Equations","Inequalities","Real-world problems"], qs:[]},
+    {id:"func", name:"Functions", topics:["Tables","Graphs","Equations","Patterns"], qs:[]},
+    {id:"stats", name:"Statistics and Probability", topics:["Probability","Samples and data","Scatter plots","Predictions"], qs:[]},
+    {id:"geo", name:"Geometry", topics:["Angles and triangles","Circles","Area, surface area and volume","Transformations","Similar and congruent shapes","Pythagorean theorem"], qs:[]}
+  ],
   "found":  [{id:"atoms", name:"Atoms and Molecules (Class 9)",
               topics:["Laws of Chemical Combination","Symbols and Formulae","Atomic and Molecular Mass","Mole Concept"], qs:[
   // EASY
@@ -507,7 +697,7 @@ const LEVELS = ["easy","medium","hard"], LN = {easy:"Easy",medium:"Medium",hard:
 const me = () => { const e = Store.session(); return e ? Store.getUser(e) : null; };
 function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove("show"), 2500); }
 function chapterOf(cid, chid){ return (CHAPTERS[cid]||[]).find(c => c.id === chid); }
-function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid); }
+function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid && chapterOf(a.course, a.chapter)); }
 function topicStats(attempts){
   const t = {}; attempts.forEach(a => a.answers.forEach(x => { t[x.topic] = t[x.topic] || {r:0,n:0}; t[x.topic].n++; if (x.ok) t[x.topic].r++; })); return t;
 }
@@ -710,7 +900,7 @@ Views.home = () => { const u = me(); if (!u) return Views.welcome();
     <div class="stat"><div><b>${all.length}</b><span>Quizzes</span></div><div><b>${tot}</b><span>Questions</span></div><div><b>${tot?Math.round(right/tot*100):0}%</b><span>Accuracy</span></div></div>
   </div>
   <h2>My courses</h2>
-  <div class="grid">${u.courses.map(cid => { const c = COURSE[cid]; const at = attemptsFor(u,cid);
+  <div class="grid">${u.courses.filter(c => COURSE[c]).map(cid => { const c = COURSE[cid]; const at = attemptsFor(u,cid);
      return `<button class="tile" data-c="${cid}"><div class="t">${esc(c.name)}</div><div class="d">${(CHAPTERS[cid]||[]).length} chapter(s) · ${at.length} quiz(zes) taken</div></button>`; }).join("") || '<p class="muted">No courses yet.</p>'}</div>
   <button class="btn ghost block" id="addCourse">+ Add another course</button>`; };
 Views.home.after = () => {
@@ -724,20 +914,21 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
   let body = "";
   if (tab === "practice"){
     body = chs.length ? chs.map(ch => { const done = new Set(); at.filter(a=>a.chapter===ch.id).forEach(a=>a.answers.forEach(x=>done.add(x.id)));
-      const pct = Math.round(done.size/ch.qs.length*100);
+      if (!ch.qs.length) return `<button class="tile" disabled><div class="t">${esc(ch.name)} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.join(" · ")}</div></button>`;
+      const pct = Math.min(100, Math.round(done.size/ch.qs.length*100));
       return `<button class="tile" data-ch="${ch.id}"><div class="t">${esc(ch.name)}</div>
-        <div class="d">${ch.topics.length} topics · ${ch.qs.length} questions · ${pct}% seen</div>
+        <div class="d">${liveTopics(ch).length} topics · ${ch.qs.length} questions · ${pct}% seen</div>
         <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
       : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
     body = `<div class="grid">${body}</div>`;
   } else if (tab === "strengths"){
-    const ts = topicStats(at); const topics = [...new Set(chs.flatMap(ch => ch.topics))];
+    const ts = topicStats(at); const topics = [...new Set(chs.flatMap(ch => liveTopics(ch)))];
     body = `<div class="card"><p class="muted">Answer at least 10 questions in a topic to get your strength score.</p>
       <table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th>Strength</th></tr>
       ${topics.map(t => { const s = ts[t]; return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${strengthTag(s)}</td></tr>`; }).join("")}</table></div>`;
   } else if (tab === "history"){
     body = at.length ? `<div class="card"><table><tr><th>When</th><th>Chapter</th><th>Score</th><th>Level</th></tr>
-      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(chapterOf(a.course,a.chapter)?.name||"")}</td><td>${a.right}/${a.total}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}</td><td>${LN[a.maxLevel]}</td></tr>`).join("")}</table></div>`
+      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(chapterOf(a.course,a.chapter)?.name||"")}<div class="muted small">${MODE_NAME[a.mode]||"Adaptive"}${a.topic?" · "+esc(a.topic):""}</div></td><td>${a.right}/${a.total}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}</td><td>${LN[a.maxLevel]}</td></tr>`).join("")}</table></div>`
       : '<p class="muted">No quizzes yet. Start one from Practice.</p>';
   } else {
     body = `<div class="grid two">
@@ -755,77 +946,99 @@ Views.course.after = () => {
   document.querySelectorAll(".tile[data-ch]").forEach(t => t.onclick = () => go("chapter",{cid:VIEW.cid, chid:t.dataset.ch}));
 };
 
-/* ---------- Chapter: choose topic and start ---------- */
+/* ---------- Chapter: choose topic and mode ---------- */
+function liveTopics(ch){ return ch.topics.filter(t => ch.qs.some(q => q.topic === t)); }
 Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid).filter(a=>a.chapter===ch.id));
+  const topic = VIEW.topic || ""; const pool = ch.qs.filter(q => !topic || q.topic === topic);
+  const n = l => pool.filter(q => q.level === l).length;
   return `
   <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
   <div class="card">
     <h1>${esc(ch.name)}</h1>
-    <p class="muted">${ch.qs.length} questions across ${ch.topics.length} topics</p>
-    <label for="topicSel">Practise</label>
-    <select id="topicSel"><option value="">Whole chapter (all topics)</option>${ch.topics.map(t => `<option>${esc(t)}</option>`).join("")}</select>
-    <h2>How it works</h2>
-    <ul class="small" style="padding-left:20px;margin:6px 0">
-      <li>Up to 10 questions. You start on Easy.</li>
-      <li><b>3 right in a row</b> moves you up a level. <b>2 wrong in a row</b> moves you down.</li>
-      <li>45 seconds per question, <b>1 minute</b> for calculations.</li>
-      <li>The quiz goes fullscreen. Leaving it, switching tabs or apps, or split screen gives a warning. <b>3 warnings</b> submits the quiz.</li>
-    </ul>
-    <button class="btn block" id="startQuiz">Start quiz</button>
+    <p class="muted">${ch.qs.length} questions across ${liveTopics(ch).length} topics</p>
+    <label for="topicSel">What do you want to practise?</label>
+    <select id="topicSel"><option value="">Whole chapter (all topics)</option>${liveTopics(ch).map(t => `<option ${t===topic?"selected":""}>${esc(t)}</option>`).join("")}</select>
+    <h2>Choose a quiz</h2>
+    <div class="grid">
+      <button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
+        <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>
+      <button class="tile" data-m="easy" ${n("easy")?"":"disabled"}><div class="t">🟢 All Easy questions</div><div class="d">${n("easy")} questions</div></button>
+      <button class="tile" data-m="medium" ${n("medium")?"":"disabled"}><div class="t">🟠 All Medium questions</div><div class="d">${n("medium")} questions</div></button>
+      <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d">${n("hard")} questions</div></button>
+    </div>
+    <p class="muted small" style="margin-top:12px">45 seconds per question, 1 minute for calculations. The quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning, and 3 warnings submits the quiz. You can end any quiz early, and your result is saved.</p>
   </div>
   <div class="card"><h3>Your topics in this chapter</h3>
     <table><tr><th>Topic</th><th>Answered</th><th>Strength</th></tr>
-    ${ch.topics.map(t => `<tr><td>${esc(t)}</td><td>${ts[t]?ts[t].n:0}</td><td>${strengthTag(ts[t])}</td></tr>`).join("")}</table></div>`; };
+    ${liveTopics(ch).map(t => `<tr><td>${esc(t)}</td><td>${ts[t]?ts[t].n:0}</td><td>${strengthTag(ts[t])}</td></tr>`).join("")}</table></div>`; };
 Views.chapter.after = () => {
   $("bk").onclick = () => go("course",{cid:VIEW.cid, tab:"practice"});
-  $("startQuiz").onclick = () => startQuiz(VIEW.cid, VIEW.chid, $("topicSel").value);
+  $("topicSel").onchange = e => go("chapter",{cid:VIEW.cid, chid:VIEW.chid, topic:e.target.value});
+  document.querySelectorAll(".tile[data-m]").forEach(t => t.onclick = () => startQuiz(VIEW.cid, VIEW.chid, $("topicSel").value, t.dataset.m));
 };
 
 /* =====================================================================
    5. QUIZ ENGINE
    ===================================================================== */
-const SECONDS = 45, MAX_WARN = 3, UP_AFTER = 3, DOWN_AFTER = 2, MAX_Q = 10;
+const SECONDS = 45, MAX_WARN = 3, NEED = {0:5, 1:10};
+const MODE_NAME = {adaptive:"Adaptive quiz", easy:"All Easy", medium:"All Medium", hard:"All Hard"};
 const CHEERS = [["🎯","Bullseye!","Spot on."],["🚀","Nailed it!","Keep going."],["🧪","Chemistry champ!","That's correct."],["😎","Too easy for you!","Correct answer."],
   ["⚗️","Perfect reaction!","Right answer."],["⭐","Superstar!","Correct."],["🙌","Yes!","Well done."],["🧠","Big brain!","Correct."]];
 const LEVELUP = ["🏆","Level up!","Questions get harder now."];
 const OOPS = [["🤏","Almost!","Read the explanation below."],["💪","No worries!","Check what went wrong below."],["🧐","Not quite!","Let's see why."]];
 let Q = null;
 
-async function startQuiz(cid, chid, topic){
+async function startQuiz(cid, chid, topic, mode){
   const ch = chapterOf(cid, chid); const pool = ch.qs.filter(q => !topic || q.topic === topic);
-  Q = {cid, chid, topic, pool, total:Math.min(MAX_Q, pool.length), level:0, maxLevel:0, rs:0, ws:0, asked:[], used:new Set(),
+  const fixed = mode !== "adaptive";
+  const queue = fixed ? shuffle(pool.filter(q => q.level === mode)) : null;
+  Q = {cid, chid, topic, mode, pool, queue, fixed, total: fixed ? queue.length : null,
+       level: fixed ? LEVELS.indexOf(mode) : 0, maxLevel: fixed ? LEVELS.indexOf(mode) : 0, rs:0, asked:[], used:new Set(), wrong:new Set(),
        warnings:0, incidents:[], cur:null, timerId:null, left:0, limit:0, answered:false, active:true,
        ts:Date.now(), lastInc:0, grace:Date.now()+2000, baseW:window.innerWidth};
+  if (!pool.length || (fixed && !queue.length)) { toast("No questions here yet."); Q = null; return; }
   try { if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {}
   Q.baseW = window.innerWidth; Q.grace = Date.now() + 1500;
   VIEW = {name:"quiz"}; header(); $("app").innerHTML = quizShell(); $("app").classList.add("quizmode");
   $("nextBtn").onclick = nextQ; $("quitBtn").onclick = () => $("confirm").classList.add("show");
   nextQ();
 }
+function shuffle(a){ a = a.slice(); for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
 function quizShell(){ const ch = chapterOf(Q.cid,Q.chid); return `
   <div class="card">
-    <div class="muted small" style="margin-bottom:8px">${esc(ch.name)}${Q.topic?" · "+esc(Q.topic):""}</div>
+    <div class="muted small" style="margin-bottom:8px">${esc(ch.name)}${Q.topic?" · "+esc(Q.topic):""} · ${MODE_NAME[Q.mode]}</div>
     <div class="bar"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy">Easy</span><span id="streak" class="pill">Streak: 0</span><span id="warnPill" class="pill warn" style="display:none"></span></div>
     <div id="timer" class="timer"><div></div></div><div id="timeLeft" class="muted small" style="margin-bottom:8px"></div>
     <div id="topic" class="muted small"></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="feedback"></div>
     <div class="row" style="justify-content:space-between"><button class="link" id="quitBtn">End quiz</button><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
   </div>`; }
 function pickQ(){
-  const order = [Q.level, Q.level+1, Q.level-1, Q.level+2, Q.level-2].filter(l => l>=0 && l<3);
-  for (const l of order){ const p = Q.pool.filter(q => q.level === LEVELS[l] && !Q.used.has(q.id)); if (p.length) return p[Math.floor(Math.random()*p.length)]; }
+  if (Q.fixed) return Q.queue[Q.asked.length] || null;
+  while (Q.level <= 2){
+    const lv = LEVELS[Q.level];
+    let p = Q.pool.filter(q => q.level === lv && !Q.used.has(q.id));
+    if (!p.length){ // ran out of new questions: bring back the ones answered wrongly at this level
+      const again = Q.pool.filter(q => q.level === lv && Q.wrong.has(q.id) && q.id !== (Q.cur && Q.cur.id));
+      if (again.length){ again.forEach(q => { Q.used.delete(q.id); Q.wrong.delete(q.id); }); p = again; }
+    }
+    if (p.length) return p[Math.floor(Math.random()*p.length)];
+    if (Q.level === 2) return null;
+    Q.level++; Q.rs = 0; Q.maxLevel = Math.max(Q.maxLevel, Q.level);
+  }
   return null;
 }
+function streakText(){ if (Q.fixed) return `Streak: ${Q.rs}`; return Q.level < 2 ? `${Q.rs} / ${NEED[Q.level]} in a row` : `Streak: ${Q.rs}`; }
 function nextQ(){
-  if (Q.asked.length >= Q.total) return finishQuiz(false);
   const q = pickQ(); if (!q) return finishQuiz(false);
   Q.used.add(q.id); Q.cur = q; Q.answered = false;
-  $("qnum").textContent = `Question ${Q.asked.length+1} of ${Q.total}`;
+  $("qnum").textContent = Q.fixed ? `Question ${Q.asked.length+1} of ${Q.total}` : `Question ${Q.asked.length+1}`;
   $("lvl").textContent = LN[q.level]; $("lvl").className = "pill " + q.level;
-  $("streak").textContent = `Streak: ${Q.rs}`;
+  $("streak").textContent = streakText();
   $("topic").textContent = "Topic: " + q.topic + (q.time ? " · Calculation: 1 minute" : "");
   $("qtext").textContent = q.q; $("feedback").innerHTML = ""; $("nextBtn").style.display = "none";
   const box = $("opts"); box.innerHTML = "";
-  q.options.forEach((o,i) => { const b = document.createElement("button"); b.className = "opt"; b.innerHTML = `<b>${"ABCD"[i]}</b>`; b.appendChild(document.createTextNode(o)); b.onclick = () => answerQ(i); box.appendChild(b); });
+  Q.order = shuffle([0,1,2,3]); // show options in a random order so the answer is not always in the same place
+  Q.order.forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt"; b.dataset.i = i; b.innerHTML = `<b>${"ABCD"[pos]}</b>`; b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => answerQ(i); box.appendChild(b); });
   clearInterval(Q.timerId); Q.limit = q.time || SECONDS; Q.left = Q.limit; drawTimer();
   Q.timerId = setInterval(() => { Q.left--; drawTimer(); if (Q.left <= 0){ clearInterval(Q.timerId); answerQ(-1); } }, 1000);
   window.scrollTo(0,0);
@@ -834,18 +1047,17 @@ function drawTimer(){ $("timer").firstElementChild.style.width = (Math.max(Q.lef
 function answerQ(i){
   if (Q.answered || !Q.active) return; Q.answered = true; clearInterval(Q.timerId);
   const q = Q.cur, ok = i === q.answer;
-  document.querySelectorAll(".opt").forEach((b,k) => { b.disabled = true; if (k===q.answer) b.classList.add("correct"); if (k===i && !ok) b.classList.add("wrong"); });
+  document.querySelectorAll(".opt").forEach(b => { const k = +b.dataset.i; b.disabled = true; if (k===q.answer) b.classList.add("correct"); if (k===i && !ok) b.classList.add("wrong"); });
   Q.asked.push({id:q.id, topic:q.topic, level:q.level, chosen:i, ok, secs:Q.limit - Q.left});
   let msg = "", up = false;
-  if (ok){ Q.rs++; Q.ws = 0; } else { Q.ws++; Q.rs = 0; }
-  if (Q.rs >= UP_AFTER && Q.level < 2){ Q.level++; Q.rs = 0; up = true; msg = `Level up! Next questions are ${LN[LEVELS[Q.level]]}.`; }
-  if (Q.ws >= DOWN_AFTER && Q.level > 0){ Q.level--; Q.ws = 0; msg = `Let's step back to ${LN[LEVELS[Q.level]]} questions to build up again.`; }
-  Q.maxLevel = Math.max(Q.maxLevel, Q.level); $("streak").textContent = `Streak: ${Q.rs}`;
+  if (ok){ Q.rs++; } else { Q.rs = 0; Q.wrong.add(q.id); }
+  if (!Q.fixed && Q.level < 2 && Q.rs >= NEED[Q.level]){ Q.level++; Q.rs = 0; up = true; msg = `Level up! ${NEED[Q.level-1]} in a row. Next questions are ${LN[LEVELS[Q.level]]}.`; }
+  Q.maxLevel = Math.max(Q.maxLevel, Q.level); $("streak").textContent = streakText();
   $("feedback").innerHTML = ok
     ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${esc(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
-    : `<div class="feedback bad"><h3>${i===-1?"⏰ Time's up!":"❌ Not quite."}</h3><p><b>Correct answer: ${"ABCD"[q.answer]}) ${esc(q.options[q.answer])}</b></p><p>${esc(q.explain)}</p>
+    : `<div class="feedback bad"><h3>${i===-1?"⏰ Time's up!":"❌ Not quite."}</h3><p><b>Correct answer: ${"ABCD"[Q.order.indexOf(q.answer)]}) ${esc(q.options[q.answer])}</b></p><p>${esc(q.explain)}</p>
        <div class="mist"><b>Where it went wrong:</b> ${i===-1?"You ran out of time on this one.":esc(q.mistakes[i]||"")}</div>${msg?`<p><b>${msg}</b></p>`:""}</div>`;
-  $("nextBtn").textContent = Q.asked.length >= Q.total ? "See my report" : "Next question"; $("nextBtn").style.display = "";
+  $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = "";
   if (ok) celebrate(up ? LEVELUP : CHEERS[Math.floor(Math.random()*CHEERS.length)], up);
   else if (i !== -1) celebrate(OOPS[Math.floor(Math.random()*OOPS.length)], false);
 }
@@ -885,19 +1097,20 @@ function finishQuiz(auto, quit){
   Q.active = false; clearInterval(Q.timerId); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode");
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
   const right = Q.asked.filter(a => a.ok).length;
-  const att = {id:"q"+Date.now(), course:Q.cid, chapter:Q.chid, topic:Q.topic||null, ts:Q.ts, right, total:Q.asked.length,
+  const att = {id:"q"+Date.now(), course:Q.cid, chapter:Q.chid, topic:Q.topic||null, mode:Q.mode, ts:Q.ts, right, total:Q.asked.length,
                maxLevel:LEVELS[Q.maxLevel], auto, quit:!!quit, answers:Q.asked, incidents:Q.incidents};
   const u = me(); if (u){ u.attempts = u.attempts || []; if (att.total) u.attempts.push(att); Store.saveUser(u); }
   VIEW = {name:"report", att}; render(); window.scrollTo(0,0);
 }
 function reportHTML(att, forTeacher){
-  const ch = chapterOf(att.course, att.chapter); const byId = id => ch.qs.find(q => q.id === id);
+  const ch = chapterOf(att.course, att.chapter); if (!ch) return '<p class="muted">This quiz was from an older version of the course.</p>';
+  const byId = id => ch.qs.find(q => q.id === id) || {q:"(question removed)", options:["","","",""], answer:0, explain:"", mistakes:{}};
   const pct = att.total ? Math.round(att.right/att.total*100) : 0;
   const t = {}; att.answers.forEach(a => { t[a.topic] = t[a.topic]||{r:0,n:0}; t[a.topic].n++; if (a.ok) t[a.topic].r++; });
   const wrong = att.answers.filter(a => !a.ok).map(a => { const q = byId(a.id); return `
     <div class="review"><div class="q">${esc(q.q)}</div>
-    <div>${forTeacher?"Answer given":"Your answer"}: ${a.chosen===-1?"<i>No answer (time ran out)</i>":"ABCD"[a.chosen]+") "+esc(q.options[a.chosen])}</div>
-    <div><b>Correct: ${"ABCD"[q.answer]}) ${esc(q.options[q.answer])}</b></div>
+    <div>${forTeacher?"Answer given":"Your answer"}: ${a.chosen===-1?"<i>No answer (time ran out)</i>":esc(q.options[a.chosen])}</div>
+    <div><b>Correct: ${esc(q.options[q.answer])}</b></div>
     ${a.chosen!==-1?`<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[a.chosen])}</div>`:""}
     <div class="muted small" style="margin-top:4px">${esc(q.explain)}</div></div>`; }).join("");
   return `
@@ -953,11 +1166,11 @@ Views.teacher = () => { if (!TEACHER) return Views.teacherLock();
       <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">${a.length} quiz(zes) · ${n?Math.round(r/n*100):0}% accuracy · ${u.courses.map(c=>esc(COURSE[c]?.name||c)).join(", ")||"No course"}</div></button>`; }).join("") || '<p class="muted">No students yet.</p>'}</div>
   <h2>Question bank</h2>
   <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
-  ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}</tr>`)).join("")}</table></div>`; };
+  ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => ch.qs.length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}</tr>`)).join("")}</table></div>`; };
 Views.teacher.after = () => { $("bk").onclick = () => { TEACHER = false; go(me() ? "home" : "welcome"); };
   document.querySelectorAll(".tile[data-u]").forEach(t => t.onclick = () => go("tStudent",{email:t.dataset.u})); };
 Views.tStudent = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.email); const a = u.attempts||[];
-  const byCourse = u.courses.map(cid => { const ts = topicStats(a.filter(x=>x.course===cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>c.topics))];
+  const byCourse = u.courses.filter(c => COURSE[c]).map(cid => { const ts = topicStats(a.filter(x=>x.course===cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>c.topics))];
     return `<h2>${esc(COURSE[cid].name)}</h2><table><tr><th>Topic</th><th>Answered</th><th>Correct</th><th></th></tr>${topics.map(t => { const s = ts[t];
       return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${s?quickTag(s.r,s.n):'<span class="tag na">Not started</span>'}</td></tr>`; }).join("")}</table>`; }).join("");
   return `<button class="back" id="bk">← Dashboard</button>
@@ -968,7 +1181,7 @@ Views.tStudent = () => { if (!TEACHER) return Views.teacherLock(); const u = Sto
 Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
   document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{email:VIEW.email, i:+t.dataset.i})); };
 Views.tAttempt = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.email); const at = u.attempts[VIEW.i];
-  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s quiz</h1><p class="muted">${esc(chapterOf(at.course,at.chapter).name)}</p>${reportHTML(at,true)}</div>`; };
+  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s quiz</h1><p class="muted">${esc(chapterOf(at.course,at.chapter)?.name||"")} · ${MODE_NAME[at.mode]||"Adaptive quiz"}</p>${reportHTML(at,true)}</div>`; };
 Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{email:VIEW.email}); };
 
 /* ---------- Boot ---------- */
