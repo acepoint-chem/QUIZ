@@ -702,7 +702,12 @@ const Store = {
   async loadMe(){
     const {F, db} = FB, uid = AUTH_USER.uid;
     const snap = await F.getDoc(F.doc(db, "users", uid));
-    if (!snap.exists()){ ME = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"", profileMissing:true, courses:[], attempts:[]}; return; }
+    if (!snap.exists()){
+      if (isTeacher()){ // the teacher never fills in the student details form
+        const t = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"Gunjan", phone:"", cls:"Teacher", courses:[], created:Date.now()};
+        await Store.saveProfile(t); ME = {...t, attempts:[]}; return;
+      }
+      ME = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"", profileMissing:true, courses:[], attempts:[]}; return; }
     const at = await F.getDocs(F.collection(db, "users", uid, "attempts"));
     ME = {...snap.data(), uid, attempts: at.docs.map(d => d.data()).sort((a,b) => a.ts - b.ts)};
   },
@@ -719,7 +724,7 @@ const Store = {
   async loadAllUsers(){
     const {F, db} = FB;
     const us = await F.getDocs(F.collection(db, "users"));
-    TUSERS = await Promise.all(us.docs.map(async d => {
+    TUSERS = await Promise.all(us.docs.filter(d => (d.data().email||"") !== TEACHER_EMAIL).map(async d => {
       const at = await F.getDocs(F.collection(db, "users", d.id, "attempts"));
       return {...d.data(), uid:d.id, attempts: at.docs.map(x => x.data()).sort((a,b) => a.ts - b.ts)};
     }));
@@ -758,9 +763,10 @@ function go(name, params={}){
 }
 function header(){
   const u = me(); const h = $("hdrRight");
-  if (u && VIEW.name !== "quiz") h.innerHTML = `<span>Hi, ${esc(u.name.split(" ")[0])}</span><button id="logoutBtn">Log out</button>`;
+  if (u && VIEW.name !== "quiz") h.innerHTML = `${isTeacher() ? '<button id="dashBtn">Dashboard</button>' : `<span>Hi, ${esc(u.name.split(" ")[0])}</span>`}<button id="logoutBtn">Log out</button>`;
   else h.innerHTML = "";
   const lb = $("logoutBtn"); if (lb) lb.onclick = () => Store.signOut();
+  const db = $("dashBtn"); if (db) db.onclick = () => { location.hash = "#teacher"; go("teacherLock"); };
   $("foot").style.display = VIEW.name === "quiz" ? "none" : "";
 }
 const NEEDS_STUDENT = ["catalogue","pay","home","course","chapter","report"];
