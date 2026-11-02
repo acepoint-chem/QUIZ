@@ -749,6 +749,10 @@ const Store = {
       ME = {uid, email:AUTH_USER.email, name:AUTH_USER.displayName||"", profileMissing:true, courses:[], attempts:[], homework:[]}; return; }
     const at = await F.getDocs(F.collection(db, "users", uid, "attempts"));
     ME = {...snap.data(), uid, attempts: at.docs.map(d => d.data()).sort((a,b) => a.ts - b.ts), homework:[]};
+    // A quiz left without finishing (tab closed, battery, internet) is saved with the answers given so far
+    const open = ME.attempts.filter(a => a.open);
+    for (const a of open){ delete a.open; a.quit = true; try { await Store.saveAttempt(a); } catch(e){ console.warn(e); } }
+    if (open.length) setTimeout(() => toast("Your last quiz wasn't finished. It has been saved with the answers you gave."), 800);
     if (ME.acepoint){ // homework is only for ACE POINT students
       try { const hs = await F.getDocs(F.query(F.collection(db, "homework"), F.where("students", "array-contains", uid)));
             ME.homework = hs.docs.map(d => ({...d.data(), id:d.id})); }
@@ -769,14 +773,23 @@ const Store = {
   async loadAllUsers(){
     const {F, db} = FB;
     const us = await F.getDocs(F.collection(db, "users"));
+    // Results are loaded only for ACE POINT students; for everyone else the teacher sees details and purchased courses
     TUSERS = await Promise.all(us.docs.filter(d => (d.data().email||"") !== TEACHER_EMAIL).map(async d => {
-      const at = await F.getDocs(F.collection(db, "users", d.id, "attempts"));
-      return {...d.data(), uid:d.id, attempts: at.docs.map(x => x.data()).sort((a,b) => a.ts - b.ts)};
+      const u = {...d.data(), uid:d.id, attempts:[]}; if (u.acepoint) u.attempts = await Store.loadAttempts(d.id); return u;
     }));
-    TUSERS.sort((a,b) => (b.attempts.at(-1)?.ts||b.created||0) - (a.attempts.at(-1)?.ts||a.created||0));
+    TUSERS.sort((a,b) => (!!b.acepoint - !!a.acepoint) || ((b.attempts.at(-1)?.ts||b.created||0) - (a.attempts.at(-1)?.ts||a.created||0)));
     TEXTRA_ERR = false;
     try { THW = (await F.getDocs(F.collection(db, "homework"))).docs.map(d => ({...d.data(), id:d.id})); } catch(e){ console.warn(e); THW = []; TEXTRA_ERR = true; }
     try { TREP = (await F.getDocs(F.collection(db, "reports"))).docs.map(d => ({...d.data(), id:d.id})); } catch(e){ console.warn(e); TREP = []; TEXTRA_ERR = true; }
+  },
+  async loadAttempts(uid){ const {F, db} = FB; const at = await F.getDocs(F.collection(db, "users", uid, "attempts")); return at.docs.map(x => x.data()).sort((a,b) => a.ts - b.ts); },
+  async deleteStudent(uid){
+    const {F, db} = FB;
+    const at = await F.getDocs(F.collection(db, "users", uid, "attempts"));
+    for (const d of at.docs) await F.deleteDoc(F.doc(db, "users", uid, "attempts", d.id));
+    for (const h of THW.filter(h => (h.students||[]).includes(uid))){ // take them off homework lists
+      try { await F.updateDoc(F.doc(db, "homework", h.id), {students:(h.students||[]).filter(x => x !== uid)}); } catch(e){ console.warn(e); } }
+    await F.deleteDoc(F.doc(db, "users", uid));
   },
   setAcepoint(uid, on){ const {F, db} = FB; return F.updateDoc(F.doc(db, "users", uid), {acepoint:on}); },
   async addHomework(h){ const {F, db} = FB; const ref = await F.addDoc(F.collection(db, "homework"), h); return ref.id; },
@@ -900,7 +913,7 @@ document.addEventListener("click", e => {
   box.querySelectorAll(".etype").forEach(o => o.classList.toggle("on", o === b));
   let tip = box.querySelector(".ana-tip"); if (!tip){ tip = document.createElement("div"); tip.className = "ana-tip"; box.appendChild(tip); }
   tip.textContent = "💡 " + ET[x.err].tip;
-  if (box.dataset.att === "live"){ if ($("nextBtn")) $("nextBtn").disabled = false; }
+  if (box.dataset.att === "live"){ if ($("nextBtn")) $("nextBtn").disabled = false; saveDraft(); }
   else { saveAna(box.dataset.att); updatePendingUI(); }
 });
 document.addEventListener("change", e => {
@@ -1369,7 +1382,7 @@ async function startQuiz(spec){
   const pool = mode === "adaptive" ? ch.qs.filter(q => !topic || q.topic === topic) : [];
   const queue = mode === "adaptive" ? null : (spec.list || []);
   if ((queue && !queue.length) || (!queue && !pool.length)){ toast("No questions here yet."); return; }
-  Q = {cid, chid, topic: topic || null, mode, style, title: spec.title || (ch ? ch.name : ""), hw: spec.hw || null,
+  Q = {id:"q"+Date.now(), cid, chid, topic: topic || null, mode, style, title: spec.title || (ch ? ch.name : ""), hw: spec.hw || null,
        pool, queue, fixed: !!queue, total: queue ? queue.length : null,
        level: 0, maxLevel: 0, rs:0, asked:[], used:new Set(), wrong:new Set(),
        warnings:0, incidents:[], cur:null, timerId:null, left:0, limit:0, answered:false, active:true,
@@ -1437,7 +1450,7 @@ function answerQ(i){
   const q = Q.cur, ok = i === q.answer;
   document.querySelectorAll(".opt").forEach(b => { const k = +b.dataset.i; b.disabled = true; if (k===q.answer) b.classList.add("correct"); if (k===i && !ok) b.classList.add("wrong"); });
   const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:i, ok, secs:Q.limit - Q.left};
-  Q.asked.push(entry);
+  Q.asked.push(entry); saveDraft();
   let msg = "", up = false;
   if (ok){ Q.rs++; } else { Q.rs = 0; Q.wrong.add(q.id); }
   if (!Q.fixed && Q.level < 2 && Q.rs >= NEED[Q.level]){ Q.level++; Q.rs = 0; up = true; msg = `Level up! ${NEED[Q.level-1]} in a row. Next questions are ${LN[LEVELS[Q.level]]}.`; }
@@ -1478,7 +1491,7 @@ function bindTest(){
   $("prevBtn").onclick = () => moveTest(Q.idx-1);
   $("nextBtn").onclick = () => moveTest(Q.idx+1);
   $("markBtn").onclick = () => { Q.marked.has(Q.idx) ? Q.marked.delete(Q.idx) : Q.marked.add(Q.idx); drawTestQ(); };
-  $("clearBtn").onclick = () => { Q.sel[Q.idx] = -1; drawTestQ(); };
+  $("clearBtn").onclick = () => { Q.sel[Q.idx] = -1; drawTestQ(); saveDraft(); };
   $("flagBtn").onclick = () => openReport(Q.cid, Q.list[Q.idx].id);
   $("submitBtn").onclick = () => { const left = Q.sel.filter(s => s < 0).length, mk = Q.marked.size;
     confirmBox("Submit the test?", (left ? `${left} question${left>1?"s":""} not answered. ` : "All questions answered. ") + (mk ? `${mk} marked for review. ` : "") + "You can't change answers after submitting.", "Submit", () => finishQuiz(false), "Keep working"); };
@@ -1491,7 +1504,7 @@ function drawTestQ(){
   $("qnum").textContent = `Question ${Q.idx+1} of ${n}`; $("lvl").textContent = LN[q.level]; $("lvl").className = "pill " + q.level;
   $("topic").textContent = "Topic: " + q.topic; $("qtext").textContent = q.q;
   const box = $("opts"); box.innerHTML = "";
-  Q.orders[Q.idx].forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt" + (Q.sel[Q.idx] === i ? " sel" : ""); b.innerHTML = `<b>${"ABCD"[pos]}</b>`; b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => { Q.sel[Q.idx] = i; drawTestQ(); }; box.appendChild(b); });
+  Q.orders[Q.idx].forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt" + (Q.sel[Q.idx] === i ? " sel" : ""); b.innerHTML = `<b>${"ABCD"[pos]}</b>`; b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => { Q.sel[Q.idx] = i; drawTestQ(); saveDraft(); }; box.appendChild(b); });
   $("markBtn").textContent = Q.marked.has(Q.idx) ? "★ Marked" : "☆ Mark for review";
   $("prevBtn").disabled = Q.idx === 0; $("nextBtn").disabled = Q.idx === n-1;
   $("tCount").textContent = `Answered ${Q.sel.filter(s => s >= 0).length}/${n}${Q.marked.size ? ` · ${Q.marked.size} marked` : ""}`;
@@ -1508,7 +1521,7 @@ function incident(reason){
   if (now < Q.grace || now - Q.lastInc < 2500 || $("confirm").classList.contains("show")) return;
   Q.lastInc = now; Q.warnings++;
   Q.incidents.push({time:new Date().toLocaleTimeString(), reason, q: Q.style === "test" ? Q.idx + 1 : Q.asked.length + (Q.answered?0:1)});
-  $("warnPill").style.display = ""; $("warnPill").textContent = `Warnings: ${Q.warnings}/${MAX_WARN}`;
+  $("warnPill").style.display = ""; $("warnPill").textContent = `Warnings: ${Q.warnings}/${MAX_WARN}`; saveDraft(true);
   if (Q.warnings >= MAX_WARN){ $("warn").classList.remove("show"); return finishQuiz(true); }
   $("warnCount").textContent = Q.warnings; $("warnText").textContent = reason + "."; $("warn").classList.add("show");
 }
@@ -1522,20 +1535,35 @@ $("warnBtn").onclick = async () => { $("warn").classList.remove("show"); Q.grace
   try { if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e) {} };
 
 /* ---------- Finish + save ---------- */
+// Build the result. draft = true while the quiz is still running (saved after every answer, so leaving early can't lose it)
+function makeAtt(auto, quit, draft){
+  let asked = Q.asked;
+  if (Q.style === "test"){
+    const spent = Q.spent.slice(); spent[Q.idx] += (Date.now() - Q.qStart)/1000;
+    asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(spent[k]), marked:Q.marked.has(k) || undefined}));
+  }
+  const right = asked.filter(a => a.ok).length;
+  const maxL = Q.fixed ? Math.max(0, ...asked.map(a => LEVELS.indexOf(a.level))) : Q.maxLevel;
+  const chs = [...new Set(asked.map(a => a.ch))];
+  return {v:2, id:Q.id, course:Q.cid, chapter: Q.chid || (chs.length === 1 ? chs[0] : null), topic:Q.topic, mode:Q.mode, style:Q.style, title:Q.title, hw:Q.hw || undefined,
+          ts:Q.ts, right, total:asked.length, maxLevel:LEVELS[maxL], auto, quit:!!quit, timeUp:!!Q.timeUp, secs: Q.style === "test" ? Q.secs : undefined,
+          open: draft || undefined, answers:asked, incidents:Q.incidents};
+}
+let DRAFT_T = null;
+function saveDraft(now){
+  clearTimeout(DRAFT_T);
+  const go = () => { if (!Q || !Q.active || !me()) return;
+    if (Q.style === "test" ? Q.sel.every(x => x < 0) : !Q.asked.length) return; // nothing answered yet
+    Store.saveAttempt(makeAtt(false, true, true)).catch(e => console.warn("draft", e)); };
+  if (now) go(); else DRAFT_T = setTimeout(go, 1500);
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden && Q && Q.active) saveDraft(true); });
 function finishQuiz(auto, quit){
   if (!Q || !Q.active) return;
+  clearTimeout(DRAFT_T);
   Q.active = false; clearInterval(Q.timerId); $("cheer").classList.remove("show"); $("app").classList.remove("quizmode"); $("rep").classList.remove("show");
   try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e) {}
-  if (Q.style === "test"){
-    Q.spent[Q.idx] += (Date.now() - Q.qStart)/1000;
-    Q.asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(Q.spent[k]), marked:Q.marked.has(k) || undefined}));
-  }
-  const right = Q.asked.filter(a => a.ok).length;
-  const maxL = Q.fixed ? Math.max(0, ...Q.asked.map(a => LEVELS.indexOf(a.level))) : Q.maxLevel;
-  const chs = [...new Set(Q.asked.map(a => a.ch))];
-  const att = {v:2, id:"q"+Date.now(), course:Q.cid, chapter: Q.chid || (chs.length === 1 ? chs[0] : null), topic:Q.topic, mode:Q.mode, style:Q.style, title:Q.title, hw:Q.hw || undefined,
-               ts:Q.ts, right, total:Q.asked.length, maxLevel:LEVELS[maxL], auto, quit:!!quit, timeUp:!!Q.timeUp, secs: Q.style === "test" ? Q.secs : undefined,
-               answers:Q.asked, incidents:Q.incidents};
+  const att = makeAtt(auto, quit, false); delete att.open;
   const u = me(); if (u && att.total){ u.attempts.push(att); Store.saveAttempt(att).catch(e => { console.error(e); toast("Couldn't save this result online. Check your internet."); }); }
   VIEW = {name:"report", att}; render(); window.scrollTo(0,0);
 }
@@ -1597,24 +1625,28 @@ Views.teacherLock.after = async () => {
   }
 };
 Views.teacher = () => { if (tOnly()) return Views.teacherLock();
-  const us = TUSERS; const at = us.flatMap(u => (u.attempts||[]));
+  const us = TUSERS; const aps = us.filter(u => u.acepoint); const at = aps.flatMap(u => (u.attempts||[]));
   const openRep = TREP.filter(r => r.status !== "done").length;
   return `
   <button class="back" id="bk">← Leave dashboard</button>
   <div class="card"><h1>Teacher dashboard</h1>
-    <div class="stat"><div><b>${us.length}</b><span>Students</span></div><div><b>${at.length}</b><span>Quizzes</span></div><div><b>${at.reduce((s,a)=>s+(a.incidents||[]).length,0)}</b><span>Warnings</span></div></div>
+    <div class="stat"><div><b>${us.length}</b><span>All students</span></div><div><b>${aps.length}</b><span>ACE POINT students</span></div><div><b>${at.length}</b><span>Their quizzes</span></div></div>
+    <p class="muted small">Results are shown only for ACE POINT students. For other students you see their details and the courses they bought.</p>
     <button class="btn ghost" id="tRefresh">↻ Refresh</button>
     ${TEXTRA_ERR ? '<div class="note">Homework and reported questions need the new database rules. Please publish them in Firebase, then refresh.</div>' : ""}</div>
   <div class="grid two">
     <button class="tile" id="goHw"><div class="t">📚 Homework</div><div class="d">${THW.length} set · ${us.filter(u=>u.acepoint).length} ACE POINT student(s)</div></button>
-    <button class="tile" id="goErr"><div class="t">🔍 Error analysis</div><div class="d">All students · filters · download as spreadsheet</div></button>
+    <button class="tile" id="goErr"><div class="t">🔍 Error analysis</div><div class="d">ACE POINT students · filters · download as spreadsheet</div></button>
     <button class="tile" id="goRep"><div class="t">⚑ Reported questions ${openRep?`<span class="badge" style="background:var(--redbg);color:var(--red)">${openRep} open</span>`:""}</div><div class="d">${TREP.length} report(s) from students</div></button>
   </div>
-  <h2>Students</h2>
-  <div class="grid">${us.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0); const last = a.at(-1);
+  <h2>ACE POINT students</h2>
+  <div class="grid">${aps.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0); const last = a.at(-1);
     return `<button class="tile" data-u="${esc(u.uid)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span>${u.acepoint?' <span class="badge live">ACE POINT</span>':""}</div>
       <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">${a.length} quiz(zes) · ${n?Math.round(r/n*100):0}% accuracy${last?" · last quiz "+fmtDate(last.ts):""}</div>
-      <div class="d">${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join(", ")||"No course"}</div></button>`; }).join("") || '<p class="muted">No students yet.</p>'}</div>
+      <div class="d">${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join(", ")||"No course"}</div></button>`; }).join("") || '<p class="muted">No ACE POINT students yet. Open a student below and turn on "ACE POINT student".</p>'}</div>
+  <h2>Other students</h2>
+  <div class="grid">${us.filter(u => !u.acepoint).map(u => `<button class="tile" data-u="${esc(u.uid)}"><div class="t">${esc(u.name)} <span class="badge own">${esc(u.cls||"")}</span></div>
+      <div class="d">${esc(u.email)} · ${esc(u.phone)}</div><div class="d">Joined ${fmtDay(u.created||Date.now())} · Bought: ${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join(", ")||"no course yet"}</div></button>`).join("") || '<p class="muted">None.</p>'}</div>
   <h2>Question bank</h2>
   <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
   ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => ch.qs.length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}</tr>`)).join("")}</table></div>`; };
@@ -1631,19 +1663,28 @@ Views.tStudent = () => { if (tOnly()) return Views.teacherLock(); const u = Stor
       return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${s?quickTag(s.r,s.n):'<span class="tag na">Not started</span>'}</td></tr>`; }).join("")}</table>`; }).join("");
   const hws = THW.filter(h => (h.students||[]).includes(u.uid)).sort((p,q) => dueTs(q.due) - dueTs(p.due));
   const rows = errRows([u]);
-  return `<button class="back" id="bk">← Dashboard</button>
+  const top = `<button class="back" id="bk">← Dashboard</button>
   <div class="card"><h1>${esc(u.name)}</h1><p class="muted">${esc(u.cls||"")} · ${esc(u.email)} · ${esc(u.phone)}</p>
-    <div class="switchrow"><div><b>ACE POINT student</b><div class="muted small">Only ACE POINT students get homework. Students can't change this.</div></div>
+    <div class="switchrow"><div><b>ACE POINT student</b><div class="muted small">ACE POINT students get homework, and you see their results. Students can't change this.</div></div>
       <button class="toggle ${u.acepoint?"on":""}" id="apTog" aria-pressed="${!!u.acepoint}"><span></span></button></div>
-    ${byCourse}</div>
+    ${u.acepoint ? byCourse : `<h2>Courses bought</h2><p>${(u.courses||[]).map(c=>esc(COURSE[c]?.name||c)).join("<br>")||"No course yet"}</p><p class="muted small">Joined ${fmtDay(u.created||Date.now())}. Results are shown only for ACE POINT students.</p>`}</div>`;
+  const del = `<div class="card" style="border-color:#f3c1bb"><h3 style="color:var(--red)">Delete student</h3><p class="muted small">Removes ${esc(u.name)}'s details, courses and all quiz results for good. This can't be undone.</p>
+    <button class="btn" id="delStu" style="background:var(--red)">Delete ${esc(u.name.split(" ")[0])} and all their data</button></div>`;
+  if (!u.acepoint) return top + del;
+  return top + `
   ${hws.length ? `<h2>Homework</h2><div class="card"><table><tr><th>Homework</th><th>Due</th><th>Status</th></tr>${hws.map(h => `<tr><td>${esc(hwTitle(h))}<div class="muted small">${h.n} questions</div></td><td>${fmtDay(dueTs(h.due))}</td><td>${hwStatusHTML(h, u)}</td></tr>`).join("")}</table></div>` : ""}
   <h2>Error analysis</h2><div class="card">${errorSummaryHTML(rows)}</div>
   <h2>Quizzes</h2>${a.length ? a.slice().reverse().map((x,i) => `<button class="tile" data-i="${a.length-1-i}" style="margin-bottom:8px">
     <div class="t">${x.right}/${x.total} · ${esc(attTitle(x))}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}</div>
-    <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]||""}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}`; };
+    <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]||""}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}` + del; };
 Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
+  $("delStu").onclick = () => { const u = Store.getUser(VIEW.uid);
+    confirmBox(`Delete ${u.name}?`, "All their details, courses, quiz results and error analysis will be removed for good. This can't be undone.", "Delete", async () => {
+      try { await Store.deleteStudent(u.uid); TUSERS = TUSERS.filter(x => x.uid !== u.uid); THW.forEach(h => h.students = (h.students||[]).filter(x => x !== u.uid));
+            toast(`${u.name} has been deleted.`); go("teacher"); }
+      catch(e){ console.error(e); toast("Couldn't delete. Please check your internet and try again."); } }, "Cancel"); };
   $("apTog").onclick = async () => { const u = Store.getUser(VIEW.uid); const on = !u.acepoint; $("apTog").disabled = true;
-    try { await Store.setAcepoint(u.uid, on); u.acepoint = on; toast(on ? `${u.name} is now an ACE POINT student.` : `${u.name} is no longer marked as an ACE POINT student.`); }
+    try { await Store.setAcepoint(u.uid, on); u.acepoint = on; u.attempts = on ? await Store.loadAttempts(u.uid) : []; toast(on ? `${u.name} is now an ACE POINT student.` : `${u.name} is no longer marked as an ACE POINT student.`); }
     catch(e){ console.error(e); toast("Couldn't change it. Please publish the new database rules, then try again."); }
     go("tStudent", {uid:VIEW.uid}); };
   document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{uid:VIEW.uid, i:+t.dataset.i})); };
@@ -1700,18 +1741,18 @@ Views.tHomework.after = () => { $("bk").onclick = () => go("teacher");
 
 /* ---------- Error analysis: all students ---------- */
 function tErrFiltered(){
-  let rows = errRows(TUSERS);
+  let rows = errRows(TUSERS.filter(u => u.acepoint));
   if (VIEW.fs) rows = rows.filter(r => r.u.uid === VIEW.fs);
   if (VIEW.fc) rows = rows.filter(r => r.a.course === VIEW.fc);
   if (VIEW.ft) rows = rows.filter(r => r.x.err === VIEW.ft);
   return rows;
 }
 Views.tErrors = () => { if (tOnly()) return Views.teacherLock();
-  const rows = tErrFiltered(); const courses = [...new Set(errRows(TUSERS).map(r => r.a.course))];
+  const rows = tErrFiltered(); const courses = [...new Set(errRows(TUSERS.filter(u => u.acepoint)).map(r => r.a.course))];
   const sel = (id, all, opts, v) => `<select id="${id}"><option value="">${all}</option>${opts.map(([k,l]) => `<option value="${esc(k)}" ${k===v?"selected":""}>${esc(l)}</option>`).join("")}</select>`;
   return `<button class="back" id="bk">← Dashboard</button>
-  <div class="card"><h1>🔍 Error analysis</h1><p class="muted">Every analysed wrong answer from all students.</p>
-    <label>Student</label>${sel("fS", "All students", TUSERS.map(u => [u.uid, u.name]), VIEW.fs)}
+  <div class="card"><h1>🔍 Error analysis</h1><p class="muted">Every analysed wrong answer from ACE POINT students.</p>
+    <label>Student</label>${sel("fS", "All ACE POINT students", TUSERS.filter(u => u.acepoint).map(u => [u.uid, u.name]), VIEW.fs)}
     <label>Course</label>${sel("fC", "All courses", courses.map(c => [c, COURSE[c].name]), VIEW.fc)}
     <label>Error type</label>${sel("fT", "All types", ETYPES.map(t => [t.k, t.n]), VIEW.ft)}
     <button class="btn block" id="dl" ${rows.length?"":"disabled"}>⬇ Download as spreadsheet (${rows.length} rows)</button></div>
