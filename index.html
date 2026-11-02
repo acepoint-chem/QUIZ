@@ -148,6 +148,7 @@ label.chk input{width:20px;height:20px;flex:none}
 .toggle span{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
 .toggle.on{background:var(--green)}.toggle.on span{left:27px}
 #rep textarea,#rep input{margin-top:10px}
+.flaglink{color:var(--red);margin-left:28px}
 </style>
 </head>
 <body>
@@ -171,7 +172,7 @@ label.chk input{width:20px;height:20px;flex:none}
   <div class="row" style="justify-content:center"><button class="btn ghost" id="confNo">Stay</button><button class="btn" id="confYes">Leave</button></div>
 </div></div>
 <div id="rep" class="modal" style="background:rgba(20,40,75,.5)"><div class="box" style="text-align:left;max-width:420px">
-  <h3 style="color:var(--navy)">⚑ Report this question</h3>
+  <h3 style="color:var(--red)">🚩 Report this question</h3>
   <p class="muted small" id="repQ"></p>
   <div id="repReasons" class="etypes" style="grid-template-columns:1fr"><button data-r="wrong">The answer is wrong</button><button data-r="unclear">The question is unclear</button><button data-r="other">Something else</button></div>
   <input id="repText" placeholder="Tell your teacher more (optional)" maxlength="300">
@@ -724,6 +725,15 @@ let AUTH_USER = null;   // signed-in Google account
 let ME = null;          // the student's profile + attempts
 let TUSERS = [];        // teacher view: all students
 let THW = [], TREP = [], TEXTRA_ERR = false; // teacher view: homework, reported questions
+let FRESH_LOGIN = false, SESS_UNSUB = null, KICKED = false;
+function kickedOut(){
+  if (KICKED) return false; KICKED = true;
+  if (SESS_UNSUB){ SESS_UNSUB(); SESS_UNSUB = null; }
+  const out = async () => { try { await Store.signOut(); } catch(e) {} KICKED = false;
+    setTimeout(() => toast("You were logged out because your account was opened on another device. Only one device can be used at a time."), 400); };
+  if (Q && Q.active){ finishQuiz(false, true); setTimeout(out, 1500); } else out();
+  return false;
+}
 const isTeacher = () => !!(AUTH_USER && AUTH_USER.email === TEACHER_EMAIL);
 
 const Store = {
@@ -733,8 +743,8 @@ const Store = {
     const db = F.initializeFirestore(app, {ignoreUndefinedProperties:true});
     FB = {auth: U.getAuth(app), db, U, F};
     U.onAuthStateChanged(FB.auth, async user => {
-      AUTH_USER = user; ME = null;
-      if (user){ try { await Store.loadMe(); } catch(e){ console.error(e); toast("Couldn't load your account. Please refresh."); } }
+      AUTH_USER = user; ME = null; if (SESS_UNSUB){ SESS_UNSUB(); SESS_UNSUB = null; }
+      if (user){ try { await Store.loadMe(); if (me() && !isTeacher() && !(await Store.startSession())) return; } catch(e){ console.error(e); toast("Couldn't load your account. Please refresh."); } }
       onChange();
     });
   },
@@ -759,11 +769,26 @@ const Store = {
       catch(e){ console.warn("homework", e); }
     }
   },
+  // One device at a time: each sign-in gets a new session code; any other device with an older code is logged out
+  async startSession(){
+    const {F, db} = FB, uid = AUTH_USER.uid, k = "ap_sess_" + uid;
+    let mine = null; try { mine = localStorage.getItem(k); } catch(e) {}
+    if (FRESH_LOGIN || !mine || !ME.session){
+      mine = Math.random().toString(36).slice(2) + Date.now().toString(36); FRESH_LOGIN = false;
+      try { localStorage.setItem(k, mine); } catch(e) {}
+      await F.setDoc(F.doc(db, "users", uid), {session:mine}, {merge:true}); ME.session = mine;
+    } else if (ME.session !== mine) return kickedOut();
+    SESS_UNSUB = F.onSnapshot(F.doc(db, "users", uid), snap => { const v = snap.exists() && snap.data().session; if (v && v !== mine) kickedOut(); }, e => console.warn(e));
+    return true;
+  },
   async signIn(){
+    FRESH_LOGIN = true;
     const p = new FB.U.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
     await FB.U.signInWithPopup(FB.auth, p);
   },
-  signOut(){ TUSERS = []; THW = []; TREP = []; return FB.U.signOut(FB.auth); },
+  signOut(){ TUSERS = []; THW = []; TREP = []; if (SESS_UNSUB){ SESS_UNSUB(); SESS_UNSUB = null; }
+    try { if (AUTH_USER) localStorage.removeItem("ap_sess_" + AUTH_USER.uid); } catch(e) {}
+    return FB.U.signOut(FB.auth); },
   saveProfile(u){
     const {F, db} = FB;
     return F.setDoc(F.doc(db, "users", u.uid), {name:u.name, email:u.email, phone:u.phone||"", cls:u.cls||"", courses:u.courses||[], created:u.created||Date.now()}, {merge:true});
@@ -975,7 +1000,7 @@ function reviewCard(a, i, o = {}){
     ${x.chosen !== -1 && q.mistakes[x.chosen] ? `<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[x.chosen])}</div>` : ""}
     <div class="muted small" style="margin-top:4px">${esc(q.explain)}</div>
     ${ana}
-    ${o.teacher ? "" : `<div style="margin-top:6px"><button class="link small" data-flag="${esc(a.course)}|${esc(x.id)}">⚑ Report this question</button></div>`}
+    ${o.teacher ? "" : `<div style="margin-top:6px"><button class="link small flaglink" style="margin-left:0" data-flag="${esc(a.course)}|${esc(x.id)}">🚩 Report this question</button></div>`}
   </div>`;
 }
 
@@ -1036,7 +1061,7 @@ async function doSignIn(btn){
   const reset = () => { btn.innerHTML = old; };
   const t = setTimeout(reset, 8000); // never leave the button stuck
   try { await Store.signIn(); }
-  catch(e){
+  catch(e){ FRESH_LOGIN = false;
     console.error(e); const c = (e && e.code) || "unknown";
     if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") {}
     else if (c === "auth/popup-blocked") toast("Your browser blocked the Google window. Allow pop-ups for this site, then try again.");
@@ -1090,7 +1115,7 @@ Views.profile.after = () => {
     $("su_err").textContent = e; if (e) return;
     const btn = $("su_go"); btn.disabled = true;
     const u = {uid:ME.uid, email:ME.email, name, phone: cc + " " + phone, cls, courses:[], created:Date.now(), attempts:[], homework:[]};
-    try { await Store.saveProfile(u); ME = u; go("catalogue", {onboarding:true}); }
+    try { await Store.saveProfile(u); ME = u; try { await Store.startSession(); } catch(e){ console.warn(e); } go("catalogue", {onboarding:true}); }
     catch(err){ console.error(err); btn.disabled = false; $("su_err").textContent = "Couldn't save. Please check your internet and try again."; }
   };
 };
@@ -1409,7 +1434,7 @@ function quizShell(){ return `
     <div class="bar"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy">Easy</span><span id="streak" class="pill">Streak: 0</span><span id="warnPill" class="pill warn" style="display:none"></span></div>
     <div id="timer" class="timer"><div></div></div><div id="timeLeft" class="muted small" style="margin-bottom:8px"></div>
     <div id="topic" class="muted small"></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="feedback"></div>
-    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="quitBtn">End quiz</button> · <button class="link" id="flagBtn">⚑ Report question</button></span><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
+    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="quitBtn">End quiz</button><button class="link flaglink" id="flagBtn">🚩 Report question</button></span><button id="nextBtn" class="btn" style="display:none">Next question</button></div>
   </div>`; }
 function pickQ(){
   if (Q.fixed) return Q.queue[Q.asked.length] || null;
@@ -1484,7 +1509,7 @@ function testShell(){ return `
     <div class="bar" style="margin:14px 0 0"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy"></span></div>
     <div id="topic" class="muted small" style="margin-top:8px"></div><div id="qtext" class="qtext"></div><div id="opts"></div>
     <div class="row" style="justify-content:space-between"><button class="btn ghost" id="prevBtn">← Back</button><button class="btn ghost" id="markBtn">☆ Mark for review</button><button class="btn" id="nextBtn">Next →</button></div>
-    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="clearBtn">Clear answer</button> · <button class="link" id="flagBtn">⚑ Report question</button></span><button class="btn" id="submitBtn" style="background:var(--green)">Submit test</button></div>
+    <div class="row" style="justify-content:space-between;align-items:center"><span><button class="link" id="clearBtn">Clear answer</button><button class="link flaglink" id="flagBtn">🚩 Report question</button></span><button class="btn" id="submitBtn" style="background:var(--green)">Submit test</button></div>
     <p class="muted small" style="margin-top:10px">You can change answers until you submit. Answers and explanations are shown at the end. The test submits itself when time is up.</p>
   </div>`; }
 function bindTest(){
@@ -1637,7 +1662,7 @@ Views.teacher = () => { if (tOnly()) return Views.teacherLock();
   <div class="grid two">
     <button class="tile" id="goHw"><div class="t">📚 Homework</div><div class="d">${THW.length} set · ${us.filter(u=>u.acepoint).length} ACE POINT student(s)</div></button>
     <button class="tile" id="goErr"><div class="t">🔍 Error analysis</div><div class="d">ACE POINT students · filters · download as spreadsheet</div></button>
-    <button class="tile" id="goRep"><div class="t">⚑ Reported questions ${openRep?`<span class="badge" style="background:var(--redbg);color:var(--red)">${openRep} open</span>`:""}</div><div class="d">${TREP.length} report(s) from students</div></button>
+    <button class="tile" id="goRep"><div class="t">🚩 Reported questions ${openRep?`<span class="badge" style="background:var(--redbg);color:var(--red)">${openRep} open</span>`:""}</div><div class="d">${TREP.length} report(s) from students</div></button>
   </div>
   <h2>ACE POINT students</h2>
   <div class="grid">${aps.map(u => { const a = u.attempts||[]; const r = a.reduce((s,x)=>s+x.right,0), n = a.reduce((s,x)=>s+x.total,0); const last = a.at(-1);
@@ -1775,7 +1800,7 @@ Views.tErrors.after = () => { $("bk").onclick = () => go("teacher");
 Views.tReports = () => { if (tOnly()) return Views.teacherLock();
   const list = TREP.slice().sort((a,b) => (a.status === "done") - (b.status === "done") || b.ts - a.ts);
   return `<button class="back" id="bk">← Dashboard</button>
-  <div class="card"><h1>⚑ Reported questions</h1><p class="muted">Questions students flagged. Tell Claude which ones to fix, then mark them as fixed.</p></div>
+  <div class="card"><h1>🚩 Reported questions</h1><p class="muted">Questions students flagged. Tell Claude which ones to fix, then mark them as fixed.</p></div>
   ${list.map(r => { const q = qOf(r.course, r.qid);
     return `<div class="review" style="background:#fff;${r.status==="done"?"opacity:.6":""}">
       <div class="muted small">${esc(COURSE[r.course]?.name||r.course)} · ${esc(chapterOf(r.course, r.chapter)?.name||"")} · Question ${esc(r.qid)} · ${fmtDate(r.ts)}</div>
