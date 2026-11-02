@@ -125,7 +125,7 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
   <div class="hdr-right" id="hdrRight"></div>
 </header>
 <main id="app"></main>
-<footer id="foot">ACE POINT Chemistry · By Gunjan, IIT Madras alumna · <button id="teacherLink">Teacher login</button></footer>
+<footer id="foot">ACE POINT Chemistry · By Gunjan, IIT Madras alumna</footer>
 
 <div id="cheer"><div class="box"><div class="emo"></div><div class="msg"></div><div class="sm"></div><div class="tap">Tap to continue</div></div></div>
 <div id="warn" class="modal"><div class="box">
@@ -728,7 +728,9 @@ function render(){
   const V = Views[VIEW.name] || Views.welcome; app.innerHTML = V(); if (V.after) V.after();
 }
 $("logo").onclick = () => { if (Q && Q.active) return; go(me() ? "home" : "welcome"); };
-$("teacherLink").onclick = () => go("teacherLock");
+// Teacher area is hidden: open it with the private address ending in #teacher
+function checkTeacherHash(){ if (location.hash === "#teacher" && !(Q && Q.active)) { go("teacherLock"); } }
+window.addEventListener("hashchange", checkTeacherHash);
 
 const Views = {};
 
@@ -1167,7 +1169,7 @@ Views.teacher = () => { if (!TEACHER) return Views.teacherLock();
   <h2>Question bank</h2>
   <div class="card"><table><tr><th>Course</th><th>Chapter</th><th>Easy</th><th>Medium</th><th>Hard</th></tr>
   ${Object.entries(CHAPTERS).flatMap(([cid,chs]) => chs.filter(ch => ch.qs.length).map(ch => `<tr><td>${esc(COURSE[cid].name)}</td><td>${esc(ch.name)}</td>${LEVELS.map(l=>`<td>${ch.qs.filter(q=>q.level===l).length}</td>`).join("")}</tr>`)).join("")}</table></div>`; };
-Views.teacher.after = () => { $("bk").onclick = () => { TEACHER = false; go(me() ? "home" : "welcome"); };
+Views.teacher.after = () => { $("bk").onclick = () => { TEACHER = false; try { history.replaceState(null, "", location.pathname); } catch(e) {} go(me() ? "home" : "welcome"); };
   document.querySelectorAll(".tile[data-u]").forEach(t => t.onclick = () => go("tStudent",{email:t.dataset.u})); };
 Views.tStudent = () => { if (!TEACHER) return Views.teacherLock(); const u = Store.getUser(VIEW.email); const a = u.attempts||[];
   const byCourse = u.courses.filter(c => COURSE[c]).map(cid => { const ts = topicStats(a.filter(x=>x.course===cid)); const topics = [...new Set((CHAPTERS[cid]||[]).flatMap(c=>c.topics))];
@@ -1185,7 +1187,7 @@ Views.tAttempt = () => { if (!TEACHER) return Views.teacherLock(); const u = Sto
 Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{email:VIEW.email}); };
 
 /* ---------- Boot ---------- */
-go(me() ? "home" : "welcome");
+if (location.hash === "#teacher") go("teacherLock"); else go(me() ? "home" : "welcome");
 </script>
 </body>
 </html>
