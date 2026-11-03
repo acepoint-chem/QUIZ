@@ -146,7 +146,10 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
 .seg button.on{background:var(--navy);border-color:var(--navy);color:#fff}
 label.chk{display:flex;align-items:center;gap:8px;font-weight:500;margin:6px 0;font-size:15px}
 label.chk input{width:20px;height:20px;flex:none}
-.cqch{border-bottom:1px solid var(--line);padding:6px 0}.cqtops{padding-left:28px}
+.cqch{border-bottom:1px solid var(--line);padding:6px 0}
+.tpick{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 10px}
+.badge.old{background:#fde7c8;color:#8a4b00}
+.linkbtn{background:none;border:0;color:var(--blue,#00427a);text-decoration:underline;padding:0;font-size:14px;cursor:pointer}.cqtops{padding-left:28px}
 .switchrow{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--sky);border-radius:12px;padding:12px;margin:10px 0}
 .toggle{width:54px;height:30px;border-radius:999px;background:#c5cfdd;position:relative;flex:none}
 .toggle span{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}
@@ -237,7 +240,7 @@ body.examon main{max-width:1120px}
    ===================================================================== */
 const CATALOGUE = [
   {group:"Indian exams", courses:[
-    {id:"neet",  name:"NEET Chemistry", desc:"Class 11 and 12, NCERT-based", status:"soon"},
+    {id:"neet",  name:"NEET Chemistry", desc:"Class 11 and 12, NCERT-based · NTA units", status:"live", srcs:["npyq"]},
     {id:"jee",   name:"JEE Chemistry", desc:"JEE Main and Advanced", status:"soon"},
     {id:"found", name:"Class 9–10 Chemistry (Foundation)", desc:"NCERT Class 9–10, foundation for NEET and JEE", status:"live", ncert:true}
   ]},
@@ -289,6 +292,39 @@ const PRICE = {default:{now:0, later:"Price to be announced"}};
 
 // Chapters per course. Each chapter: id, name, topics, questions.
 const CHAPTERS = {
+  // NEET: 20 NTA units (NEET UG 2026 syllabus) plus old-syllabus chapters for past PYQs. Topics: short names; full names in the Drive Topic List.
+  // A question can have extra topics: topic:"Mole concept", topics:["Limiting reagent"].
+  "neet": [
+    {id:"n01-basic", unit:1, name:"Some Basic Concepts in Chemistry", topics:["Laws of chemical combination", "Dalton's atomic theory", "Atomic & molecular mass", "Mole concept", "Molar mass", "Percentage composition", "Empirical & molecular formula", "Stoichiometry", "Limiting reagent", "Concentration terms"], qs:[], npyq:[]},
+    {id:"n02-atom", unit:2, name:"Atomic Structure", topics:["Subatomic particles", "Thomson & Rutherford models", "Isotopes & isobars", "Electromagnetic radiation", "Planck's quantum theory", "Photoelectric effect", "Atomic spectra & hydrogen spectrum", "Bohr model", "de Broglie wavelength", "Heisenberg uncertainty", "Quantum numbers", "Shapes of orbitals", "Nodes", "Aufbau principle", "Pauli principle", "Hund's rule", "Half/fully-filled stability"], qs:[], npyq:[]},
+    {id:"n03-bond", unit:3, name:"Chemical Bonding and Molecular Structure", topics:["Ionic bond", "Lattice enthalpy", "Fajans' rules", "Lewis structures", "Formal charge", "Octet rule exceptions", "Bond parameters", "Dipole moment", "VSEPR shapes", "Valence bond theory", "Hybridisation", "Sigma & pi bonds", "Resonance", "MO theory (bond order & magnetism)", "Hydrogen bonding"], qs:[], npyq:[]},
+    {id:"n04-thermo", unit:4, name:"Chemical Thermodynamics", topics:["System & state functions", "Types of processes", "Work & heat", "First law", "Enthalpy (ΔH = ΔU + ΔnRT)", "Heat capacity & calorimetry", "Hess's law", "Thermochemistry", "Entropy", "Second & third law", "Spontaneity", "Gibbs energy", "ΔG° and K"], qs:[], npyq:[]},
+    {id:"n05-soln", unit:5, name:"Solutions", topics:["Types of solutions", "Henry's law", "Vapour pressure", "Raoult's law", "Ideal & non-ideal solutions", "Azeotropes", "Lowering of vapour pressure", "Elevation of boiling point", "Depression of freezing point", "Osmotic pressure", "Molar mass from colligative properties", "van't Hoff factor"], qs:[], npyq:[]},
+    {id:"n06-equil", unit:6, name:"Equilibrium", topics:["Physical & dynamic equilibrium", "Law of equilibrium", "Kc & Kp", "Kp–Kc relation", "Reaction quotient & Le Chatelier's principle", "Acid–base theories", "Weak acid ionisation", "Weak base ionisation", "Ionic product of water", "pH scale", "Common ion effect", "Salt hydrolysis", "Buffers", "Solubility product", "Precipitation"], qs:[], npyq:[]},
+    {id:"n07-redox", unit:7, name:"Redox Reactions and Electrochemistry", topics:["Oxidation & reduction", "Oxidation number", "Types of redox reactions", "Disproportionation", "Balancing: ion–electron method", "Balancing: oxidation-number method", "Redox titrations", "Conductivity", "Molar conductivity", "Conductivity vs concentration", "Kohlrausch's law", "Galvanic cells", "Electrode potential & SHE", "Electrochemical series", "Nernst equation", "EMF & Gibbs energy", "EMF & K", "Electrolysis", "Faraday's laws", "Products of electrolysis", "Batteries", "Fuel cells", "Corrosion"], qs:[], npyq:[]},
+    {id:"n08-kin", unit:8, name:"Chemical Kinetics", topics:["Rate of reaction", "Factors affecting rate", "Rate law & rate constant", "Order", "Molecularity", "Zero order", "First order", "Half-life", "Pseudo-first order", "Arrhenius equation", "Activation energy", "Catalyst effect", "Collision theory"], qs:[], npyq:[]},
+    {id:"n09-period", unit:9, name:"Classification of Elements and Periodicity", topics:["Modern periodic table", "s, p, d, f blocks", "Naming elements with Z > 100", "Atomic radius", "Ionic radius & isoelectronic species", "Ionisation enthalpy", "Electron gain enthalpy", "Electronegativity", "Valence & oxidation states", "Nature of oxides", "Anomalous second-period behaviour"], qs:[], npyq:[]},
+    {id:"n10-pblock", unit:10, name:"p-Block Elements", topics:["Group 13 trends", "Boron compounds", "Aluminium compounds", "Group 14 trends", "Allotropes of carbon", "Oxides of carbon", "Silicon compounds", "Group 15 trends", "Nitrogen & its compounds", "Phosphorus & its compounds", "Group 16 trends", "Oxygen, ozone & oxides", "Sulphur & its compounds", "Group 17 trends", "Chlorine & HCl", "Oxoacids of halogens", "Interhalogens", "Group 18 trends", "Xenon compounds", "Inert pair effect & catenation"], qs:[], npyq:[]},
+    {id:"n11-dblock", unit:11, name:"d- and f-Block Elements", topics:["d-block configuration", "Atomic size & atomisation enthalpy", "Ionisation enthalpy", "Oxidation states", "E° trends", "Magnetic moment", "Colour of ions", "Catalytic properties", "Interstitial compounds & alloys", "K₂Cr₂O₇", "KMnO₄", "Lanthanoids", "Lanthanoid contraction", "Actinoids", "Lanthanoids vs actinoids"], qs:[], npyq:[]},
+    {id:"n12-coord", unit:12, name:"Coordination Compounds", topics:["Werner's theory", "Double salts vs complexes", "Ligands & denticity", "Chelation", "Coordination number & oxidation state", "IUPAC naming", "Structural isomerism", "Geometrical isomerism", "Optical isomerism", "VBT: hybridisation & geometry", "VBT: magnetism", "Crystal field splitting", "CFSE", "Spectrochemical series", "Colour of complexes", "Stability of complexes", "Metal carbonyls", "Applications"], qs:[], npyq:[]},
+    {id:"n13-purif", unit:13, name:"Purification and Characterisation of Organic Compounds", topics:["Crystallisation", "Sublimation", "Distillation", "Extraction", "Chromatography", "Test for nitrogen", "Test for sulphur", "Test for halogens", "Test for phosphorus", "Estimating C & H", "Estimating N (Dumas, Kjeldahl)", "Estimating halogens (Carius)", "Estimating S & P", "Formula from analysis"], qs:[], npyq:[]},
+    {id:"n14-goc", unit:14, name:"Some Basic Principles of Organic Chemistry", topics:["Tetravalency & shapes", "Hybridisation in organic molecules", "Structural formulae", "Classification", "Functional groups", "IUPAC naming", "Chain & position isomerism", "Functional isomerism & metamerism", "Tautomerism", "Geometrical isomerism", "Optical isomerism", "Bond fission", "Carbocations", "Carbanions", "Free radicals", "Electrophiles & nucleophiles", "Inductive effect", "Electromeric effect", "Resonance effect", "Hyperconjugation", "Acid & base strength", "Types of reactions"], qs:[], npyq:[]},
+    {id:"n15-hc", unit:15, name:"Hydrocarbons", topics:["Alkane preparation", "Alkane reactions", "Conformations", "Alkene isomerism", "Alkene preparation", "Markovnikov addition", "Peroxide effect", "Ozonolysis", "Alkene oxidation", "Alkyne preparation", "Acidity of alkynes", "Alkyne addition", "Aromaticity", "Structure of benzene", "Electrophilic substitution", "Directive influence"], qs:[], npyq:[]},
+    {id:"n16-halo", unit:16, name:"Organic Compounds Containing Halogens", topics:["C–X bond", "Naming", "Haloalkane preparation", "Haloarene preparation", "Physical properties", "SN2", "SN1", "Stereochemistry of substitution", "Elimination & Saytzeff", "Substitution vs elimination", "Reactions with metals", "Haloarene reactions", "Polyhalogen compounds"], qs:[], npyq:[]},
+    {id:"n17-oxy", unit:17, name:"Organic Compounds Containing Oxygen", topics:["Alcohol classification & naming", "Alcohol preparation", "Alcohol physical properties", "Acidity of alcohols", "Alcohol reactions", "Dehydration", "Oxidation of alcohols", "Lucas test", "Phenol preparation", "Acidity of phenols", "Phenol substitution", "Kolbe reaction", "Reimer–Tiemann", "Williamson synthesis", "Ether reactions", "Aldehyde & ketone preparation", "Nucleophilic addition", "Ammonia-derivative reactions", "Aldol", "Cannizzaro", "Clemmensen & Wolff–Kishner", "Haloform", "Tollens' & Fehling's tests", "Carboxylic acid preparation", "Acidity of carboxylic acids", "Carboxylic acid reactions", "Acid derivatives"], qs:[], npyq:[]},
+    {id:"n18-nitro", unit:18, name:"Organic Compounds Containing Nitrogen", topics:["Amine classification & naming", "Amine structure", "Amine preparation by reduction", "Gabriel synthesis", "Hoffmann bromamide", "Basicity of amines", "Alkylation & acylation", "Carbylamine test", "Reaction with nitrous acid", "Hinsberg test", "Aniline substitution", "Diazonium preparation", "Sandmeyer & Gattermann", "Coupling reactions", "Diazonium in synthesis"], qs:[], npyq:[]},
+    {id:"n19-bio", unit:19, name:"Biomolecules", topics:["Carbohydrate classification", "Glucose structure", "Glucose reactions", "Fructose", "Disaccharides", "Polysaccharides", "Amino acids", "Peptide bond", "Protein structure", "Denaturation", "Enzymes", "Vitamins", "DNA & RNA structure", "Nucleic acid functions", "Hormones"], qs:[], npyq:[]},
+    {id:"n20-prac", unit:20, name:"Principles Related to Practical Chemistry", topics:["Detecting extra elements", "Functional group tests", "Mohr's salt", "Potash alum", "Acetanilide", "p-Nitroacetanilide", "Aniline yellow", "Iodoform", "Acid–base titration", "KMnO₄ titrations", "Indicators", "Cation analysis", "Anion analysis", "Enthalpy experiments", "Colloid preparation", "Kinetics experiments"], qs:[], npyq:[]},
+    {id:"nx-som", old:true, name:"States of Matter", topics:["Gas laws", "Ideal gas equation", "Dalton's partial pressures", "Kinetic theory", "Real gases", "Liquids"], qs:[], npyq:[]},
+    {id:"nx-ss", old:true, name:"Solid State", topics:["Types of solids", "Unit cells", "Packing efficiency", "Density", "Voids", "Defects", "Electrical & magnetic properties"], qs:[], npyq:[]},
+    {id:"nx-surf", old:true, name:"Surface Chemistry", topics:["Adsorption", "Isotherms", "Catalysis", "Colloid types", "Colloid properties", "Emulsions"], qs:[], npyq:[]},
+    {id:"nx-met", old:true, name:"Metallurgy", topics:["Concentration", "Extraction", "Ellingham diagram", "Refining"], qs:[], npyq:[]},
+    {id:"nx-hyd", old:true, name:"Hydrogen", topics:["Hydrogen & isotopes", "Hydrides", "Hard water", "H₂O₂"], qs:[], npyq:[]},
+    {id:"nx-sb", old:true, name:"s-Block Elements", topics:["Group 1 trends", "Group 2 trends", "Sodium compounds", "Calcium compounds", "Anomalous Li & Be"], qs:[], npyq:[]},
+    {id:"nx-env", old:true, name:"Environmental Chemistry", topics:["Air pollution", "Water pollution", "Soil pollution", "Green chemistry"], qs:[], npyq:[]},
+    {id:"nx-poly", old:true, name:"Polymers", topics:["Classification", "Addition polymers", "Condensation polymers", "Rubber", "Biodegradable polymers"], qs:[], npyq:[]},
+    {id:"nx-evd", old:true, name:"Chemistry in Everyday Life", topics:["Drugs", "Food chemicals", "Soaps & detergents"], qs:[], npyq:[]},
+  ],
   "sci8": [
     {id:"nav", name:"Navigation & Tracking",
      topics:["Maps and Globes","Latitude","Longitude","Writing Coordinates","Degrees, Minutes and Seconds","Distance on the Earth"], qs:[
@@ -2688,7 +2724,9 @@ function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("
 function chapterOf(cid, chid){ return (CHAPTERS[cid]||[]).find(c => c.id === chid); }
 // Every question knows its chapter; QIDX finds any question in a course by its id
 const QIDX = {};
-const SRC = [["ncert","NCERT"],["exemplar","NCERT Exemplar"],["pyq","CBSE PYQs"]], SRCNAME = Object.fromEntries(SRC);
+const SRC = [["ncert","NCERT"],["exemplar","NCERT Exemplar"],["pyq","CBSE PYQs"],["npyq","NEET PYQs"],["jpyq","JEE PYQs"]], SRCNAME = Object.fromEntries(SRC);
+const srcsOf = cid => (COURSE[cid].srcs || ["ncert","exemplar","pyq"]).map(k => [k, SRCNAME[k]]);
+const PYQ_PFX = {pyq:"CBSE ", npyq:"NEET ", jpyq:"JEE "};
 const allQs = ch => [...ch.qs, ...SRC.flatMap(([k]) => ch[k] || [])];
 Object.entries(CHAPTERS).forEach(([cid, chs]) => { QIDX[cid] = {}; chs.forEach(ch => {
   // Questions marked test:true are kept only for the chapter test and never appear in practice
@@ -2697,12 +2735,12 @@ Object.entries(CHAPTERS).forEach(([cid, chs]) => { QIDX[cid] = {}; chs.forEach(c
   SRC.forEach(([k]) => (ch[k] || []).forEach(q => { q.ch = ch.id; q.src = k; if (!q.level) q.level = "medium"; QIDX[cid][q.id] = q; })); }); });
 const isW = q => q && q.type === "written";
 const correctText = q => isW(q) ? q.answer : q.options[q.answer];
-function allTopics(ch){ const t = new Set(allQs(ch).map(q => q.topic)); return [...ch.topics.filter(x => t.has(x)), ...[...t].filter(x => !ch.topics.includes(x))]; }
+function allTopics(ch){ const t = new Set(allQs(ch).flatMap(qTs)); return [...ch.topics.filter(x => t.has(x)), ...[...t].filter(x => !ch.topics.includes(x))]; }
 const qOf = (cid, id) => (QIDX[cid] || {})[id];
 const ansCh = (a, x) => x.ch || a.chapter;
 function attemptsFor(u, cid){ return (u.attempts||[]).filter(a => a.course === cid && COURSE[cid]); }
 function topicStats(attempts, chid){
-  const t = {}; attempts.forEach(a => a.answers.forEach(x => { if (chid && ansCh(a,x) !== chid) return; t[x.topic] = t[x.topic] || {r:0,n:0}; t[x.topic].n++; if (x.ok) t[x.topic].r++; })); return t;
+  const t = {}; attempts.forEach(a => a.answers.forEach(x => { if (chid && ansCh(a,x) !== chid) return; xTs(x).forEach(k => { t[k] = t[k] || {r:0,n:0}; t[k].n++; if (x.ok) t[k].r++; }); })); return t;
 }
 function strengthTag(st){
   if (!st || st.n < 10) return `<span class="tag na">${st ? 10 - st.n : 10} more to unlock</span>`;
@@ -2715,7 +2753,12 @@ const pad = n => String(n).padStart(2,"0");
 const localDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const dueTs = s => new Date(s + "T23:59:59").getTime();
 function attTitle(a){ return a.title || chapterOf(a.course, a.chapter)?.name || MODE_NAME[a.mode] || "Quiz"; }
-function liveTopics(ch){ return ch.topics.filter(t => ch.qs.some(q => q.topic === t)); }
+// A question has a main topic and may have extra topics (q.topics). A topic choice can be one topic or a list.
+const qTs = q => q.topics && q.topics.length ? [q.topic, ...q.topics.filter(t => t !== q.topic)] : [q.topic];
+const xTs = x => x.topics && x.topics.length ? [x.topic, ...x.topics.filter(t => t !== x.topic)] : [x.topic];
+const tSel = t => !t ? [] : Array.isArray(t) ? t : [t];
+const hasT = (q, t) => { const s = tSel(t); return !s.length || qTs(q).some(x => s.includes(x)); };
+function liveTopics(ch){ return ch.topics.filter(t => ch.qs.some(q => qTs(q).includes(t))); }
 
 // Test pace copies the real exam: NEET about 1 minute per question; Grade 8 is 20 questions in 25 minutes
 const PACE = {sci8:75, math8:75}; const pace = cid => PACE[cid] || 60;
@@ -3093,9 +3136,11 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
   if (tab === "practice"){
     body = chs.length ? chs.map(ch => { const done = new Set(); at.forEach(a => a.answers.forEach(x => { if (ansCh(a,x) === ch.id) done.add(x.id); }));
       const nq = allQs(ch).length;
-      if (!nq) return `<button class="tile" disabled><div class="t">${esc(ch.name)} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.join(" · ")}</div></button>`;
+      const oldB = ch.old ? ' <span class="badge old">Not in 2026 syllabus</span>' : "";
+      const cname = (ch.unit ? `Unit ${ch.unit} · ` : "") + esc(ch.name) + oldB;
+      if (!nq) return `<button class="tile" disabled><div class="t">${cname} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.length > 8 ? ch.topics.length + " topics" : ch.topics.join(" · ")}</div></button>`;
       const pct = Math.min(100, Math.round(done.size/nq*100));
-      return `<button class="tile" data-ch="${ch.id}"><div class="t">${esc(ch.name)}</div>
+      return `<button class="tile" data-ch="${ch.id}"><div class="t">${cname}</div>
         <div class="d">${nq} questions${SRC.some(([k]) => (ch[k]||[]).length) ? " · " + [["qs","Practice"], ...SRC].filter(([k]) => (ch[k]||[]).length).map(([k,l]) => `${l} ${ch[k].length}`).join(" · ") : ""} · ${pct}% seen</div>
         <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
       : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
@@ -3169,8 +3214,8 @@ function cqHTML(cid){
     <button class="btn block" id="cqGo">Start my quiz</button></div>`;
 }
 function cqPool(){
-  const out = []; CQ.picked.forEach(k => { const p = k.indexOf("|"), chid = k.slice(0,p), t = k.slice(p+1); const ch = chapterOf(CQ.cid, chid); if (ch) ch.qs.forEach(q => { if (q.topic === t) out.push(q); }); });
-  return out;
+  const out = []; CQ.picked.forEach(k => { const p = k.indexOf("|"), chid = k.slice(0,p), t = k.slice(p+1); const ch = chapterOf(CQ.cid, chid); if (ch) ch.qs.forEach(q => { if (qTs(q).includes(t)) out.push(q); }); });
+  const seen = new Set(); return out.filter(q => !seen.has(q.id) && seen.add(q.id));
 }
 function cqUpdate(){
   document.querySelectorAll("[data-cqch]").forEach(b => { const ch = chapterOf(CQ.cid, b.dataset.cqch); const ts = liveTopics(ch); const k = ts.filter(t => CQ.picked.has(ch.id+"|"+t)).length;
@@ -3210,15 +3255,15 @@ function hardProgress(u, cid, ch){
   return {done: done.size, total: hard.length, left};
 }
 Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid), ch.id);
-  const hasSrc = !!COURSE[VIEW.cid].ncert; const src = hasSrc ? (VIEW.src || "practice") : "practice";
-  const tabs = hasSrc ? `<div class="tabs">${[["practice","Practice"], ...SRC].map(([k,l]) => `<button data-src="${k}" class="${src===k?"on":""}">${l}${k!=="practice" && (ch[k]||[]).length ? ` (${ch[k].length})` : ""}</button>`).join("")}</div>` : "";
+  const hasSrc = !!(COURSE[VIEW.cid].ncert || COURSE[VIEW.cid].srcs); const src = hasSrc ? (VIEW.src || "practice") : "practice";
+  const tabs = hasSrc ? `<div class="tabs">${[["practice","Practice"], ...srcsOf(VIEW.cid)].map(([k,l]) => `<button data-src="${k}" class="${src===k?"on":""}">${l}${k!=="practice" && (ch[k]||[]).length ? ` (${ch[k].length})` : ""}</button>`).join("")}</div>` : "";
   let body;
   if (src !== "practice"){
     const list = ch[src] || [], mc = list.filter(q => !isW(q)).length, wr = list.length - mc;
-    const groups = {}; list.forEach(q => { const g = src === "pyq" ? (q.year ? "CBSE " + q.year : "Other years") : (q.group || "Questions"); groups[g] = (groups[g]||0) + 1; });
+    const groups = {}; list.forEach(q => { const g = PYQ_PFX[src] ? (q.year ? PYQ_PFX[src] + q.year + (q.paper ? " · " + q.paper : "") : "Other years") : (q.group || "Questions"); groups[g] = (groups[g]||0) + 1; });
     body = `<div class="card"><h2 style="margin-top:0">${SRCNAME[src]} questions</h2>
       ${list.length ? `<p class="muted">${list.length} question${list.length>1?"s":""} · ${mc} MCQ · ${wr} written answer</p>
-        <table><tr><th>${src==="pyq"?"Year":"Section"}</th><th>Questions</th></tr>${Object.entries(groups).map(([g,n]) => `<tr><td>${esc(g)}</td><td>${n}</td></tr>`).join("")}</table>
+        <table><tr><th>${PYQ_PFX[src]?"Year":"Section"}</th><th>Questions</th></tr>${Object.entries(groups).map(([g,n]) => `<tr><td>${esc(g)}</td><td>${n}</td></tr>`).join("")}</table>
         <div class="grid" style="margin-top:12px">
           <button class="tile" data-sk="all"><div class="t">📚 All ${SRCNAME[src]} questions</div><div class="d">${list.length} questions in order</div></button>
           <button class="tile" data-sk="mcq" ${mc?"":"disabled"}><div class="t">🔘 MCQs only</div><div class="d">${mc} question${mc===1?"":"s"} · answers after each one</div></button>
@@ -3227,9 +3272,9 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
         <p class="muted small" style="margin-top:12px">Written answers have no timer: write your answer in your notebook, tap Show answer, then mark Got it or Didn't get it honestly.</p>`
       : `<p class="muted">${SRCNAME[src]} questions for this chapter are coming soon.</p>`}</div>`;
   } else if (!ch.qs.length){
-    body = `<div class="card"><p class="muted">ACE POINT practice questions for this chapter are coming soon.${hasSrc ? " Try the NCERT, Exemplar and PYQ tabs." : ""}</p></div>`;
+    body = `<div class="card"><p class="muted">ACE POINT practice questions for this chapter are coming soon.${hasSrc ? " Try the other tabs above." : ""}</p></div>`;
   } else {
-    const topic = VIEW.topic || ""; const pool = ch.qs.filter(q => !topic || q.topic === topic);
+    const topic = tSel(VIEW.topics); const pool = ch.qs.filter(q => hasT(q, topic));
     const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch); const hp = hardProgress(u, VIEW.cid, ch);
     body = `<div class="card">
     <p class="muted" style="margin-top:0">${ch.qs.length} practice questions across ${liveTopics(ch).length} topics</p>
@@ -3243,14 +3288,16 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
       : `<button class="tile" id="chTest"><div class="t">Chapter test (exam style) <span class="badge own">${tn} questions · ${Math.round(tn*pace(VIEW.cid)/60)} min</span></div>
       <div class="d">New questions you haven't seen in practice, about a third Easy, Medium and Hard. One timer for the whole test; jump between questions, change answers, mark for review. Answers at the end.</div></button>`}
     <h2>Practice</h2>
-    <label for="topicSel">What do you want to practise?</label>
-    <select id="topicSel"><option value="">Whole chapter (all topics)</option>${liveTopics(ch).map(t => `<option ${t===topic?"selected":""}>${esc(t)}</option>`).join("")}</select>
+    <label>What do you want to practise?</label>
+    <p class="muted small" style="margin:2px 0 6px">Tick one or more topics. Tick none to practise the whole chapter.</p>
+    <div id="topicSel" class="tpick">${liveTopics(ch).map(t => `<label class="chk"><input type="checkbox" data-tp="${esc(t)}" ${topic.includes(t)?"checked":""}> ${esc(t)}</label>`).join("")}</div>
+    <p class="small" style="margin:6px 0 0"><b id="tpInfo"></b> <button class="linkbtn" id="tpClear" type="button">Clear</button></p>
     <div class="grid" style="margin-top:12px">
       <button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
         <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>
-      <button class="tile" data-m="easy" ${n("easy")?"":"disabled"}><div class="t">🟢 All Easy questions</div><div class="d">${n("easy")} questions</div></button>
-      <button class="tile" data-m="medium" ${n("medium")?"":"disabled"}><div class="t">🟠 All Medium questions</div><div class="d">${n("medium")} questions</div></button>
-      <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d">${n("hard")} questions</div></button>
+      <button class="tile" data-m="easy" ${n("easy")?"":"disabled"}><div class="t">🟢 All Easy questions</div><div class="d"><span data-n="easy">${n("easy")}</span> questions</div></button>
+      <button class="tile" data-m="medium" ${n("medium")?"":"disabled"}><div class="t">🟠 All Medium questions</div><div class="d"><span data-n="medium">${n("medium")}</span> questions</div></button>
+      <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d"><span data-n="hard">${n("hard")}</span> questions</div></button>
     </div>
     <p class="muted small" style="margin-top:12px">Practice: 45 seconds per question, 1 minute for calculations. After a wrong answer, pick why it happened before going on. The quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning, and 3 warnings submits the quiz.</p>
   </div>`;
@@ -3258,7 +3305,7 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
   const tps = allTopics(ch);
   return `
   <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
-  <div class="card"><h1>${esc(ch.name)}</h1></div>
+  <div class="card"><h1>${ch.unit ? `Unit ${ch.unit} · ` : ""}${esc(ch.name)}</h1>${ch.old ? '<span class="badge old">Not in 2026 syllabus</span> <span class="muted small">Asked in earlier NEET papers; practise it for past PYQs.</span>' : ""}</div>
   ${tabs}${body}
   ${tps.length ? `<div class="card"><h3>Your topics in this chapter</h3>
     <table><tr><th>Topic</th><th>Answered</th><th>Strength</th></tr>
@@ -3272,11 +3319,18 @@ Views.chapter.after = () => {
     startQuiz({cid, chid, mode:src, list, title: ch.name + " · " + SRCNAME[src] + (k === "mcq" ? " MCQs" : k === "written" ? " written answers" : "")}); });
   if (!$("topicSel")) return;
   if ($("chTest")) $("chTest").onclick = () => startChapterTest(cid, chid);
-  $("topicSel").onchange = e => go("chapter",{cid, chid, topic:e.target.value});
+  const picked = () => [...document.querySelectorAll("[data-tp]:checked")].map(b => b.dataset.tp);
+  const upd = () => { const tp = picked(); VIEW.topics = tp; const pool = ch.qs.filter(q => hasT(q, tp));
+    $("tpInfo").textContent = tp.length ? `${tp.length} topic${tp.length>1?"s":""} ticked · ${pool.length} questions` : `Whole chapter · ${pool.length} questions`;
+    $("tpClear").style.display = tp.length ? "" : "none";
+    ["easy","medium","hard"].forEach(l => { const k = pool.filter(q => q.level === l).length; const sp = document.querySelector(`[data-n="${l}"]`); if (sp){ sp.textContent = k; sp.closest(".tile").disabled = !k; } }); };
+  document.querySelectorAll("[data-tp]").forEach(b => b.onchange = upd);
+  $("tpClear").onclick = () => { document.querySelectorAll("[data-tp]").forEach(b => b.checked = false); upd(); };
+  upd();
   document.querySelectorAll(".tile[data-m]").forEach(t => t.onclick = () => {
-    const topic = $("topicSel").value, m = t.dataset.m;
+    const topic = picked(), m = t.dataset.m;
     if (m === "adaptive") return startQuiz({cid, chid, topic, mode:m});
-    startQuiz({cid, chid, topic, mode:m, list: shuffle(ch.qs.filter(q => (!topic || q.topic === topic) && q.level === m))});
+    startQuiz({cid, chid, topic, mode:m, list: shuffle(ch.qs.filter(q => hasT(q, topic) && q.level === m))});
   });
 };
 
@@ -3297,7 +3351,7 @@ function startRevision(cid, chid){
 }
 function startHomework(id){
   const u = me(); const h = (u.homework||[]).find(x => x.id === id); if (!h) return;
-  const ch = chapterOf(h.course, h.chapter); const pool = ch.qs.filter(q => !h.topic || q.topic === h.topic);
+  const ch = chapterOf(h.course, h.chapter); const pool = ch.qs.filter(q => hasT(q, h.topic));
   startQuiz({cid:h.course, chid:h.chapter, topic:h.topic||null, mode:"homework", list: pickBalanced(pool, h.n, "mixed"), hw:h.id, title:"Homework · " + hwTitle(h)});
 }
 
@@ -3319,10 +3373,10 @@ async function startQuiz(spec){
   if (pendingOf(u).length){ toast("Finish your error analysis first. Then you can start a new quiz."); return go("analysis"); }
   const {cid, chid = null, topic = null, mode, style = "practice"} = spec;
   const ch = chid ? chapterOf(cid, chid) : null;
-  const pool = mode === "adaptive" ? ch.qs.filter(q => !topic || q.topic === topic) : [];
+  const pool = mode === "adaptive" ? ch.qs.filter(q => hasT(q, topic)) : [];
   const queue = mode === "adaptive" ? null : (spec.list || []);
   if ((queue && !queue.length) || (!queue && !pool.length)){ toast("No questions here yet."); return; }
-  Q = {id:"q"+Date.now(), cid, chid, topic: topic || null, mode, style, title: spec.title || (ch ? ch.name : ""), hw: spec.hw || null, exam: spec.exam || null,
+  Q = {id:"q"+Date.now(), cid, chid, topic: tSel(topic).join(", ") || null, mode, style, title: spec.title || (ch ? ch.name : ""), hw: spec.hw || null, exam: spec.exam || null,
        pool, queue, fixed: !!queue, total: queue ? queue.length : null,
        level: 0, maxLevel: 0, rs:0, asked:[], used:new Set(), wrong:new Set(),
        warnings:0, incidents:[], cur:null, timerId:null, left:0, limit:0, answered:false, active:true,
@@ -3408,7 +3462,7 @@ function nextQ(){
 }
 function answerWritten(ok){
   if (Q.answered || !Q.active) return; Q.answered = true;
-  const q = Q.cur; const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen: ok ? 0 : -2, ok, written:true, secs:0,
+  const q = Q.cur; const entry = {id:q.id, ch:q.ch, topic:q.topic, topics:q.topics, level:q.level, chosen: ok ? 0 : -2, ok, written:true, secs:0,
     typed: Q.wTyped != null ? Q.wTyped.slice(0, 1500) : undefined, kwMissing: Q.wMissing && Q.wMissing.length ? Q.wMissing : undefined};
   Q.asked.push(entry); saveDraft();
   if (ok) Q.rs++; else { Q.rs = 0; Q.wrong.add(q.id); }
@@ -3439,7 +3493,7 @@ function answerQ(i){
   if (Q.answered || !Q.active) return; Q.answered = true; clearInterval(Q.timerId);
   const q = Q.cur, ok = i === q.answer;
   document.querySelectorAll(".opt").forEach(b => { const k = +b.dataset.i; b.disabled = true; if (k===q.answer) b.classList.add("correct"); if (k===i && !ok) b.classList.add("wrong"); });
-  const entry = {id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:i, ok, secs:Q.limit - Q.left};
+  const entry = {id:q.id, ch:q.ch, topic:q.topic, topics:q.topics, level:q.level, chosen:i, ok, secs:Q.limit - Q.left};
   const fast = i >= 0 && entry.secs < minSecs(q); if (fast) entry.rushed = true;
   Q.fastRun = fast ? (Q.fastRun||0) + 1 : 0;
   Q.asked.push(entry); saveDraft();
@@ -3737,7 +3791,7 @@ function makeAtt(auto, quit, draft){
   let asked = Q.asked;
   if (Q.style === "test"){
     const spent = Q.spent.slice(); spent[Q.idx] += (Date.now() - Q.qStart)/1000;
-    asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(spent[k]), marked:Q.marked.has(k) || undefined, rushed:(Q.sel[k] >= 0 && spent[k] < minSecs(q)) || undefined}));
+    asked = Q.list.map((q,k) => ({id:q.id, ch:q.ch, topic:q.topic, topics:q.topics, level:q.level, chosen:Q.sel[k], ok:Q.sel[k] === q.answer, secs:Math.round(spent[k]), marked:Q.marked.has(k) || undefined, rushed:(Q.sel[k] >= 0 && spent[k] < minSecs(q)) || undefined}));
   }
   let ex = {}; // Exam mode: the paper's marking (negative marking included) decides the score
   if (Q.exam){ const m = Q.exam.marking;
@@ -3772,7 +3826,7 @@ function finishQuiz(auto, quit){
 function reportHTML(att, forTeacher){
   if (att.mode === "exam") return examReportHTML(att, forTeacher);
   const pct = att.total ? Math.round(att.right/att.total*100) : 0;
-  const t = {}; att.answers.forEach(a => { t[a.topic] = t[a.topic]||{r:0,n:0}; t[a.topic].n++; if (a.ok) t[a.topic].r++; });
+  const t = {}; att.answers.forEach(a => xTs(a).forEach(k => { t[k] = t[k]||{r:0,n:0}; t[k].n++; if (a.ok) t[k].r++; }));
   const wrongIdx = att.answers.map((x,i) => i).filter(i => !att.answers[i].ok);
   const wrong = wrongIdx.map(i => reviewCard(att, i, {teacher:forTeacher})).join("");
   const pend = !forTeacher && att.v && wrongIdx.some(i => !att.answers[i].err);
