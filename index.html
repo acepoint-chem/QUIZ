@@ -3769,7 +3769,7 @@ function answerQ(i){
   $("feedback").innerHTML = ok
     ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${esc(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
     : `<div class="feedback bad"><h3>${i===-1?"⏰ Time's up!":"❌ Not quite."}</h3><p><b>Correct answer: ${q.lettered ? "Option " + "ABCD"[q.answer] : `${"ABCD"[Q.order.indexOf(q.answer)]}) ${esc(q.options[q.answer])}`}</b></p><p>${esc(q.explain)}</p>
-       <div class="mist"><b>Where it went wrong:</b> ${i===-1?"You ran out of time on this one.":esc(q.mistakes[i]||"")}</div>${msg?`<p><b>${msg}</b></p>`:""}</div>
+       ${i===-1 ? `<div class="mist"><b>Where it went wrong:</b> You ran out of time on this one.</div>` : (q.mistakes && q.mistakes[i]) ? `<div class="mist"><b>Where it went wrong:</b> ${esc(q.mistakes[i])}</div>` : ""}${msg?`<p><b>${msg}</b></p>`:""}</div>
        ${anaBox("live", Q.asked.length-1, entry)}`;
   $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = "";
   $("nextBtn").disabled = !ok;
