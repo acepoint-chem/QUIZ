@@ -2956,6 +2956,12 @@ const Store = {
    ===================================================================== */
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Question text: show X_abc as X with a real subscript (P_ext, V_final, K_sp, S_N2, Δ_fH, n_gRT)
+const fx = s => esc(s)
+  .replace(/S_N([12i])\b/g, "S<sub>N</sub>$1")
+  .replace(/Δ_(fus|vap|sub|mix|f|r|c)([HGSU])/g, "Δ<sub>$1</sub>$2")
+  .replace(/n_g(RT)/g, "n<sub>g</sub>$1")
+  .replace(/([A-Za-zΔ°)\]])_\{?([A-Za-z0-9+\-]+(?:,m)?)\}?/g, "$1<sub>$2</sub>");
 const LEVELS = ["easy","medium","hard"], LN = {easy:"Easy",medium:"Medium",hard:"Hard"};
 const me = () => (ME && !ME.profileMissing) ? ME : null;
 const DAY = 864e5, REVISE_DAYS = 15;
@@ -2979,7 +2985,7 @@ const correctText = q => isW(q) || isN(q) ? q.answer : isM(q) ? (q.lettered ? "O
 const givenText = (q, x) => isSel(q) ? (x.typed || "") : q.lettered ? "Option " + "ABCD"[x.chosen] : q.options[x.chosen];
 // Questions from the original paper carry img:[...] (watermarked crops) and lettered options A-D that are never shuffled
 const qImgs = q => (q.img || []).map(src => `<img class="qimg" src="${esc(src)}" alt="Question from the original paper" draggable="false" loading="lazy" oncontextmenu="return false">`).join("");
-const qHTML = q => (q.q ? `<div style="white-space:pre-line">${esc(q.q)}</div>` : "") + ((q.img||[]).length ? `<div class="qzoom" data-zoom="${esc(q.img.join("|"))}">${qImgs(q)}</div>` : "");
+const qHTML = q => (q.q ? `<div style="white-space:pre-line">${fx(q.q)}</div>` : "") + ((q.img||[]).length ? `<div class="qzoom" data-zoom="${esc(q.img.join("|"))}">${qImgs(q)}</div>` : "");
 // Tap a question image to see it bigger: scroll around, + and − to resize
 let ZW = 1;
 function drawZoom(){ document.querySelectorAll("#zsc img").forEach(im => { im.style.width = Math.round((im.naturalWidth || 1000) / 1.4 * ZW) + "px"; }); }
@@ -3154,12 +3160,12 @@ function reviewCard(a, i, o = {}){
   return `<div class="review"${o.anchor ? ` id="${o.anchor}"` : ""}>${o.head || ""}
     ${o.ctx ? `<div class="muted small" style="margin-bottom:4px">${o.who ? `<b>${esc(o.who)}</b> · ` : ""}${esc(COURSE[a.course]?.name||"")} · ${esc(chapterOf(a.course, ansCh(a,x))?.name||"")} · ${esc(x.topic)} · ${fmtDay(a.ts)}</div>` : ""}
     <div class="q">${qHTML(q)}</div>
-    ${isW(q) ? `<div>Self-check: <b>Didn't get it</b></div>${x.typed ? `<div class="small" style="white-space:pre-line;margin-top:4px">${o.teacher ? "Answer typed" : "You wrote"}: ${esc(x.typed)}</div>` : ""}${x.kwMissing ? `<div class="small" style="color:#7a4b00;margin-top:4px">💡 Missing key points: ${x.kwMissing.map(esc).join(", ")}</div>` : ""}<div class="model"><b>Model answer</b><div>${esc(q.answer)}</div></div>` : `
-    <div>${o.teacher ? "Answer given" : "Your answer"}: ${x.skipped ? "<i>Skipped</i>" : x.chosen === -1 ? `<i>${none}</i>` : esc(givenText(q, x))}${x.hint ? ' <span class="muted small">· 💡 used a hint</span>' : ""}</div>
-    <div><b>Correct: ${esc(correctText(q))}</b></div>`}
-    ${!isW(q) && x.chosen >= 0 && q.mistakes && q.mistakes[x.chosen] ? `<div class="muted small" style="margin-top:4px">Where it went wrong: ${esc(q.mistakes[x.chosen])}</div>` : ""}
-    ${q.explain ? `<div class="muted small" style="margin-top:4px;white-space:pre-line">${esc(q.explain)}</div>` : ""}
-    ${(q.traps||[]).length ? `<div class="muted small" style="margin-top:4px"><b>Common traps:</b> ${q.traps.map(esc).join(" · ")}</div>` : ""}
+    ${isW(q) ? `<div>Self-check: <b>Didn't get it</b></div>${x.typed ? `<div class="small" style="white-space:pre-line;margin-top:4px">${o.teacher ? "Answer typed" : "You wrote"}: ${esc(x.typed)}</div>` : ""}${x.kwMissing ? `<div class="small" style="color:#7a4b00;margin-top:4px">💡 Missing key points: ${x.kwMissing.map(esc).join(", ")}</div>` : ""}<div class="model"><b>Model answer</b><div>${fx(q.answer)}</div></div>` : `
+    <div>${o.teacher ? "Answer given" : "Your answer"}: ${x.skipped ? "<i>Skipped</i>" : x.chosen === -1 ? `<i>${none}</i>` : fx(givenText(q, x))}${x.hint ? ' <span class="muted small">· 💡 used a hint</span>' : ""}</div>
+    <div><b>Correct: ${fx(correctText(q))}</b></div>`}
+    ${!isW(q) && x.chosen >= 0 && q.mistakes && q.mistakes[x.chosen] ? `<div class="muted small" style="margin-top:4px">Where it went wrong: ${fx(q.mistakes[x.chosen])}</div>` : ""}
+    ${q.explain ? `<div class="muted small" style="margin-top:4px;white-space:pre-line">${fx(q.explain)}</div>` : ""}
+    ${(q.traps||[]).length ? `<div class="muted small" style="margin-top:4px"><b>Common traps:</b> ${q.traps.map(fx).join(" · ")}</div>` : ""}
     ${ana}
     ${o.teacher ? "" : `<div style="margin-top:6px"><button class="link small flaglink" style="margin-left:0" data-flag="${esc(a.course)}|${esc(x.id)}">🚩 Report this question</button></div>`}
   </div>`;
@@ -3414,7 +3420,7 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
         ${chs.filter(ch => byCh[ch.id]).map(ch => { const rs = byCh[ch.id]; const byT = {}; rs.forEach(r => (byT[r.x.topic] = byT[r.x.topic] || []).push(r));
           return `<div class="card"><div class="bar" style="margin:0"><h3 style="margin:0">${esc(ch.name)} (${rs.length})</h3><button class="btn ghost" data-msch="${ch.id}" style="padding:8px 14px;font-size:14px">Practise these</button></div>
             ${Object.entries(byT).map(([t, list]) => `<h3 style="margin-top:12px;font-size:15px;color:var(--navy)">${esc(t)}</h3>${list.map(r => { const q = qOf(VIEW.cid, r.x.id);
-              return `<div class="review"><div class="q">${qHTML(q)}</div><div class="small">${isW(q) ? "Self-check: Didn't get it" : "Your answer: " + (r.x.chosen === -1 ? `<i>${r.a.style==="test"?"Not answered":"Time ran out"}</i>` : esc(givenText(q, r.x)))}</div>
+              return `<div class="review"><div class="q">${qHTML(q)}</div><div class="small">${isW(q) ? "Self-check: Didn't get it" : "Your answer: " + (r.x.chosen === -1 ? `<i>${r.a.style==="test"?"Not answered":"Time ran out"}</i>` : fx(givenText(q, r.x)))}</div>
                 <div class="small muted">${fmtDay(r.a.ts)} · <span class="pill ${q.level}" style="font-size:11px;padding:2px 8px">${LN[q.level]}</span> · ${r.x.err && ET[r.x.err] ? ET[r.x.err].e + " " + ET[r.x.err].n : "Not analysed"}</div></div>`; }).join("")}`).join("")}</div>`; }).join("")}`;
     }
   } else if (tab === "strengths"){
@@ -3705,7 +3711,7 @@ function nextQ(){
       Q.wTyped = typed; Q.wMissing = kw ? kw.missing : null;
       box.innerHTML = `${typed != null ? `<div class="review" style="margin:0 0 8px"><div class="muted small">Your answer</div><div style="white-space:pre-line">${esc(typed)}</div></div>` : ""}
         ${kw ? `<div class="kw"><b>Key points</b>${kw.found.map(k => `<div>✅ ${esc(k)}</div>`).join("")}${kw.missing.map(k => `<div class="miss">💡 Also mention: <b>${esc(k)}</b></div>`).join("")}${kw.missing.length ? "" : "<div><b>Great, all the key points are there!</b></div>"}</div>` : ""}
-        <div class="model"><b>Model answer</b><div>${esc(q.answer)}</div>${q.explain ? `<div class="muted small">${esc(q.explain)}</div>` : ""}</div>
+        <div class="model"><b>Model answer</b><div>${fx(q.answer)}</div>${q.explain ? `<div class="muted small">${fx(q.explain)}</div>` : ""}</div>
         <p class="small" style="margin-top:10px;font-weight:600">Was your answer right? Be honest, it helps you improve.</p>
         <div class="row" style="justify-content:space-between;margin-top:4px"><button class="btn ghost" id="wNo">❌ Didn't get it</button><button class="btn" id="wYes">✅ Got it</button></div>`;
       $("wYes").onclick = () => answerWritten(true); $("wNo").onclick = () => answerWritten(false); };
@@ -3716,7 +3722,7 @@ function nextQ(){
   }
   if (isSel(q)){ // JEE numerical / multi-correct: answer, then press Submit
     box.innerHTML = isN(q) ? `<label for="nAns" style="margin-top:0">Your answer</label><input id="nAns" inputmode="decimal" autocomplete="off" placeholder="Type a number">`
-      : `<p class="muted small" style="margin:0 0 4px"><b>One or more options are correct.</b> Tick every correct option, then submit.</p>` + q.options.map((o,i) => `<button class="opt" data-i="${i}"><b>${"ABCD"[i]}</b>${q.lettered ? "" : esc(o)}</button>`).join("");
+      : `<p class="muted small" style="margin:0 0 4px"><b>One or more options are correct.</b> Tick every correct option, then submit.</p>` + q.options.map((o,i) => `<button class="opt" data-i="${i}"><b>${"ABCD"[i]}</b>${q.lettered ? "" : fx(o)}</button>`).join("");
     box.insertAdjacentHTML("beforeend", `<button class="btn block" id="subAns" style="margin-top:8px">Submit answer</button>`);
     box.querySelectorAll(".opt").forEach(b => b.onclick = () => b.classList.toggle("sel"));
     $("subAns").onclick = () => answerSel(false);
@@ -3726,7 +3732,7 @@ function nextQ(){
     window.scrollTo(0,0); return;
   }
   Q.order = (q.lettered || q.fixed) ? [0,1,2,3] : shuffle([0,1,2,3]); // show options in a random order so the answer is not always in the same place
-  Q.order.forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt"; b.dataset.i = i; b.innerHTML = `<b>${"ABCD"[pos]}</b>`; if (!q.lettered) b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => answerQ(i); box.appendChild(b); });
+  Q.order.forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt"; b.dataset.i = i; b.innerHTML = `<b>${"ABCD"[pos]}</b>`; if (!q.lettered) b.insertAdjacentHTML("beforeend", fx(q.options[i])); b.onclick = () => answerQ(i); box.appendChild(b); });
   clearInterval(Q.timerId); Q.limit = q.time || SECONDS; Q.left = Q.limit; drawTimer();
   Q.timerId = setInterval(() => { Q.left--; drawTimer(); if (Q.left <= 0){ clearInterval(Q.timerId); answerQ(-1); } }, 1000);
   window.scrollTo(0,0);
@@ -3747,7 +3753,7 @@ function hintText(q){
 function showHint(){
   if (!Q || Q.answered || !Q.cur) return;
   Q.hinted = true; $("hintBtn").disabled = true;
-  $("hintBox").innerHTML = `<div class="hint">💡 <b>Hint:</b> ${esc(hintText(Q.cur))}</div>`;
+  $("hintBox").innerHTML = `<div class="hint">💡 <b>Hint:</b> ${fx(hintText(Q.cur))}</div>`;
 }
 function skipQ(){
   if (!Q || Q.answered || !Q.active || !Q.cur) return;
@@ -3800,9 +3806,9 @@ function answerQ(i){
   if (!Q.fixed && Q.level < 2 && Q.rs >= NEED[Q.level]){ Q.level++; Q.rs = 0; up = true; msg = `Level up! ${NEED[Q.level-1]} in a row. Next questions are ${LN[LEVELS[Q.level]]}.`; }
   Q.maxLevel = Math.max(Q.maxLevel, Q.level); $("streak").textContent = streakText();
   $("feedback").innerHTML = ok
-    ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${esc(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
-    : `<div class="feedback bad"><h3>${Q.skipping ? "⏭️ Skipped" : i===-1 ? "⏰ Time's up!" : "❌ Not quite."}</h3><p><b>Correct answer: ${q.lettered ? "Option " + "ABCD"[q.answer] : `${"ABCD"[Q.order.indexOf(q.answer)]}) ${esc(q.options[q.answer])}`}</b></p><p>${esc(q.explain)}</p>
-       ${i===-1 ? `<div class="mist"><b>Where it went wrong:</b> ${Q.skipping ? "You skipped this one. Read the solution above, then pick a reason below." : "You ran out of time on this one."}</div>` : (q.mistakes && q.mistakes[i]) ? `<div class="mist"><b>Where it went wrong:</b> ${esc(q.mistakes[i])}</div>` : ""}${msg?`<p><b>${msg}</b></p>`:""}</div>
+    ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${fx(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
+    : `<div class="feedback bad"><h3>${Q.skipping ? "⏭️ Skipped" : i===-1 ? "⏰ Time's up!" : "❌ Not quite."}</h3><p><b>Correct answer: ${q.lettered ? "Option " + "ABCD"[q.answer] : `${"ABCD"[Q.order.indexOf(q.answer)]}) ${fx(q.options[q.answer])}`}</b></p><p>${fx(q.explain)}</p>
+       ${i===-1 ? `<div class="mist"><b>Where it went wrong:</b> ${Q.skipping ? "You skipped this one. Read the solution above, then pick a reason below." : "You ran out of time on this one."}</div>` : (q.mistakes && q.mistakes[i]) ? `<div class="mist"><b>Where it went wrong:</b> ${fx(q.mistakes[i])}</div>` : ""}${msg?`<p><b>${msg}</b></p>`:""}</div>
        ${anaBox("live", Q.asked.length-1, entry)}`;
   $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = "";
   $("nextBtn").disabled = !ok;
@@ -3832,12 +3838,12 @@ function answerSel(timeout){
   if (ok){ Q.rs++; } else { Q.rs = 0; Q.wrong.add(q.id); }
   if (!Q.fixed && Q.level < 2 && Q.rs >= NEED[Q.level]){ Q.level++; Q.rs = 0; up = true; msg = `Level up! ${NEED[Q.level-1]} in a row. Next questions are ${LN[LEVELS[Q.level]]}.`; }
   Q.maxLevel = Math.max(Q.maxLevel, Q.level); $("streak").textContent = streakText();
-  const traps = (q.traps || []).length ? `<div class="mist"><b>Common traps:</b><ul class="traps">${q.traps.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : "";
+  const traps = (q.traps || []).length ? `<div class="mist"><b>Common traps:</b><ul class="traps">${q.traps.map(t => `<li>${fx(t)}</li>`).join("")}</ul></div>` : "";
   $("feedback").innerHTML = ok
-    ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${esc(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
-    : `<div class="feedback bad"><h3>${Q.skipping ? "⏭️ Skipped" : timeout ? "⏰ Time's up!" : "❌ Not quite."}</h3>${typed ? `<p>Your answer: ${esc(typed)}</p>` : ""}<p><b>Correct answer: ${esc(correctText(q))}</b></p>
+    ? `<div class="feedback good"><h3>✅ Correct!</h3><p>${fx(q.explain)}</p>${msg?`<p><b>${msg}</b></p>`:""}</div>`
+    : `<div class="feedback bad"><h3>${Q.skipping ? "⏭️ Skipped" : timeout ? "⏰ Time's up!" : "❌ Not quite."}</h3>${typed ? `<p>Your answer: ${esc(typed)}</p>` : ""}<p><b>Correct answer: ${fx(correctText(q))}</b></p>
        ${partial ? `<p>All your ticks were right but you missed some. In the real JEE Advanced paper this gets part marks; here it counts as wrong so you learn the full answer.</p>` : ""}
-       <p>${esc(q.explain)}</p>${traps}${msg?`<p><b>${msg}</b></p>`:""}</div>${anaBox("live", Q.asked.length-1, entry)}`;
+       <p>${fx(q.explain)}</p>${traps}${msg?`<p><b>${msg}</b></p>`:""}</div>${anaBox("live", Q.asked.length-1, entry)}`;
   $("nextBtn").textContent = (Q.fixed && Q.asked.length >= Q.total) ? "See my report" : "Next question"; $("nextBtn").style.display = "";
   $("nextBtn").disabled = !ok;
   if (Q.fastRun >= 3){ Q.fastRun = 0; celebrate(["🐢","Slow down!","Read each question fully. Very quick answers don't count towards unlocking the chapter test."], false); }
@@ -3884,7 +3890,7 @@ function drawTestQ(){
   $("qnum").textContent = `Question ${Q.idx+1} of ${n}`; $("lvl").textContent = LN[q.level]; $("lvl").className = "pill " + q.level;
   $("topic").textContent = "Topic: " + q.topic; $("qtext").innerHTML = qHTML(q);
   const box = $("opts"); box.innerHTML = ""; box.className = q.lettered ? "lt" : "";
-  Q.orders[Q.idx].forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt" + (Q.sel[Q.idx] === i ? " sel" : ""); b.innerHTML = `<b>${"ABCD"[pos]}</b>`; if (!q.lettered) b.appendChild(document.createTextNode(q.options[i])); b.onclick = () => { Q.sel[Q.idx] = i; drawTestQ(); saveDraft(); }; box.appendChild(b); });
+  Q.orders[Q.idx].forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt" + (Q.sel[Q.idx] === i ? " sel" : ""); b.innerHTML = `<b>${"ABCD"[pos]}</b>`; if (!q.lettered) b.insertAdjacentHTML("beforeend", fx(q.options[i])); b.onclick = () => { Q.sel[Q.idx] = i; drawTestQ(); saveDraft(); }; box.appendChild(b); });
   $("markBtn").textContent = Q.marked.has(Q.idx) ? "★ Marked" : "☆ Mark for review";
   $("prevBtn").disabled = Q.idx === 0; $("nextBtn").disabled = Q.idx === n-1;
   $("tCount").textContent = `Answered ${Q.sel.filter(s => s >= 0).length}/${n}${Q.marked.size ? ` · ${Q.marked.size} marked` : ""}`;
@@ -4024,7 +4030,7 @@ function drawExamQ(){
   const box = $("opts"); box.innerHTML = "";
   Q.orders[Q.idx].forEach((i,pos) => { const b = document.createElement("button"); b.className = "opt xopt" + (shown === i ? " sel" : "");
     b.setAttribute("role", "radio"); b.setAttribute("aria-checked", shown === i); b.innerHTML = `<span class="rad"></span><b>${"ABCD"[pos]}</b>`;
-    const t = document.createElement("span"); t.textContent = q.options[i]; b.appendChild(t);
+    const t = document.createElement("span"); t.innerHTML = fx(q.options[i]); b.appendChild(t);
     b.onclick = () => { if (nta) Q.pick = i; else { Q.sel[Q.idx] = i; saveDraft(); } drawExamQ(); }; box.appendChild(b); });
   const cnt = exCounts(), lab = Object.fromEntries(EXAM_COMMON.palette[Q.exam.ui].map(s => [s.key, s.label]));
   $("palette").innerHTML = Q.list.map((x,k) => { const s = exState(k); return `<button data-k="${k}" class="s-${s}${k===Q.idx?" cur":""}" aria-label="Question ${k+1}: ${lab[s]}">${k+1}</button>`; }).join("");
@@ -4371,7 +4377,7 @@ Views.tReports = () => { if (tOnly()) return Views.teacherLock();
     return `<div class="review" style="background:#fff;${r.status==="done"?"opacity:.6":""}">
       <div class="muted small">${esc(COURSE[r.course]?.name||r.course)} · ${esc(chapterOf(r.course, r.chapter)?.name||"")} · Question ${esc(r.qid)} · ${fmtDate(r.ts)}</div>
       <div class="q" style="margin-top:4px">${q ? qHTML(q) : "(question no longer in the bank)"}</div>
-      ${q ? `<div class="small">Correct answer in the bank: <b>${esc(correctText(q))}</b></div>` : ""}
+      ${q ? `<div class="small">Correct answer in the bank: <b>${fx(correctText(q))}</b></div>` : ""}
       <div style="margin-top:6px"><span class="tag ${r.status==="done"?"ok":"weak"}">${r.status==="done"?"Fixed":esc(REASON[r.reason]||r.reason)}</span> ${r.text ? `“${esc(r.text)}”` : ""}</div>
       <div class="muted small" style="margin-top:4px">From ${esc(r.name)} (${esc(r.email)})</div>
       <div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn ghost" style="padding:8px 14px;font-size:14px" data-rs="${esc(r.id)}">${r.status==="done"?"Reopen":"Mark as fixed"}</button><button class="link" style="color:var(--red)" data-rd="${esc(r.id)}">Delete</button></div></div>`; }).join("") || '<p class="muted">No reports yet.</p>'}`; };
