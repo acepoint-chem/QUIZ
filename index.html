@@ -4199,7 +4199,7 @@ Views.report = () => { const a = VIEW.att, u = me(); const pct = a.mode === "exa
     <p class="muted small">${esc(attTitle(a))} · Saved to your account.</p>${a.lad ? ladBanner(a) : ""}${a.total?reportHTML(a,false):'<p class="muted">No questions were answered.</p>'}
     <div class="row" style="justify-content:flex-start"><button class="btn" id="again">${a.lad ? "Back to the ladder" : a.mode === "exam" ? "Back to exam mode" : "Practise again"}</button><button class="btn ghost" id="share">Copy result for teacher</button><button class="btn ghost" id="toCourse">Back to course</button></div></div>`; };
 Views.report.after = () => { const a = VIEW.att;
-  if (a.ladRes === "pass" || a.ladRes === "cleared") setTimeout(() => celebrate(a.ladRes === "cleared" ? ["🏆","Concept cleared!","The next concept is open."] : ["🪜","Step passed!","The next step is open."], true), 300);
+  if (a.ladRes === "pass" || a.ladRes === "cleared") setTimeout(() => celebrate(a.ladRes === "cleared" ? ["🏆","Concept cleared!","The next concept is open."] : ["🪜","Step done!","The next step is open."], true), 300);
   $("again").onclick = () => a.lad ? go("ladder",{cid:a.course, chid:a.chapter}) : a.mode === "exam" ? go("course",{cid:a.course, tab:"exam"}) : a.chapter && a.mode !== "custom" ? go("chapter",{cid:a.course, chid:a.chapter, src: SRCNAME[a.mode] ? a.mode : undefined}) : go("course",{cid:a.course, tab: a.mode === "custom" ? "create" : a.mode === "mistakes" ? "mistakes" : "practice"});
   $("toCourse").onclick = () => go("course",{cid:a.course, tab:"practice"});
   $("share").onclick = async () => { const u = me();
@@ -4235,7 +4235,7 @@ Views.teacherLock.after = async () => {
 };
 /* ---------- Ladder mode (7 Nov 2026) ----------
    ch.ladder = [{c, name}] in teaching order. Each concept has steps L1..L5 (q.rung, q.concept starts with c).
-   Pass a step = every question right. Concepts open in order: the next one opens when every step that exists is done.
+   Pass a step = every question answered, right or wrong (Gunjan, 7 Nov; was: every question right). Concepts open in order: the next one opens when every step that exists is done.
    Progress: users/{uid}.ladder["cid_chid"][c] = {s: steps passed, f: failed tries on the current step, o: 1 once opened, t: time} */
 const RUNGS = ["L1","L2","L3","L4","L5"];
 const ladKey = (cid, chid) => cid + "_" + chid;
@@ -4255,7 +4255,7 @@ function ladResult(u, att, quit){
   const ch = chapterOf(att.course, att.chapter); if (!ch || !ch.ladder) return;
   const st = ladState(u, att.course, att.chapter), c = att.lad.c, r = att.lad.r, x = st[c] = st[c] || {s:0, f:0};
   if (r !== (x.s || 0)){ att.ladRes = "replay"; return; }
-  if (!quit && att.total && att.right === att.total && att.total === ladQs(ch, c, ladSteps(ch, c)[r]).length){ x.s = r + 1; x.f = 0; att.ladRes = "pass"; }
+  if (!quit && att.total && att.total === ladQs(ch, c, ladSteps(ch, c)[r]).length){ x.s = r + 1; x.f = 0; att.ladRes = "pass"; }
   else { x.f = (x.f || 0) + 1; att.ladRes = quit ? "quit" : "fail"; }
   x.t = Date.now();
   if (ladCleared(ch, st, c)){ att.ladRes = att.ladRes === "pass" ? "cleared" : att.ladRes;
@@ -4265,9 +4265,10 @@ function ladResult(u, att, quit){
 function ladBanner(a){
   const ch = chapterOf(a.course, a.chapter), x = ch && ch.ladder && ch.ladder.find(y => y.c === a.lad.c); if (!x) return "";
   const st = ladState(me(), a.course, a.chapter), f = (st[x.c] && st[x.c].f) || 0, n = ladSteps(ch, x.c).length;
-  const msg = {pass:`✅ <b>Step ${a.lad.r+1} passed!</b> Step ${a.lad.r+2} of “${esc(x.name)}” is now open.`,
-    cleared:`🏆 <b>Concept cleared: ${esc(x.name)}!</b>${n < 5 ? " (More steps will be added later.)" : " ⭐ Mastered."} The next concept is now open.`,
-    fail:`🔁 <b>Not yet.</b> You need every question right to pass a step. Read the solutions below, then try again.${f >= 3 ? " Stuck? Ask your teacher about this concept." : ""}`,
+  const sc = ` (${a.right}/${a.total} right${a.right < a.total ? " — read the solutions below for the ones you missed" : ""})`;
+  const msg = {pass:`✅ <b>Step ${a.lad.r+1} done!</b>${sc} Step ${a.lad.r+2} of “${esc(x.name)}” is now open.`,
+    cleared:`🏆 <b>Concept cleared: ${esc(x.name)}!</b>${sc}${n < 5 ? " (More steps will be added later.)" : " ⭐ Mastered."} The next concept is now open.`,
+    fail:`🔁 <b>Not finished.</b> Answer every question in the step to open the next one. Try the step again.${f >= 3 ? " Stuck? Ask your teacher about this concept." : ""}`,
     quit:"The step was left early, so it doesn't count. Try it again when you're ready.",
     replay:"Practice of an earlier step: your ladder position doesn't change."}[a.ladRes] || "";
   return msg ? `<div class="banner" style="margin:10px 0">🪜 ${msg}</div>` : "";
@@ -4277,7 +4278,7 @@ Views.ladder = () => { const u = me(), {cid, chid} = VIEW, ch = chapterOf(cid, c
   const st = ladState(u, cid, chid), L = ch.ladder, nx = ladNext(ch, st), done = L.filter(x => ladCleared(ch, st, x.c)).length;
   return `<button class="back" id="bk">← ${esc(ch.name)}</button>
   <div class="card"><h1>🪜 Ladder</h1>
-    <p class="muted" style="margin-top:0">Climb one concept at a time. Each step is a short quiz of 2–3 questions: get <b>every question right</b> to open the next step. Finish all the steps of a concept to open the next concept.</p>
+    <p class="muted" style="margin-top:0">Climb one concept at a time. Each step is a short quiz of 2–3 questions: <b>answer every question</b> to open the next step (right or wrong — read the solutions for any you miss). Finish all the steps of a concept to open the next concept.</p>
     <div class="progress"><div style="width:${Math.round(done/L.length*100)}%"></div></div>
     <p class="small"><b>${done} of ${L.length} concepts cleared</b></p>
     ${nx ? `<button class="btn" id="ladGo">▶ Next step: ${esc(nx.name)} · Step ${nx.r+1}</button>` : `<p><b>🏆 You have cleared every concept in this ladder!</b></p>`}</div>
