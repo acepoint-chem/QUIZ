@@ -4270,7 +4270,7 @@ function ladSteps(ch, c){ return RUNGS.filter(r => ladHere(ch, c, r) || (ch.ladP
 const ladNeed = (ch, c) => { let n = 0; ladSteps(ch, c).forEach((r, k) => { if (ladHere(ch, c, r)) n = k + 1; }); return n; }; // steps to pass in this portal
 const ladPassed = (st, c) => (st[c] && st[c].s) || 0;
 const ladCleared = (ch, st, c) => { const n = ladNeed(ch, c); return n > 0 && ladPassed(st, c) >= n; };
-function ladOpen(ch, st, i){ if (i === 0) return true; const x = ch.ladder[i]; if (x.part && x.part !== ch.ladder[i-1].part) return true; // first concept of each part is open return !!(st[x.c] && st[x.c].o) || ladCleared(ch, st, ch.ladder[i-1].c); }
+function ladOpen(ch, st, i){ if (i === 0) return true; const x = ch.ladder[i]; if (x.part && x.part !== ch.ladder[i-1].part) return true; /* first concept of each part is open */ return !!(st[x.c] && st[x.c].o) || ladCleared(ch, st, ch.ladder[i-1].c); }
 function ladNext(ch, st){ for (let i = 0; i < ch.ladder.length; i++){ const x = ch.ladder[i]; if (!ladOpen(ch, st, i)) continue;
   const steps = ladSteps(ch, x.c), s = ladPassed(st, x.c); if (s < ladNeed(ch, x.c)) return {...x, i, r: s, rung: steps[s], here: ladHere(ch, x.c, steps[s])}; } return null; }
 function ladGoOther(ch){ const o = ch.ladOther; if (!o) return;
