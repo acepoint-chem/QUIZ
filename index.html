@@ -3076,7 +3076,7 @@ function homeworkFor(u){
   return (u.homework||[]).filter(h => chapterOf(h.course, h.chapter)).map(h => ({h, done: hwDone(h, u)}))
     .filter(x => !x.done || Date.now() - dueTs(x.h.due) < 7*DAY).sort((a,b) => dueTs(a.h.due) - dueTs(b.h.due));
 }
-function hwTitle(h){ const ch = chapterOf(h.course, h.chapter); return (ch ? ch.name : "") + (h.topic ? " · " + h.topic : ""); }
+function hwTitle(h){ const ch = chapterOf(h.course, h.chapter); return (ch ? ch.name : "") + (h.label ? " · " + h.label : h.topic && !Array.isArray(h.topic) ? " · " + h.topic : ""); }
 // Every analysed wrong answer
 function errRows(users){
   const out = []; users.forEach(u => (u.attempts||[]).forEach(a => { if (!COURSE[a.course]) return; a.answers.forEach((x,i) => { if (!x.ok && x.err && ET[x.err]) out.push({u, a, i, x}); }); }));
@@ -3351,6 +3351,17 @@ Views.pay.after = () => {
     catch(e){ console.error(e); btn.disabled = false; toast("Couldn't enrol. Please check your internet."); } };
 };
 
+/* ---------- Announcements (home page, dismissible) ---------- */
+const ANNOUNCE = [{id:"ape-live-2026-11", until:"2026-12-06", lad:{jee:"a17-oxy", jeem:"m17-oxy", neet:"n17-oxy"},
+  title:"🎉 New: Alcohols, Phenols & Ethers is live!", text:"Ladder questions for Alcohols, Phenols & Ethers are now in Organic Compounds Containing Oxygen. Open the 🪜 Ladder and start with concept 1."}];
+function annFor(u){ let off = []; try { off = JSON.parse(localStorage.getItem("ap_ann_off") || "[]"); } catch(e){}
+  return ANNOUNCE.filter(a => !off.includes(a.id) && Date.now() <= dueTs(a.until)).map(a => ({a, cid: Object.keys(a.lad).find(c => (u.courses||[]).includes(c))})).filter(x => x.cid); }
+function annHTML(u){ return annFor(u).map(({a, cid}) => `<div class="banner"><b>${esc(a.title)}</b><div class="small">${esc(a.text)}</div>
+  <button class="btn" data-ann="${esc(a.id)}" data-annc="${esc(cid)}" style="margin-top:8px">Open the ladder</button> <button class="link" data-annx="${esc(a.id)}">Hide</button></div>`).join(""); }
+function annWire(){ document.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => { const a = ANNOUNCE.find(x => x.id === b.dataset.ann), cid = b.dataset.annc, chid = a.lad[cid];
+    if (chapterOf(cid, chid)) go("ladder", {cid, chid}); });
+  document.querySelectorAll("[data-annx]").forEach(b => b.onclick = () => { let off = []; try { off = JSON.parse(localStorage.getItem("ap_ann_off") || "[]"); off.push(b.dataset.annx); localStorage.setItem("ap_ann_off", JSON.stringify(off)); } catch(e){} b.closest(".banner").remove(); }); }
+
 /* ---------- Home: my courses ---------- */
 Views.home = () => { const u = me(); if (!u) return Views.welcome();
   const all = (u.attempts||[]).filter(a => COURSE[a.course]), right = all.reduce((s,a)=>s+a.right,0), tot = all.reduce((s,a)=>s+a.total,0);
@@ -3360,6 +3371,7 @@ Views.home = () => { const u = me(); if (!u) return Views.welcome();
     <h1>Welcome back, ${esc(u.name.split(" ")[0])} 👋</h1>
     <div class="stat"><div><b>${all.length}</b><span>Quizzes</span></div><div><b>${tot}</b><span>Questions</span></div><div><b>${tot?Math.round(right/tot*100):0}%</b><span>Accuracy</span></div></div>
   </div>
+  ${annHTML(u)}
   ${pend ? `<div class="banner" id="pendBanner"><b>📝 ${pend} error analysis${pend>1?" questions":" question"} to finish</b><div class="small">Pick why you got each one wrong. You can start a new quiz after that.</div><button class="btn" id="goAna" style="margin-top:8px">Finish now</button></div>` : ""}
   ${hw.length ? `<h2>Homework 📚</h2><div class="grid">${hw.map(({h, done}) => { const late = !done && Date.now() > dueTs(h.due);
       return `<button class="tile" data-hw="${esc(h.id)}" ${done?"disabled":""}><div class="t">${esc(hwTitle(h))} ${done ? `<span class="badge live">Done ${done.right}/${done.total}</span>` : late ? '<span class="badge" style="background:var(--redbg);color:var(--red)">Overdue</span>' : `<span class="badge soon">Due ${fmtDay(dueTs(h.due))}</span>`}</div>
@@ -3371,7 +3383,7 @@ Views.home = () => { const u = me(); if (!u) return Views.welcome();
      return `<button class="tile" data-c="${cid}"><div class="t">${esc(c.name)}</div><div class="d">${(CHAPTERS[cid]||[]).length} chapter(s) · ${at.length} quiz(zes) taken${m?` · ${m} mistake(s) to fix`:""}</div></button>`; }).join("") || '<p class="muted">No courses yet.</p>'}</div>
   <button class="btn ghost block" id="myErr">🔍 My Error Analysis</button>
   <button class="btn ghost block" id="addCourse">+ Add another course</button>`; };
-Views.home.after = () => {
+Views.home.after = () => { annWire();
   document.querySelectorAll(".tile[data-c]").forEach(t => t.onclick = () => go("course",{cid:t.dataset.c, tab:"practice"}));
   document.querySelectorAll(".tile[data-hw]").forEach(t => t.onclick = () => startHomework(t.dataset.hw));
   document.querySelectorAll(".tile[data-rev]").forEach(t => t.onclick = () => { const [cid, ch] = t.dataset.rev.split("|"); startRevision(cid, ch); });
@@ -4258,8 +4270,8 @@ function ladSteps(ch, c){ return RUNGS.filter(r => ladHere(ch, c, r) || (ch.ladP
 const ladNeed = (ch, c) => { let n = 0; ladSteps(ch, c).forEach((r, k) => { if (ladHere(ch, c, r)) n = k + 1; }); return n; }; // steps to pass in this portal
 const ladPassed = (st, c) => (st[c] && st[c].s) || 0;
 const ladCleared = (ch, st, c) => { const n = ladNeed(ch, c); return n > 0 && ladPassed(st, c) >= n; };
-function ladOpen(ch, st, i){ if (i === 0) return true; const x = ch.ladder[i]; return !!(st[x.c] && st[x.c].o) || ladCleared(ch, st, ch.ladder[i-1].c); }
-function ladNext(ch, st){ for (let i = 0; i < ch.ladder.length; i++){ const x = ch.ladder[i]; if (!ladOpen(ch, st, i)) return null;
+function ladOpen(ch, st, i){ if (i === 0) return true; const x = ch.ladder[i]; if (x.part && x.part !== ch.ladder[i-1].part) return true; // first concept of each part is open return !!(st[x.c] && st[x.c].o) || ladCleared(ch, st, ch.ladder[i-1].c); }
+function ladNext(ch, st){ for (let i = 0; i < ch.ladder.length; i++){ const x = ch.ladder[i]; if (!ladOpen(ch, st, i)) continue;
   const steps = ladSteps(ch, x.c), s = ladPassed(st, x.c); if (s < ladNeed(ch, x.c)) return {...x, i, r: s, rung: steps[s], here: ladHere(ch, x.c, steps[s])}; } return null; }
 function ladGoOther(ch){ const o = ch.ladOther; if (!o) return;
   if (me().courses.includes(o.cid)) go("ladder", {cid:o.cid, chid:o.chid}); else toast(`This step is in the ${LAD_SHORT[o.cid] || "other"} course.`); }
@@ -4302,7 +4314,8 @@ Views.ladder = () => { const u = me(), {cid, chid} = VIEW, ch = chapterOf(cid, c
     <p class="small"><b>${done} of ${L.length} concepts cleared</b></p>
     ${nx ? `<button class="btn" id="ladGo">▶ Next step: ${esc(nx.name)} · Step ${nx.r+1}${nx.here ? "" : ` (in ${oth})`}</button>` : `<p><b>🏆 You have cleared every concept in this ladder!</b></p>`}</div>
   <div class="card">${L.map((x, i) => { const open = ladOpen(ch, st, i), steps = ladSteps(ch, x.c), s = ladPassed(st, x.c), cl = ladCleared(ch, st, x.c), f = (st[x.c] && st[x.c].f) || 0;
-    return `<div class="lrow${open ? "" : " locked"}"><div class="lname">${i+1}. ${esc(x.name)} ${cl ? (steps.length === 5 && ladNeed(ch, x.c) === 5 ? "⭐" : "✅") : ""}</div>
+    const ph = x.part && (i === 0 || L[i-1].part !== x.part) ? `<h2 class="lpart" style="margin:${i?"18px":"0"} 0 8px">${esc(x.part)}</h2>` : "";
+    return `${ph}<div class="lrow${open ? "" : " locked"}"><div class="lname">${i+1}. ${esc(x.name)} ${cl ? (steps.length === 5 && ladNeed(ch, x.c) === 5 ? "⭐" : "✅") : ""}</div>
       <div class="lsteps">${RUNGS.map(r => { const k = steps.indexOf(r);
         if (k < 0) return `<span class="lstep soon" title="Coming soon">${r} soon</span>`;
         const here = ladHere(ch, x.c, r), tag = here ? "" : ` <span class="small">${esc(oth)}</span>`;
@@ -4417,7 +4430,7 @@ Views.tHomework = () => { if (tOnly()) return Views.teacherLock();
   <div class="card"><h1>📚 Set homework</h1>
     <label for="hwC">Course</label><select id="hwC">${live.map(c => `<option value="${c}" ${c===cid?"selected":""}>${esc(COURSE[c].name)}</option>`).join("")}</select>
     <label for="hwCh">Chapter</label><select id="hwCh">${chs.map(c => `<option value="${c.id}" ${c===ch?"selected":""}>${esc(c.name)}</option>`).join("")}</select>
-    <label for="hwT">Topic</label><select id="hwT"><option value="">Whole chapter</option>${ch ? liveTopics(ch).map(t => `<option>${esc(t)}</option>`).join("") : ""}</select>
+    <label for="hwT">Topic</label><select id="hwT"><option value="">Whole chapter</option>${ch && ch.parts ? ch.parts.map((p, j) => `<option value="part:${j}">${esc(p.name)} (whole part)</option>`).join("") : ""}${ch ? liveTopics(ch).map(t => `<option>${esc(t)}</option>`).join("") : ""}</select>
     <label for="hwN">Number of questions</label><select id="hwN">${[5,10,15,20,30].map(n => `<option ${n===10?"selected":""}>${n}</option>`).join("")}</select>
     <label for="hwDue">Due date</label><input id="hwDue" type="date" value="${localDate(new Date(Date.now()+3*DAY))}">
     <label>Students</label>
@@ -4437,7 +4450,8 @@ Views.tHomework.after = () => { $("bk").onclick = () => go("teacher");
     const due = $("hwDue").value;
     if (!students.length) return $("hwErr").textContent = "Tick at least one student.";
     if (!due) return $("hwErr").textContent = "Choose a due date.";
-    const h = {course:$("hwC").value, chapter:$("hwCh").value, topic:$("hwT").value || null, n:+$("hwN").value, due, students, created:Date.now()};
+    const tv = $("hwT").value, hch = chapterOf($("hwC").value, $("hwCh").value), pt = tv.startsWith("part:") && hch && hch.parts ? hch.parts[+tv.slice(5)] : null;
+    const h = {course:$("hwC").value, chapter:$("hwCh").value, topic: pt ? pt.topics : (tv || null), n:+$("hwN").value, due, students, created:Date.now()}; if (pt) h.label = pt.name;
     $("hwSave").disabled = true;
     try { const id = await Store.addHomework(h); THW.push({...h, id}); toast("Homework set! Students will see it on their home page."); go("tHomework", {hwc:h.course, hwch:h.chapter}); }
     catch(e){ console.error(e); $("hwSave").disabled = false; $("hwErr").textContent = "Couldn't save. Please publish the new database rules, then try again."; }
