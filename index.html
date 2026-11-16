@@ -61,7 +61,7 @@ button{font:inherit;cursor:pointer;border:none;border-radius:10px}
 .tile .d{font-size:13px;color:var(--muted);margin-top:2px}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
 .badge.live{background:var(--greenbg);color:var(--green)} .badge.soon{background:#eceff4;color:var(--muted)} .badge.own{background:var(--sky);color:var(--blue)}
-.tabs{display:flex;gap:6px;margin:4px 0 12px;overflow-x:auto}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
 .tabs button{background:#fff;border:1px solid var(--line);padding:8px 12px;font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
 .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 .progress{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
@@ -131,8 +131,18 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
 .stat div{background:var(--sky);border-radius:10px;padding:10px;text-align:center}
 .stat b{display:block;font-size:20px;color:var(--navy)}
 .stat span{font-size:12px;color:var(--muted)}
+.news{display:flex;align-items:center;gap:6px;background:var(--sky);border-radius:12px;margin-bottom:8px;padding:2px 4px 2px 0}
+.news-go{flex:1;text-align:left;background:none;border:0;padding:9px 12px;font-size:14px;font-weight:700;color:var(--navy)}
+.news-go span{font-weight:600;white-space:nowrap;text-decoration:underline}
+.news-x{background:none;border:0;color:var(--muted);font-size:15px;padding:8px 10px}
 .banner{background:var(--redbg);border:1px solid #f3c1bb;color:#7a1f16;border-radius:14px;padding:14px 16px;margin-bottom:14px}
 .ana{margin-top:12px;padding:12px;border:2px solid var(--navy);border-radius:12px;background:#fff}
+details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:4px}
+details.more>summary{cursor:pointer;font-weight:700;color:var(--blue);padding:12px 2px;font-size:15px;list-style:none}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"▸ "}
+details.more[open]>summary::before{content:"▾ "}
+.ana-need{margin-top:10px;font-size:14px;font-weight:600;color:var(--navy);background:var(--sky);border-radius:10px;padding:8px 10px;text-align:center}
 .ana-h{font-weight:700;color:var(--navy);margin-bottom:8px;font-size:15px}
 .etypes{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .etype,#repReasons button{background:#fff;border:1.5px solid var(--line);padding:10px 8px;font-size:14px;font-weight:600;color:var(--ink);text-align:left;border-radius:10px}
@@ -3089,7 +3099,7 @@ function anaBox(attId, i, x){
     <div class="ana-h">🔍 Error analysis: why did you get this wrong?</div>
     <div class="etypes">${ETYPES.map(t => `<button class="etype ${x.err===t.k?"on":""}" data-t="${t.k}">${t.e} ${t.n}</button>`).join("")}</div>
     <input class="enote" placeholder="What will I do differently next time? (optional)" value="${esc(x.note||"")}" maxlength="200">
-    ${x.err ? `<div class="ana-tip">💡 ${esc(ET[x.err].tip)}</div>` : ""}
+    ${x.err ? `<div class="ana-tip">💡 ${esc(ET[x.err].tip)}</div>` : attId === "live" ? `<div class="ana-need">👆 Pick a reason above to unlock <b>Next</b>.</div>` : ""}
   </div>`;
 }
 function anaTarget(box){
@@ -3109,7 +3119,7 @@ document.addEventListener("click", e => {
   const b = e.target.closest(".etype"); if (!b) return;
   const box = b.closest(".ana"); const x = anaTarget(box); if (!x) return;
   x.err = b.dataset.t; x.note = box.querySelector(".enote").value.trim();
-  box.querySelectorAll(".etype").forEach(o => o.classList.toggle("on", o === b));
+  box.querySelectorAll(".etype").forEach(o => o.classList.toggle("on", o === b)); const nd = box.querySelector(".ana-need"); if (nd) nd.remove();
   let tip = box.querySelector(".ana-tip"); if (!tip){ tip = document.createElement("div"); tip.className = "ana-tip"; box.appendChild(tip); }
   tip.textContent = "💡 " + ET[x.err].tip;
   if (box.dataset.att === "live"){ if ($("nextBtn")) $("nextBtn").disabled = false; saveDraft(); }
@@ -3358,11 +3368,10 @@ const ANNOUNCE = [{id:"amn-live-2026-11", until:"2026-12-13", lad:{jeem:"m18-nit
   title:"🎉 New: Alcohols, Phenols & Ethers is live!", text:"Ladder questions for Alcohols, Phenols & Ethers are now in Organic Compounds Containing Oxygen. Open the 🪜 Ladder and start with concept 1."}];
 function annFor(u){ let off = []; try { off = JSON.parse(localStorage.getItem("ap_ann_off") || "[]"); } catch(e){}
   return ANNOUNCE.filter(a => !off.includes(a.id) && Date.now() <= dueTs(a.until)).map(a => ({a, cid: Object.keys(a.lad).find(c => (u.courses||[]).includes(c))})).filter(x => x.cid); }
-function annHTML(u){ return annFor(u).map(({a, cid}) => `<div class="banner"><b>${esc(a.title)}</b><div class="small">${esc(a.text)}</div>
-  <button class="btn" data-ann="${esc(a.id)}" data-annc="${esc(cid)}" style="margin-top:8px">Open the ladder</button> <button class="link" data-annx="${esc(a.id)}">Hide</button></div>`).join(""); }
+function annHTML(u){ return annFor(u).map(({a, cid}) => `<div class="news"><button class="news-go" data-ann="${esc(a.id)}" data-annc="${esc(cid)}">${esc(a.title)} <span>Open the ladder ›</span></button><button class="news-x" data-annx="${esc(a.id)}" aria-label="Hide">✕</button></div>`).join(""); }
 function annWire(){ document.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => { const a = ANNOUNCE.find(x => x.id === b.dataset.ann), cid = b.dataset.annc, chid = a.lad[cid];
     if (chapterOf(cid, chid)) go("ladder", {cid, chid}); });
-  document.querySelectorAll("[data-annx]").forEach(b => b.onclick = () => { let off = []; try { off = JSON.parse(localStorage.getItem("ap_ann_off") || "[]"); off.push(b.dataset.annx); localStorage.setItem("ap_ann_off", JSON.stringify(off)); } catch(e){} b.closest(".banner").remove(); }); }
+  document.querySelectorAll("[data-annx]").forEach(b => b.onclick = () => { let off = []; try { off = JSON.parse(localStorage.getItem("ap_ann_off") || "[]"); off.push(b.dataset.annx); localStorage.setItem("ap_ann_off", JSON.stringify(off)); } catch(e){} b.closest(".news").remove(); }); }
 
 /* ---------- Home: my courses ---------- */
 Views.home = () => { const u = me(); if (!u) return Views.welcome();
@@ -3564,7 +3573,27 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
     const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch); const hp = hardProgress(u, VIEW.cid, ch);
     body = `<div class="card">
     <p class="muted" style="margin-top:0">${ch.qs.length} practice questions across ${liveTopics(ch).length} topics</p>
-    <h2>📝 Chapter test</h2>
+    <h2 style="margin-top:6px">▶️ Start here</h2>
+    <div class="grid">
+${ch.ladder ? (() => { const st = ladState(u, VIEW.cid, ch.id), d = ch.ladder.filter(x => ladCleared(ch, st, x.c)).length;
+      return `<button class="tile" id="goLad"><div class="t">🪜 Ladder: climb concept by concept <span class="badge live">New</span></div>
+      <div class="d">${ch.ladder.length} concepts, each with steps from easy to hard. Answer every question in a step to unlock the next.</div>
+      <div class="progress"><div style="width:${Math.round(d/ch.ladder.length*100)}%"></div></div><div class="d" style="margin-top:6px"><b>${d} of ${ch.ladder.length} concepts cleared</b></div></button>`; })() : `<button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
+        <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>`}</div>
+    <details class="more" ${VIEW.more ? "open" : ""}><summary>More ways to practise</summary>
+    <h3 style="margin:14px 0 6px">🎯 Practise by topic or level</h3>
+    <label>Which topics?</label>
+    <p class="muted small" style="margin:2px 0 6px">Tick one or more topics. Tick none to practise the whole chapter.</p>
+    <div id="topicSel" class="tpick">${liveTopics(ch).map(t => `<label class="chk"><input type="checkbox" data-tp="${esc(t)}" ${topic.includes(t)?"checked":""}> ${esc(t)}</label>`).join("")}</div>
+    <p class="small" style="margin:6px 0 0"><b id="tpInfo"></b> <button class="linkbtn" id="tpClear" type="button">Clear</button></p>
+    <div class="grid" style="margin-top:12px">
+      ${ch.ladder ? `<button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
+        <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>` : ""}
+      <button class="tile" data-m="easy" ${n("easy")?"":"disabled"}><div class="t">🟢 All Easy questions</div><div class="d"><span data-n="easy">${n("easy")}</span> questions</div></button>
+      <button class="tile" data-m="medium" ${n("medium")?"":"disabled"}><div class="t">🟠 All Medium questions</div><div class="d"><span data-n="medium">${n("medium")}</span> questions</div></button>
+      <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d"><span data-n="hard">${n("hard")}</span> questions</div></button>
+    </div>
+    <h3 style="margin:16px 0 6px">📝 Chapter test</h3>
     ${!tn ? `<button class="tile" disabled><div class="t">Chapter test <span class="badge soon">Coming soon</span></div><div class="d">Test questions for this chapter are being added.</div></button>`
       : hp.done < hp.total ? `<button class="tile" disabled style="opacity:1"><div class="t">🔒 Chapter test <span class="badge soon">Locked</span></div>
         <div class="d">Unlocks when you have answered <b>every Hard question</b> in this chapter, right or wrong.</div>
@@ -3573,22 +3602,7 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
         <div class="d">Take your time: answers given in under 10 seconds (20 for calculations) or left unanswered don't count.</div></button>`
       : `<button class="tile" id="chTest"><div class="t">Chapter test (exam style) <span class="badge own">${tn} questions · ${Math.round(tn*pace(VIEW.cid)/60)} min</span></div>
       <div class="d">New questions you haven't seen in practice, about a third Easy, Medium and Hard. One timer for the whole test; jump between questions, change answers, mark for review. Answers at the end.</div></button>`}
-    ${ch.ladder ? (() => { const st = ladState(u, VIEW.cid, ch.id), d = ch.ladder.filter(x => ladCleared(ch, st, x.c)).length;
-      return `<h2>🪜 Ladder</h2><button class="tile" id="goLad"><div class="t">🪜 Ladder: climb concept by concept <span class="badge live">New</span></div>
-      <div class="d">${ch.ladder.length} concepts, each with steps from easy to hard. Answer every question in a step to unlock the next.</div>
-      <div class="progress"><div style="width:${Math.round(d/ch.ladder.length*100)}%"></div></div><div class="d" style="margin-top:6px"><b>${d} of ${ch.ladder.length} concepts cleared</b></div></button>`; })() : ""}
-    <h2>Practice</h2>
-    <label>What do you want to practise?</label>
-    <p class="muted small" style="margin:2px 0 6px">Tick one or more topics. Tick none to practise the whole chapter.</p>
-    <div id="topicSel" class="tpick">${liveTopics(ch).map(t => `<label class="chk"><input type="checkbox" data-tp="${esc(t)}" ${topic.includes(t)?"checked":""}> ${esc(t)}</label>`).join("")}</div>
-    <p class="small" style="margin:6px 0 0"><b id="tpInfo"></b> <button class="linkbtn" id="tpClear" type="button">Clear</button></p>
-    <div class="grid" style="margin-top:12px">
-      <button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
-        <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>
-      <button class="tile" data-m="easy" ${n("easy")?"":"disabled"}><div class="t">🟢 All Easy questions</div><div class="d"><span data-n="easy">${n("easy")}</span> questions</div></button>
-      <button class="tile" data-m="medium" ${n("medium")?"":"disabled"}><div class="t">🟠 All Medium questions</div><div class="d"><span data-n="medium">${n("medium")}</span> questions</div></button>
-      <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d"><span data-n="hard">${n("hard")}</span> questions</div></button>
-    </div>
+    </details>
     <p class="muted small" style="margin-top:12px">Practice: 45 seconds per question, 1 minute for calculations. After a wrong answer, pick why it happened before going on. The quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning, and 3 warnings submits the quiz.</p>
   </div>`;
   }
@@ -3610,6 +3624,7 @@ Views.chapter.after = () => {
   if (!$("topicSel")) return;
   if ($("chTest")) $("chTest").onclick = () => startChapterTest(cid, chid);
   if ($("goLad")) $("goLad").onclick = () => go("ladder", {cid, chid});
+  const md = document.querySelector("details.more"); if (md) md.ontoggle = () => { VIEW.more = md.open; };
   const picked = () => [...document.querySelectorAll("[data-tp]:checked")].map(b => b.dataset.tp);
   const upd = () => { const tp = picked(); VIEW.topics = tp; const pool = ch.qs.filter(q => hasT(q, tp));
     $("tpInfo").textContent = tp.length ? `${tp.length} topic${tp.length>1?"s":""} ticked · ${pool.length} questions` : `Whole chapter · ${pool.length} questions`;
