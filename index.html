@@ -131,6 +131,11 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
 .stat div{background:var(--sky);border-radius:10px;padding:10px;text-align:center}
 .stat b{display:block;font-size:20px;color:var(--navy)}
 .stat span{font-size:12px;color:var(--muted)}
+.howbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;color:var(--navy)}
+.howbtn>span:first-child{font-size:26px}.howbtn b{display:block;font-size:15px}.howbtn small{color:var(--muted);font-size:13px}
+.howvid{position:fixed;inset:0;background:rgba(0,20,40,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px}
+.howvid-in{position:relative;max-width:420px;width:100%}.howvid-in video{width:100%;max-height:82vh;border-radius:14px;background:#00427a;display:block}
+.howvid-x{display:block;margin:0 0 8px auto;background:#fff;color:var(--navy);border:0;border-radius:999px;padding:8px 14px;font-weight:700}
 .news{display:flex;align-items:center;gap:6px;background:var(--sky);border-radius:12px;margin-bottom:8px;padding:2px 4px 2px 0}
 .news-go{flex:1;text-align:left;background:none;border:0;padding:9px 12px;font-size:14px;font-weight:700;color:var(--navy)}
 .news-go span{font-weight:600;white-space:nowrap;text-decoration:underline}
@@ -3361,6 +3366,13 @@ Views.pay.after = () => {
     catch(e){ console.error(e); btn.disabled = false; toast("Couldn't enrol. Please check your internet."); } };
 };
 
+/* ---------- "How this app works" video (16 Nov 2026) ---------- */
+function showHowVideo(){ const d = document.createElement("div"); d.className = "howvid";
+  d.innerHTML = `<div class="howvid-in"><button class="howvid-x" aria-label="Close">✕ Close</button><video src="img/how-it-works.mp4" controls autoplay playsinline></video></div>`;
+  const close = () => { const v = d.querySelector("video"); if (v) v.pause(); d.remove(); };
+  d.onclick = e => { if (e.target === d || e.target.closest(".howvid-x")) close(); };
+  document.body.appendChild(d); }
+
 /* ---------- Announcements (home page, dismissible) ---------- */
 const ANNOUNCE = [{id:"amn-live-2026-11", until:"2026-12-13", lad:{jeem:"m18-nitro", jee:"a18-nitro", neet:"n18-nitro"},
   title:"🎉 New: Amines is live!", text:"Ladder questions for Amines are now in Organic Compounds Containing Nitrogen. Open the 🪜 Ladder and start with concept 1."},
@@ -3382,6 +3394,7 @@ Views.home = () => { const u = me(); if (!u) return Views.welcome();
     <h1>Welcome back, ${esc(u.name.split(" ")[0])} 👋</h1>
     <div class="stat"><div><b>${all.length}</b><span>Quizzes</span></div><div><b>${tot}</b><span>Questions</span></div><div><b>${tot?Math.round(right/tot*100):0}%</b><span>Accuracy</span></div></div>
   </div>
+  <button class="howbtn" id="howBtn"><span>▶️</span><span><b>How this app works</b><small>Watch a 45-second video</small></span></button>
   ${annHTML(u)}
   ${pend ? `<div class="banner" id="pendBanner"><b>📝 ${pend} error analysis${pend>1?" questions":" question"} to finish</b><div class="small">Pick why you got each one wrong. You can start a new quiz after that.</div><button class="btn" id="goAna" style="margin-top:8px">Finish now</button></div>` : ""}
   ${hw.length ? `<h2>Homework 📚</h2><div class="grid">${hw.map(({h, done}) => { const late = !done && Date.now() > dueTs(h.due);
@@ -3394,7 +3407,7 @@ Views.home = () => { const u = me(); if (!u) return Views.welcome();
      return `<button class="tile" data-c="${cid}"><div class="t">${esc(c.name)}</div><div class="d">${(CHAPTERS[cid]||[]).length} chapter(s) · ${at.length} quiz(zes) taken${m?` · ${m} mistake(s) to fix`:""}</div></button>`; }).join("") || '<p class="muted">No courses yet.</p>'}</div>
   <button class="btn ghost block" id="myErr">🔍 My Error Analysis</button>
   <button class="btn ghost block" id="addCourse">+ Add another course</button>`; };
-Views.home.after = () => { annWire();
+Views.home.after = () => { annWire(); $("howBtn").onclick = showHowVideo;
   document.querySelectorAll(".tile[data-c]").forEach(t => t.onclick = () => go("course",{cid:t.dataset.c, tab:"practice"}));
   document.querySelectorAll(".tile[data-hw]").forEach(t => t.onclick = () => startHomework(t.dataset.hw));
   document.querySelectorAll(".tile[data-rev]").forEach(t => t.onclick = () => { const [cid, ch] = t.dataset.rev.split("|"); startRevision(cid, ch); });
@@ -3709,7 +3722,7 @@ async function startQuiz(spec){
 function shuffle(a){ a = a.slice(); for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
 function quizShell(){ return `
   <div class="card">
-    <div class="muted small" style="margin-bottom:8px">${esc(Q.title)}${Q.topic && Q.mode !== "custom" ? " · "+esc(Q.topic) : ""}${SRCNAME[Q.mode] ? "" : " · " + MODE_NAME[Q.mode]}</div>
+    <div class="muted small" style="margin-bottom:8px">${esc(Q.title)}${Q.topic && Q.mode !== "custom" ? " · "+esc(Q.topic) : ""}${SRCNAME[Q.mode] || !MODE_NAME[Q.mode] ? "" : " · " + MODE_NAME[Q.mode]}</div>
     <div class="bar"><span id="qnum" class="pill"></span><span id="lvl" class="pill easy">Easy</span><span id="streak" class="pill">Streak: 0</span><span id="warnPill" class="pill warn" style="display:none"></span></div>
     <div id="timer" class="timer"><div></div></div><div id="timeLeft" class="muted small" style="margin-bottom:8px"></div>
     <div class="qhead"><div id="topic" class="muted small"></div><button class="flagbtn" id="flagBtn">🚩 Report</button></div><div id="qtext" class="qtext"></div><div id="opts"></div><div id="hintBox"></div>
