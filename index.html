@@ -58,6 +58,15 @@ button{font:inherit;cursor:pointer;border:none;border-radius:10px}
 .tile{background:#fff;border:2px solid var(--line);border-radius:12px;padding:14px;text-align:left;width:100%;color:var(--ink);display:block}
 .tile:hover:not(:disabled){border-color:var(--blue)}
 .tile:disabled{opacity:.6;cursor:not-allowed}
+.gostart{display:inline-flex;align-items:center;gap:4px;background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;white-space:nowrap;flex:none}
+.tile .t.tsrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tile.soonT{background:#f6f7f9;border-style:dashed}.tile.soonT .t,.tile.soonT .d{color:var(--muted)}
+.soonb{display:inline-flex;align-items:center;gap:4px;background:#eceff4;color:#5f6b78;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;white-space:nowrap;flex:none}
+.tcard.soonR{background:#f6f7f9;border-style:dashed;border-left-style:solid}.tcard.soonR b{color:var(--muted)}
+#soonPop{position:fixed;inset:0;z-index:80;background:rgba(0,20,40,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+#soonPop .sp{background:#fff;border-radius:18px;max-width:340px;width:100%;padding:22px 20px;text-align:center}
+#soonPop .sp .e{font-size:40px}#soonPop .sp h3{color:var(--navy);margin:6px 0}#soonPop .sp p{color:var(--ink);font-size:15px;margin:0 0 16px}
+#soonPop .sp button{background:var(--navy);color:#fff;border:0;border-radius:12px;padding:11px 22px;font-size:15px;font-weight:700;width:100%}
 .tile .t{font-weight:700;font-size:16px}
 .tile .d{font-size:13px;color:var(--muted);margin-top:2px}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
@@ -3066,6 +3075,10 @@ const fx = s => esc(s)
 const LEVELS = ["easy","medium","hard"], LN = {easy:"Easy",medium:"Medium",hard:"Hard"};
 const me = () => (ME && !ME.profileMissing) ? ME : null;
 const DAY = 864e5, REVISE_DAYS = 15;
+function soonPop(name){ const old = $("soonPop"); if (old) old.remove();
+  const d = document.createElement("div"); d.id = "soonPop";
+  d.innerHTML = `<div class="sp" role="dialog" aria-modal="true"><div class="e">⏳</div><h3>Questions coming soon</h3><p>Questions for <b>${esc(name)}</b> are being added. Please practise the other topics for now.</p><button id="soonOk">OK, got it</button></div>`;
+  document.body.appendChild(d); const x = () => d.remove(); d.onclick = e => { if (e.target === d) x(); }; $("soonOk").onclick = x; }
 function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove("show"), 6000); }
 function chapterOf(cid, chid){ return (CHAPTERS[cid]||[]).find(c => c.id === chid); }
 // Every question knows its chapter; QIDX finds any question in a course by its id
@@ -3562,9 +3575,9 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
       const nq = allQs(ch).length;
       const oldB = ch.old ? ' <span class="badge old">Not in 2026 syllabus</span>' : "";
       const cname = (ch.unit ? `Unit ${ch.unit} · ` : "") + esc(ch.name) + oldB;
-      if (!nq) return `<button class="tile" disabled><div class="t">${cname} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.length > 8 ? ch.topics.length + " topics" : ch.topics.join(" · ")}</div></button>`;
+      if (!nq) return `<button class="tile soonT" data-soon="${esc(ch.name)}"><div class="t tsrow"><span>${cname}</span><span class="soonb">⏳ Coming soon</span></div><div class="d">${ch.topics.length > 8 ? ch.topics.length + " topics" : ch.topics.join(" · ")}</div></button>`;
       const pct = Math.min(100, Math.round(done.size/nq*100));
-      return `<button class="tile" data-ch="${ch.id}"><div class="t">${cname}</div>
+      return `<button class="tile" data-ch="${ch.id}"><div class="t tsrow"><span>${cname}</span><span class="gostart">▶ Start</span></div>
         <div class="d">${nq} questions${ch.ladder ? ` · 🪜 ${ch.ladder.filter(x => ladCleared(ch, ladState(u, VIEW.cid, ch.id), x.c)).length} of ${ch.ladder.length} concepts` : ""}<span class="pct">${pct}% done</span></div>
         <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
       : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
@@ -3612,6 +3625,7 @@ Views.course.after = () => {
   $("bk").onclick = () => go("home");
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => go("course",{cid:VIEW.cid, tab:b.dataset.t}));
   document.querySelectorAll(".tile[data-ch]").forEach(t => t.onclick = () => go("chapter",{cid:VIEW.cid, chid:t.dataset.ch}));
+  document.querySelectorAll(".tile[data-soon]").forEach(t => t.onclick = () => soonPop(t.dataset.soon));
   const cid = VIEW.cid;
   const mlist = chid => shuffle(mistakesOf(me(), cid, chid).map(r => qOf(cid, r.x.id)));
   if ($("msAll")) $("msAll").onclick = () => startQuiz({cid, mode:"mistakes", list:mlist(), title:"My Mistakes"});
@@ -3779,13 +3793,16 @@ Views.chapter.after = () => {
     const tot = Object.values(ts).reduce((a, x) => ({r:a.r + x.r, n:a.n + x.n}), {r:0, n:0}), all = ch.qs.length;
     const rank = t => { const st = ts[t]; return !st || st.n < 10 ? 2 : st.r/st.n; };
     if (VIEW.weakFirst) tops.sort((x, y) => rank(x) - rank(y));
-    const row = (t, nm, st, d, n, k) => `<button class="tcard ${k}" data-tl="${esc(t)}"><span class="dot ${k}"></span><div class="tn"><b>${nm}</b><span class="muted small">${d} of ${n} done · ${strTxt(st)}</span></div><span class="tarr">›</span></button>`;
+    const row = (t, nm, st, d, n, k) => `<button class="tcard ${k}" data-tl="${esc(t)}"><span class="dot ${k}"></span><div class="tn"><b>${nm}</b><span class="muted small">${d} of ${n} done · ${strTxt(st)}</span></div><span class="gostart">▶ Start</span></button>`;
+    const soonTops = ch.topics.filter(t => !tops.includes(t));
     show(`${head("Chapter", "Topics", `${tops.length} topics`)}
       <div class="legend"><span><i class="dot ok"></i>Strong</span><span><i class="dot mid"></i>Okay</span><span><i class="dot weak"></i>Needs work</span><span><i class="dot new"></i>Not started / under 10</span></div>
       <label class="chk wf"><input type="checkbox" id="wf" ${VIEW.weakFirst ? "checked" : ""}> Weakest first</label>
       ${row("", "📚 Whole chapter", tot, TD.all, all, topicChip(tot)[0] === "go" ? "new" : topicChip(tot)[0])}
       <button class="tcard mixb" id="mixB"><span class="dot"></span><div class="tn"><b>➕ Mix several topics</b><span class="muted small">Tick topics for one quiz</span></div><span class="tarr">›</span></button>
-      ${tops.map(t => { const k = topicChip(ts[t])[0]; return row(t, esc(t), ts[t], TD.per[t].d, TD.per[t].n, k === "go" ? "new" : k); }).join("")}`);
+      ${tops.map(t => { const k = topicChip(ts[t])[0]; return row(t, esc(t), ts[t], TD.per[t].d, TD.per[t].n, k === "go" ? "new" : k); }).join("")}
+      ${soonTops.map(t => `<button class="tcard soonR" data-ts="${esc(t)}"><span class="dot"></span><div class="tn"><b>${esc(t)}</b></div><span class="soonb">⏳ Coming soon</span></button>`).join("")}`);
+    sh.querySelectorAll("[data-ts]").forEach(b => b.onclick = () => soonPop(b.dataset.ts));
     $("wf").onchange = () => { VIEW.weakFirst = $("wf").checked; const y = sh.querySelector(".sh").scrollTop; topicsList(); sh.querySelector(".sh").scrollTop = y; };
     $("mixB").onclick = () => levels([], true);
     sh.querySelectorAll("[data-tl]").forEach(b => b.onclick = () => levels(b.dataset.tl ? [b.dataset.tl] : [], false));
