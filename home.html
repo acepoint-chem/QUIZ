@@ -92,6 +92,36 @@
     .stat{padding:12px}
     .stat b{font-size:20px}
   }
+  /* chemistry art + phone/tablet layout (17 Nov) */
+  .hero{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='97' viewBox='0 0 84 97'%3E%3Cpath d='M42 8l30 17v35L42 77 12 60V25z' fill='none' stroke='%23ffffff' stroke-opacity='.05' stroke-width='1.5'/%3E%3C/svg%3E"),linear-gradient(135deg,#00427a 0%,#0a5aa0 100%)}
+  .chemart{position:absolute;right:4%;top:50%;transform:translateY(-50%);width:min(38vw,420px);height:auto;color:#fff;opacity:.55;z-index:0;pointer-events:none}
+  .chemart .liq{fill:var(--gold);opacity:.95}
+  .hero::after{display:none}
+  .chemart .bub circle{animation:bub 3.2s ease-in infinite}
+  .chemart .bub circle:nth-child(2){animation-delay:.8s}.chemart .bub circle:nth-child(3){animation-delay:1.6s}.chemart .bub circle:nth-child(4){animation-delay:.4s}.chemart .bub circle:nth-child(5){animation-delay:2s}
+  @keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-34px);opacity:0}}
+  @media (prefers-reduced-motion:reduce){.chemart .bub circle{animation:none}}
+  @media (max-width:1000px){.chemart{right:-30px;top:auto;bottom:10px;transform:none;width:260px;opacity:.16}.chemart .liq{opacity:.5}}
+  @media (min-width:560px) and (max-width:820px){.g3:not(.steps){grid-template-columns:1fr 1fr}}
+  @media (max-width:559px){
+    .hero .wrap{padding:44px 18px 52px}
+    .tag{margin-bottom:16px}
+    .lead{margin:14px 0 22px}
+    .stats{margin-top:30px}
+    .stat{padding:10px}
+    .stat b{font-size:17px;white-space:nowrap}
+    .stat small{font-size:11.5px}
+    .chemart{width:190px;opacity:.13}
+    section{padding:44px 0}
+    .sub{margin-bottom:24px}
+    #features .card{display:grid;grid-template-columns:44px 1fr;column-gap:12px;padding:16px}
+    #features .card .ic{grid-row:span 2;margin:0;width:44px;height:44px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:22px}
+    #features .card h3{margin-bottom:2px}
+    .courses{grid-template-columns:1fr 1fr;gap:10px}
+    .course{padding:14px 12px}
+    .course h3{font-size:15px}
+    .cta{padding:36px 20px}
+  }
 </style>
 </head>
 <body>
@@ -110,6 +140,13 @@
 </nav>
 
 <header class="hero" id="top">
+  <svg class="chemart" viewBox="0 0 300 260" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <g><path d="M232 20l26 15v30l-26 15-26-15V35z"/><path d="M232 30l17 10v20l-17 10"/><line x1="258" y1="35" x2="280" y2="23"/><line x1="206" y1="65" x2="186" y2="77"/></g>
+  <g><path d="M120 120v40l-38 66a10 10 0 0 0 9 15h86a10 10 0 0 0 9-15l-38-66v-40"/><line x1="112" y1="120" x2="156" y2="120"/><path class="liq" d="M93 205c14-6 28 6 42 0s28-6 42 0l9 15a6 6 0 0 1-5 9H89a6 6 0 0 1-5-9z" stroke="none"/></g>
+  <g><rect x="222" y="118" width="22" height="104" rx="11"/><line x1="216" y1="118" x2="250" y2="118"/><path class="liq" d="M224 175h18v36a9 9 0 0 1-18 0z" stroke="none"/></g>
+  <g class="bub"><circle cx="128" cy="196" r="4"/><circle cx="142" cy="186" r="3"/><circle cx="134" cy="172" r="2.5"/><circle cx="233" cy="165" r="3"/><circle cx="229" cy="150" r="2"/></g>
+  <g><ellipse cx="44" cy="58" rx="30" ry="11"/><ellipse cx="44" cy="58" rx="30" ry="11" transform="rotate(60 44 58)"/><ellipse cx="44" cy="58" rx="30" ry="11" transform="rotate(-60 44 58)"/><circle cx="44" cy="58" r="3.5" fill="currentColor"/></g>
+</svg>
   <div class="wrap">
     <span class="tag">🎓 Free for early students</span>
     <h1>Practise chemistry the way <span>toppers</span> do.</h1>

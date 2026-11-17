@@ -281,6 +281,37 @@ body.examon main{max-width:1120px}
 .lstep.lock{color:var(--muted,#777)} .lstep.soon{border-style:dashed;color:#999;font-weight:500}
 .lgrid td,.lgrid th{text-align:center;padding:4px 6px;font-size:12px;white-space:nowrap} .lgrid td:first-child{text-align:left}
 .lg-ok{background:var(--greenbg)} .lg-on{background:#eef4ff} .lg-stuck{background:var(--redbg);color:var(--red);font-weight:700}
+/* welcome redesign 17 Nov */
+.hero-w{padding:28px 22px 30px;background:radial-gradient(120% 90% at 100% 100%,#0a5a9e 0%,var(--navy) 55%,#00315c 100%)}
+.hero-w::after{display:none}
+.hero-in{position:relative;z-index:1}
+.kicker{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.8;margin-bottom:8px}
+.chemdeco{position:absolute;right:-18px;bottom:-14px;width:250px;height:auto;color:#fff;opacity:.16;pointer-events:none;z-index:0}
+.chemdeco .liq{opacity:.55}
+.chemdeco .bub circle{animation:bub 3.2s ease-in infinite}
+.chemdeco .bub circle:nth-child(2){animation-delay:.8s}.chemdeco .bub circle:nth-child(3){animation-delay:1.6s}.chemdeco .bub circle:nth-child(4){animation-delay:.4s}.chemdeco .bub circle:nth-child(5){animation-delay:2s}
+@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-34px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.chemdeco .bub circle{animation:none}}
+.hero-w .btn.gold{box-shadow:0 4px 14px rgba(0,0,0,.18);max-width:420px}
+.chk2 div::before{content:none}
+.chk2 .ci{flex:0 0 38px;height:38px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:19px}
+@media(max-width:479px){
+  header{padding:8px 12px}.logo img{height:40px}.logo small{display:none}
+  main{padding:12px 10px 40px}
+  .hero-w{padding:22px 16px 24px;border-radius:16px}
+  .hero-w h1{font-size:25px}
+  .chemdeco{width:180px;opacity:.12}
+  .checks div{padding:12px 14px;font-size:14px}
+}
+@media(min-width:480px){.chk2{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){
+  main:has(.welc){max-width:1040px}
+  .welc{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:stretch}
+  .welc .hero-w{margin:0;padding:44px 38px;display:flex;align-items:center}
+  .welc .hero-w h1{font-size:38px}
+  .welc .chemdeco{width:320px}
+  .welc .chk2{grid-template-columns:1fr;margin:0;align-content:center}
+}
 </style>
 </head>
 <body>
@@ -3333,19 +3364,32 @@ async function doSignIn(btn){
   }
   finally { clearTimeout(t); reset(); }
 }
+const CHEM_DECOR = `<svg class="chemdeco" viewBox="0 0 300 260" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <g class="hexa"><path d="M232 20l26 15v30l-26 15-26-15V35z"/><path d="M232 30l17 10v20l-17 10"/><line x1="258" y1="35" x2="280" y2="23"/><line x1="206" y1="65" x2="186" y2="77"/></g>
+  <g><path d="M120 120v40l-38 66a10 10 0 0 0 9 15h86a10 10 0 0 0 9-15l-38-66v-40"/><line x1="112" y1="120" x2="156" y2="120"/><path class="liq" d="M93 205c14-6 28 6 42 0s28-6 42 0l9 15a6 6 0 0 1-5 9H89a6 6 0 0 1-5-9z" fill="currentColor" stroke="none"/></g>
+  <g><rect x="222" y="118" width="22" height="104" rx="11"/><line x1="216" y1="118" x2="250" y2="118"/><path class="liq" d="M224 175h18v36a9 9 0 0 1-18 0z" fill="currentColor" stroke="none"/></g>
+  <g class="bub"><circle cx="128" cy="196" r="4"/><circle cx="142" cy="186" r="3"/><circle cx="134" cy="172" r="2.5"/><circle cx="233" cy="165" r="3"/><circle cx="229" cy="150" r="2"/></g>
+  <g class="atom"><ellipse cx="44" cy="58" rx="30" ry="11"/><ellipse cx="44" cy="58" rx="30" ry="11" transform="rotate(60 44 58)"/><ellipse cx="44" cy="58" rx="30" ry="11" transform="rotate(-60 44 58)"/><circle cx="44" cy="58" r="3.5" fill="currentColor"/></g>
+</svg>`;
 Views.welcome = () => `
-  <div class="hero">
+  <div class="welc">
+  <div class="hero hero-w">
+    ${CHEM_DECOR}
+    <div class="hero-in">
+    <div class="kicker">⚗️ ACE POINT Chemistry</div>
     <h1>Adaptive Chemistry Practice for Every Exam</h1>
     <div class="byline">By Gunjan · IIT Madras alumna</div>
     <p>Quizzes that get harder as you get better, with clear explanations for every answer.</p>
     <button class="btn gold block" id="gIn">${GOOGLE_BTN}</button>
     <p class="small" style="margin-top:12px;opacity:.9">New or returning student, use the same button. Your progress is saved to your account.</p>
+    </div>
   </div>
-  <div class="checks">
-    <div>Questions get harder as you improve</div>
-    <div>Every answer explained, every mistake shown</div>
-    <div>Strong and weak topics tracked for you</div>
-    <div>NEET, JEE, AP, A Level, O Level, IGCSE and more</div>
+  <div class="checks chk2">
+    <div><span class="ci">📈</span>Questions get harder as you improve</div>
+    <div><span class="ci">🧪</span>Every answer explained, every mistake shown</div>
+    <div><span class="ci">🎯</span>Strong and weak topics tracked for you</div>
+    <div><span class="ci">🎓</span>NEET, JEE, AP, A Level, O Level, IGCSE and more</div>
+  </div>
   </div>`;
 Views.welcome.after = () => { $("gIn").onclick = e => doSignIn(e.currentTarget); };
 
