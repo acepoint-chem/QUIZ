@@ -4615,7 +4615,7 @@ Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
     go("tStudent", {uid:VIEW.uid}); };
   document.querySelectorAll(".tile[data-i]").forEach(t => t.onclick = () => go("tAttempt",{uid:VIEW.uid, i:+t.dataset.i})); };
 Views.tAttempt = () => { if (tOnly()) return Views.teacherLock(); const u = Store.getUser(VIEW.uid); const at = u.attempts[VIEW.i];
-  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s ${at.mode === "exam" ? "exam" : "quiz"}</h1><p class="muted">${esc(attTitle(at))} · ${MODE_NAME[at.mode]||"Adaptive quiz"}</p>${reportHTML(at,true)}</div>`; };
+  return `<button class="back" id="bk">← ${esc(u.name)}</button><div class="card"><h1>${esc(u.name)}'s ${at.mode === "exam" ? "exam" : "quiz"}</h1><p class="muted">${esc(attTitle(at))} · ${MODE_NAME[at.mode]||"Smart practice"}</p>${reportHTML(at,true)}</div>`; };
 Views.tAttempt.after = () => { $("bk").onclick = () => go("tStudent",{uid:VIEW.uid}); };
 
 /* ---------- Homework ---------- */
