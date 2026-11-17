@@ -321,6 +321,26 @@ body.examon main{max-width:1120px}
   .welc .chemdeco{width:320px}
   .welc .chk2{grid-template-columns:1fr;margin:0;align-content:center}
 }
+/* course + chapter pages redesign 17 Nov */
+.phead{background:radial-gradient(120% 120% at 100% 100%,#0a5a9e 0%,var(--navy) 60%,#00315c 100%);color:#fff;border:0;position:relative;overflow:hidden;padding:20px 18px}
+.phead>*:not(.chemdeco){position:relative;z-index:1}
+.phead h1{color:#fff;font-size:24px;line-height:1.2}
+.phead .muted,.phead .small{color:rgba(255,255,255,.88)}
+.phead b{color:#fff}
+.phead .progress{background:rgba(255,255,255,.22)}
+.phead .progress>div{background:#7fe0a8}
+.phead .link,.phead a{color:#fff}
+.phead .hiw summary,.phead .hiw{color:#fff}.phead .hiw li{color:rgba(255,255,255,.92)}
+.phead .chemdeco{width:170px;right:-14px;bottom:-26px;opacity:.15}
+.phead .kicker{margin-bottom:4px}
+.tile.chT{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center;border-radius:14px}
+.chT .ub{grid-row:span 3;align-self:start;width:44px;height:44px;border-radius:12px;background:var(--sky);color:var(--navy);font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center}
+.chT .t,.chT .d,.chT .progress{grid-column:2}
+.soonT .ub{background:#eceff4;color:#5f6b78}
+.box4 .bi{width:44px;height:44px;border-radius:12px;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:22px}
+@media(max-width:479px){.tile{padding:12px}.phead{padding:18px 16px}.phead h1{font-size:22px}}
+@media(min-width:700px){.grid.chs{grid-template-columns:1fr 1fr}.grid4{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1000px){main:has(.grid.chs),main:has(.grid4){max-width:980px}}
 </style>
 </head>
 <body>
@@ -3575,13 +3595,13 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
       const nq = allQs(ch).length;
       const oldB = ch.old ? ' <span class="badge old">Not in 2026 syllabus</span>' : "";
       const cname = (ch.unit ? `Unit ${ch.unit} · ` : "") + esc(ch.name) + oldB;
-      if (!nq) return `<button class="tile soonT" data-soon="${esc(ch.name)}"><div class="t tsrow"><span>${cname}</span><span class="soonb">⏳ Coming soon</span></div><div class="d">${ch.topics.length > 8 ? ch.topics.length + " topics" : ch.topics.join(" · ")}</div></button>`;
+      if (!nq) return `<button class="tile soonT${ch.unit ? " chT" : ""}" data-soon="${esc(ch.name)}">${ch.unit ? `<span class="ub">${ch.unit}</span>` : ""}<div class="t tsrow"><span>${ch.unit ? esc(ch.name) + oldB : cname}</span><span class="soonb">⏳ Coming soon</span></div><div class="d">${ch.topics.length > 8 ? ch.topics.length + " topics" : ch.topics.join(" · ")}</div></button>`;
       const pct = Math.min(100, Math.round(done.size/nq*100));
-      return `<button class="tile" data-ch="${ch.id}"><div class="t tsrow"><span>${cname}</span><span class="gostart">▶ Start</span></div>
+      return `<button class="tile${ch.unit ? " chT" : ""}" data-ch="${ch.id}">${ch.unit ? `<span class="ub">${ch.unit}</span>` : ""}<div class="t tsrow"><span>${ch.unit ? esc(ch.name) + oldB : cname}</span><span class="gostart">▶ Start</span></div>
         <div class="d">${nq} questions${ch.ladder ? ` · 🪜 ${ch.ladder.filter(x => ladCleared(ch, ladState(u, VIEW.cid, ch.id), x.c)).length} of ${ch.ladder.length} concepts` : ""}<span class="pct">${pct}% done</span></div>
         <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
       : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
-    body = `<div class="grid">${body}</div>`;
+    body = `<div class="grid chs">${body}</div>`;
   } else if (tab === "create"){
     body = cqHTML(VIEW.cid);
   } else if (tab === "exam"){
@@ -3617,7 +3637,7 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
   }
   return `
   <button class="back" id="bk">← My courses</button>
-  <div class="card"><h1>${esc(c.name)}</h1><p class="muted">${esc(c.desc)}</p></div>
+  <div class="card phead">${CHEM_DECOR}<h1>${esc(c.name)}</h1><p class="muted">${esc(c.desc)}</p></div>
   <div class="tabs main4">${TABS.map(t => `<button data-t="${t[0]}" class="${grp===t?"on":""}">${t[1]}</button>`).join("")}</div>
   ${grp[2].length > 1 ? `<div class="tabs sub2">${grp[2].map(k => `<button data-t="${k}" class="${tab===k?"on":""}">${SUBTAB[k]}</button>`).join("")}</div>` : ""}
   ${body}`; };
@@ -3750,7 +3770,7 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
     </ul></details>`; }
   return `
   <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
-  <div class="card"><h1>${ch.unit ? `Unit ${ch.unit} · ` : ""}${esc(ch.name)}</h1>${ch.old ? '<span class="badge old">Not in 2026 syllabus</span> <span class="muted small">Asked in earlier NEET papers; practise it for past PYQs.</span>' : ""}${hdrX}</div>
+  <div class="card phead">${CHEM_DECOR}${ch.unit ? `<div class="kicker">Unit ${ch.unit}</div>` : ""}<h1>${esc(ch.name)}</h1>${ch.old ? '<span class="badge old">Not in 2026 syllabus</span> <span class="muted small">Asked in earlier NEET papers; practise it for past PYQs.</span>' : ""}${hdrX}</div>
   ${tabs}${body}
   ${tps.length && !prac ? `<div class="card"><h3>Your topics in this chapter</h3>
     <table><tr><th>Topic</th><th>Answered</th><th>Strength</th></tr>
