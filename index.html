@@ -3377,7 +3377,7 @@ Views.welcome = () => `
     ${CHEM_DECOR}
     <div class="hero-in">
     <div class="kicker">⚗️ ACE POINT Chemistry</div>
-    <h1>Adaptive Chemistry Practice for Every Exam</h1>
+    <h1>Smart Chemistry Practice for Every Exam</h1>
     <div class="byline">By Gunjan · IIT Madras alumna</div>
     <p>Quizzes that get harder as you get better, with clear explanations for every answer.</p>
     <button class="btn gold block" id="gIn">${GOOGLE_BTN}</button>
@@ -3593,7 +3593,7 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
       ${topics.map(t => { const s = ts[t]; return `<tr><td>${esc(t)}</td><td>${s?s.n:0}</td><td>${s?Math.round(s.r/s.n*100)+"%":"–"}</td><td>${strengthTag(s)}</td></tr>`; }).join("")}</table></div>`;
   } else if (tab === "history"){
     body = at.length ? `<div class="card"><table><tr><th>When</th><th>Quiz</th><th>Score</th><th>Level</th></tr>
-      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(attTitle(a))}<div class="muted small">${MODE_NAME[a.mode]||"Adaptive"}${a.topic?" · "+esc(a.topic):""}</div></td><td>${a.mode === "exam" ? `${a.score}/${a.maxScore} marks<div class="muted small">${a.right}/${a.total} correct</div>` : `${a.right}/${a.total}`}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}${a.timeUp && a.mode === "exam" ? ' <span class="tag mid">Time up</span>' : ""}</td><td>${a.mode === "exam" ? "" : LN[a.maxLevel]||""}</td></tr>`).join("")}</table></div>`
+      ${at.slice().reverse().map(a => `<tr><td>${fmtDate(a.ts)}</td><td>${esc(attTitle(a))}<div class="muted small">${MODE_NAME[a.mode]||"Smart practice"}${a.topic?" · "+esc(a.topic):""}</div></td><td>${a.mode === "exam" ? `${a.score}/${a.maxScore} marks<div class="muted small">${a.right}/${a.total} correct</div>` : `${a.right}/${a.total}`}${a.auto?' <span class="tag weak">Auto-submitted</span>':""}${a.timeUp && a.mode === "exam" ? ' <span class="tag mid">Time up</span>' : ""}</td><td>${a.mode === "exam" ? "" : LN[a.maxLevel]||""}</td></tr>`).join("")}</table></div>`
       : '<p class="muted">No quizzes yet. Start one from Practice.</p>';
   } else {
     const ex = EXAM_MODES[VIEW.cid];
@@ -3854,7 +3854,7 @@ function startHomework(id){
    5. QUIZ ENGINE
    ===================================================================== */
 const SECONDS = 45, MAX_WARN = 3, NEED = {0:5, 1:10};
-const MODE_NAME = {ncert:"NCERT", exemplar:"NCERT Exemplar", pyq:"CBSE PYQs", adaptive:"Adaptive quiz", easy:"All Easy", medium:"All Medium", hard:"All Hard", test:"Chapter test", custom:"Create a Quiz",
+const MODE_NAME = {ncert:"NCERT", exemplar:"NCERT Exemplar", pyq:"CBSE PYQs", adaptive:"Smart practice", easy:"All Easy", medium:"All Medium", hard:"All Hard", test:"Chapter test", custom:"Create a Quiz",
   mistakes:"My Mistakes", revision:"Quick Revision", homework:"Homework", exam:"Exam mode", ladder:"Ladder"};
 const CHEERS = [["🎯","Bullseye!","Spot on."],["🚀","Nailed it!","Keep going."],["🧪","Chemistry champ!","That's correct."],["😎","Too easy for you!","Correct answer."],
   ["⚗️","Perfect reaction!","Right answer."],["⭐","Superstar!","Correct."],["🙌","Yes!","Well done."],["🧠","Big brain!","Correct."]];
@@ -4602,7 +4602,7 @@ Views.tStudent = () => { if (tOnly()) return Views.teacherLock(); const u = Stor
   <h2>Error analysis</h2><div class="card">${errorSummaryHTML(rows)}</div>
   <h2>Quizzes</h2>${a.length ? a.slice().reverse().map((x,i) => `<button class="tile" data-i="${a.length-1-i}" style="margin-bottom:8px">
     <div class="t">${x.mode === "exam" ? `${x.score}/${x.maxScore} marks` : `${x.right}/${x.total}`} · ${esc(attTitle(x))}${(x.incidents||[]).length?` <span class="badge" style="background:var(--redbg);color:var(--red)">${x.incidents.length} warning(s)</span>`:""}${x.rushed?` <span class="badge" style="background:var(--amberbg);color:var(--amber)">${x.rushed} rushed</span>`:""}</div>
-    <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Adaptive quiz"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]||""}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}` + del; };
+    <div class="d">${fmtDate(x.ts)} · ${MODE_NAME[x.mode]||"Smart practice"}${x.topic?" · "+esc(x.topic):""} · Highest level ${LN[x.maxLevel]||""}${x.auto?" · Auto-submitted":""}</div></button>`).join("") : '<p class="muted">No quizzes yet.</p>'}` + del; };
 Views.tStudent.after = () => { $("bk").onclick = () => go("teacher");
   $("delStu").onclick = () => { const u = Store.getUser(VIEW.uid);
     confirmBox(`Delete ${u.name}?`, "All their details, courses, quiz results and error analysis will be removed for good. This can't be undone.", "Delete", async () => {
