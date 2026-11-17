@@ -65,6 +65,9 @@ button{font:inherit;cursor:pointer;border:none;border-radius:10px}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
 .tabs button{background:#fff;border:1px solid var(--line);padding:8px 12px;font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
 .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tabs.main4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px}.tabs.main4 button{border:0;border-radius:9px;padding:9px 4px}
+.tabs.sub2 button{border-radius:999px;padding:6px 12px;font-size:13px}.tabs.sub2 button.on{background:#e6eef7;color:var(--navy);border-color:var(--navy)}
+.tile .d .pct{float:right;font-weight:800;color:var(--navy)}
 .progress{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
 .progress>div{height:100%;background:var(--green)}
 .pill{font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--sky);color:var(--blue)}
@@ -144,6 +147,47 @@ footer button{background:none;color:var(--muted);text-decoration:underline;font-
 .banner{background:var(--redbg);border:1px solid #f3c1bb;color:#7a1f16;border-radius:14px;padding:14px 16px;margin-bottom:14px}
 .ana{margin-top:12px;padding:12px;border:2px solid var(--navy);border-radius:12px;background:#fff}
 details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:4px}
+.cont{display:block;width:100%;text-align:left;position:relative;background:linear-gradient(135deg,#00427a,#0a5aa0);color:#fff;border:0;border-radius:16px;padding:16px 64px 16px 16px;margin:0 0 12px}
+.cont .t{font-size:17px;font-weight:800}.cont .d{font-size:13px;opacity:.92;margin-top:4px;font-weight:500}
+.cont .go{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:#fff;color:var(--navy);border-radius:50%;width:40px;height:40px;display:grid;place-items:center;font-weight:900;font-size:18px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.three button{background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px 4px;font-size:13px;font-weight:700;color:var(--navy);text-align:center}
+.three button span{display:block;font-size:22px;margin-bottom:3px}
+.three button small{display:block;font-weight:500;color:var(--muted);font-size:11px;margin-top:2px}
+.three button:hover{border-color:var(--navy)}
+.sech{margin:4px 2px 8px;color:var(--navy)}
+.tcard{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-left:5px solid #c7d0da;border-radius:12px;padding:10px 12px;margin-bottom:7px;color:var(--ink)}
+.tcard .tn{flex:1;min-width:0}.tcard .tn b{display:block;font-size:14px}.tcard .progress{height:6px;margin-top:5px}
+.tcard .tchip{font-size:10.5px;font-weight:800;border-radius:999px;padding:3px 8px;white-space:nowrap;background:#eef1f5;color:#6a7886}
+.tcard .tarr{color:var(--navy);font-weight:900;font-size:18px}
+.tcard.ok{border-left-color:var(--green)}.tcard.ok .tchip{background:var(--greenbg);color:var(--green)}.tcard.ok .progress>div{background:var(--green)}
+.tcard.mid{border-left-color:var(--amber)}.tcard.mid .tchip{background:var(--amberbg);color:var(--amber)}.tcard.mid .progress>div{background:var(--amber)}
+.tcard.weak{border-left-color:var(--red)}.tcard.weak .tchip{background:var(--redbg);color:var(--red)}.tcard.weak .progress>div{background:var(--red)}
+.tcard.go{border-left-color:var(--navy)}.tcard.whole{border-left-color:var(--navy);background:#e6eef7}
+.moreT{display:block;margin:4px auto 12px;font-weight:700}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.box4{background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px 12px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:2px;min-height:118px}
+.box4:hover{border-color:var(--navy)}.box4 .bi{font-size:26px}.box4 b{font-size:15px;color:var(--navy);margin-top:4px}.box4 small{color:var(--muted);font-size:12px;line-height:1.35}.box4 .progress{height:6px;margin-top:auto}
+.needs{display:block;width:100%;text-align:left;background:var(--redbg);color:var(--red);border:1px solid #f3c6c0;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:13.5px}.needs span{float:right;font-weight:800}
+.mbar{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:2px solid #f3c6c0;border-radius:16px;padding:12px 14px;color:var(--ink);margin-bottom:12px}.mbar>span:first-child{font-size:24px}.mbar>div{flex:1}.mbar b{color:var(--red);display:block}.mbar small{color:var(--muted);font-size:12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#c7d0da;flex:none;vertical-align:middle;margin-right:3px}.dot.ok{background:var(--green)}.dot.mid{background:var(--amber)}.dot.weak{background:var(--red)}.dot.new{background:#c7d0da}
+.tcard .dot{width:12px;height:12px}.tcard.mixb{border-left-color:var(--navy);border-style:dashed}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted);margin:10px 0 4px}.legend i{margin-right:4px}
+.wf{margin:6px 0 8px;font-weight:700;font-size:13.5px}
+.sopt .cnt{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--redbg);color:var(--red);font-weight:800;font-size:14px}
+.testc{border:2px dashed #b9c7d6;margin-top:6px}.testc .t{font-weight:800;color:var(--navy);font-size:15px;margin-bottom:4px}
+.hiw{margin-top:10px}.hiw summary{cursor:pointer;color:var(--blue);font-weight:700;font-size:13px;list-style:none}.hiw summary::-webkit-details-marker{display:none}
+.hiw ul{margin:8px 0 0 18px;font-size:13px;color:var(--muted);display:grid;gap:4px}
+.tsheet{position:fixed;inset:0;z-index:55;background:rgba(0,20,40,.45);display:flex;align-items:flex-end;justify-content:center}
+.tsheet[hidden]{display:none}
+.tsheet .sh{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px 24px;position:relative}
+.tsheet h2{margin:2px 40px 2px 0;color:var(--navy);font-size:18px}
+.shx{position:absolute;right:12px;top:12px;background:#eef1f5;border:0;border-radius:50%;width:34px;height:34px;font-size:15px;color:var(--ink)}
+.sopt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-top:9px;color:var(--ink)}
+.sopt>div{flex:1;min-width:0}.sopt .e{font-size:22px}.sopt b{display:block;width:auto;font-size:14.5px}.sopt small{color:var(--muted);font-size:12px}
+.sopt.rec{border-color:var(--navy);background:#e6eef7}.sopt.dash{border-style:dashed}.sopt:disabled{opacity:.5}
+.shlist{max-height:34vh;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:6px 10px;margin-top:10px;display:grid;gap:2px}
+body.noscroll{overflow:hidden}
 details.more>summary{cursor:pointer;font-weight:700;color:var(--blue);padding:12px 2px;font-size:15px;list-style:none}
 details.more>summary::-webkit-details-marker{display:none}
 details.more>summary::before{content:"▸ "}
@@ -3045,6 +3089,31 @@ const xTs = x => x.topics && x.topics.length ? [x.topic, ...x.topics.filter(t =>
 const tSel = t => !t ? [] : Array.isArray(t) ? t : [t];
 const hasT = (q, t) => { const s = tSel(t); return !s.length || qTs(q).some(x => s.includes(x)); };
 function liveTopics(ch){ return ch.topics.filter(t => ch.qs.some(q => qTs(q).includes(t))); }
+// Questions seen per topic in a chapter (unique ids answered), for the topic cards
+function topicDone(u, cid, ch){ const ids = new Set(); attemptsFor(u, cid).forEach(a => a.answers.forEach(x => { if (ansCh(a,x) === ch.id) ids.add(x.id); }));
+  const per = {}; liveTopics(ch).forEach(t => { const qs = ch.qs.filter(q => qTs(q).includes(t)); per[t] = {n: qs.length, d: qs.filter(q => ids.has(q.id)).length}; });
+  return {per, all: ch.qs.filter(q => ids.has(q.id)).length}; }
+function seenIds(u, cid, chid){ const ids = new Set(); attemptsFor(u, cid).forEach(a => a.answers.forEach(x => { if (ansCh(a,x) === chid) ids.add(x.id); })); return ids; }
+const chSrcs = (ch, cid) => (COURSE[cid].ncert || COURSE[cid].srcs ? srcsOf(cid) : SRC).filter(([k]) => (ch[k]||[]).length);
+function srcDone(u, cid, ch, k){ const s = seenIds(u, cid, ch.id); return (ch[k]||[]).filter(q => s.has(q.id)).length; }
+function chSeen(u, cid, ch){ const s = seenIds(u, cid, ch.id), all = new Set([...ch.qs, ...chSrcs(ch, cid).flatMap(([k]) => ch[k])].map(q => q.id)); return {n: all.size, d: [...all].filter(i => s.has(i)).length}; }
+// What "Continue" should open on the chapter page: pick up the last thing the student did in this chapter
+function chCont(u, cid, ch){
+  const seen = seenIds(u, cid, ch.id), a = attemptsFor(u, cid).filter(x => x.chapter === ch.id && !["test","exam","revision","mistakes","custom"].includes(x.mode) && !x.hw).at(-1);
+  const lad = () => { if (!ch.ladder) return null; const nx = ladNext(ch, ladState(u, cid, ch.id)); return nx && {k:"lad", nx, t:`Ladder · Concept ${nx.i+1} of ${ch.ladder.length} · Step ${nx.r+1}${nx.here ? "" : " (in " + (LAD_SHORT[ch.ladOther && ch.ladOther.cid] || "the other course") + ")"}`, n:nx.name}; };
+  const src = k => { const list = ch[k] || [], left = list.filter(q => !seen.has(q.id)); return left.length && {k:"src", src:k, list:left, t:`${SRCNAME[k]} · ${list.length - left.length} of ${list.length} done`, n:`Next: question ${list.length - left.length + 1}`}; };
+  const lv = (mode, tp) => { const pool = ch.qs.filter(q => hasT(q, tp) && (mode === "adaptive" || q.level === mode)), left = pool.filter(q => !seen.has(q.id));
+    return left.length && {k:"lv", mode, topic:tp, list:left, t:`${!tp.length ? "Whole chapter" : tp.length === 1 ? tp[0] : tp.length + " topics"} · ${mode === "adaptive" ? "Smart practice" : LN[mode]}`, n:`${left.length} question${left.length === 1 ? "" : "s"} not done yet`}; };
+  let r = null;
+  if (a){ r = a.lad ? lad() : SRCNAME[a.mode] ? src(a.mode) : ["adaptive","easy","medium","hard"].includes(a.mode) && ch.qs.length ? lv(a.mode, tSel(a.topic)) : null; if (r) r.resume = true; }
+  return r || lad() || (ch.qs.length && lv("adaptive", [])) || chSrcs(ch, cid).map(([k]) => src(k)).find(Boolean) || null;
+}
+function runCont(cid, ch, c){ if (!c) return;
+  if (c.k === "lad") return c.nx.here ? startLadder(cid, ch.id, c.nx.c, c.nx.r) : ladGoOther(ch);
+  if (c.k === "src") return startQuiz({cid, chid:ch.id, mode:c.src, list:c.list, title: ch.name + " · " + SRCNAME[c.src]});
+  if (c.mode === "adaptive") return startQuiz({cid, chid:ch.id, topic:c.topic, mode:"adaptive"});
+  startQuiz({cid, chid:ch.id, topic:c.topic, mode:c.mode, list: shuffle(c.list)}); }
+function topicChip(st){ if (!st || !st.n) return ["new","NEW"]; if (st.n < 10) return ["go","KEEP GOING"]; const p = st.r/st.n; return p >= .75 ? ["ok","STRONG"] : p >= .5 ? ["mid","OKAY"] : ["weak","NEEDS WORK"]; }
 
 // Test pace copies the real exam: NEET about 1 minute per question; Grade 8 is 20 questions in 25 minutes
 const PACE = {sci8:75, math8:75}; const pace = cid => PACE[cid] || 60;
@@ -3437,10 +3506,12 @@ Views.errors = () => { const u = me(); const cid = VIEW.cid || "";
 Views.errors.after = () => { $("bk").onclick = () => go("home"); $("eCourse").onchange = e => go("errors", {cid:e.target.value}); };
 
 /* ---------- Course home ---------- */
-const TABS = [["practice","Practice"],["create","Create a Quiz"],["exam","Exam mode"],["mistakes","My Mistakes"],["strengths","Strengths & weaknesses"],["history","History"],["more","More"]];
+// Four main tabs; Tests and Review each hold two sub-tabs
+const TABS = [["practice","Chapters",["practice"]],["exam","Tests",["exam","create"]],["mistakes","Review",["mistakes","history"]],["strengths","Progress",["strengths"]]];
+const SUBTAB = {exam:"📝 Exam mode", create:"🧩 Create a Quiz", mistakes:"❌ My Mistakes", history:"🕘 History"};
 let CQ = null; // Create a Quiz choices
 Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c = COURSE[VIEW.cid]; const chs = CHAPTERS[VIEW.cid]||[];
-  const at = attemptsFor(u, VIEW.cid); const tab = VIEW.tab || "practice";
+  const at = attemptsFor(u, VIEW.cid); if (VIEW.tab === "more") VIEW.tab = "exam"; const tab = VIEW.tab || "practice"; const grp = TABS.find(g => g[2].includes(tab)) || TABS[0];
   let body = "";
   if (tab === "practice"){
     body = chs.length ? chs.map(ch => { const done = new Set(); at.forEach(a => a.answers.forEach(x => { if (ansCh(a,x) === ch.id) done.add(x.id); }));
@@ -3450,7 +3521,7 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
       if (!nq) return `<button class="tile" disabled><div class="t">${cname} <span class="badge soon">Questions coming soon</span></div><div class="d">${ch.topics.length > 8 ? ch.topics.length + " topics" : ch.topics.join(" · ")}</div></button>`;
       const pct = Math.min(100, Math.round(done.size/nq*100));
       return `<button class="tile" data-ch="${ch.id}"><div class="t">${cname}</div>
-        <div class="d">${nq} questions${SRC.some(([k]) => (ch[k]||[]).length) ? " · " + [["qs","Practice"], ...SRC].filter(([k]) => (ch[k]||[]).length).map(([k,l]) => `${l} ${ch[k].length}`).join(" · ") : ""} · ${pct}% seen</div>
+        <div class="d">${nq} questions${ch.ladder ? ` · 🪜 ${ch.ladder.filter(x => ladCleared(ch, ladState(u, VIEW.cid, ch.id), x.c)).length} of ${ch.ladder.length} concepts` : ""}<span class="pct">${pct}% done</span></div>
         <div class="progress"><div style="width:${pct}%"></div></div></button>`; }).join("")
       : '<p class="muted">Chapters for this course are being added. Check back soon!</p>';
     body = `<div class="grid">${body}</div>`;
@@ -3490,7 +3561,8 @@ Views.course = () => { const u = me(); if (!u) return Views.welcome(); const c =
   return `
   <button class="back" id="bk">← My courses</button>
   <div class="card"><h1>${esc(c.name)}</h1><p class="muted">${esc(c.desc)}</p></div>
-  <div class="tabs">${TABS.map(t => `<button data-t="${t[0]}" class="${tab===t[0]?"on":""}">${t[1]}</button>`).join("")}</div>
+  <div class="tabs main4">${TABS.map(t => `<button data-t="${t[0]}" class="${grp===t?"on":""}">${t[1]}</button>`).join("")}</div>
+  ${grp[2].length > 1 ? `<div class="tabs sub2">${grp[2].map(k => `<button data-t="${k}" class="${tab===k?"on":""}">${SUBTAB[k]}</button>`).join("")}</div>` : ""}
   ${body}`; };
 Views.course.after = () => {
   $("bk").onclick = () => go("home");
@@ -3564,8 +3636,8 @@ function hardProgress(u, cid, ch){
   return {done: done.size, total: hard.length, left};
 }
 Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid); const ts = topicStats(attemptsFor(u,VIEW.cid), ch.id);
-  const hasSrc = !!(COURSE[VIEW.cid].ncert || COURSE[VIEW.cid].srcs); const src = hasSrc ? (VIEW.src || "practice") : "practice";
-  const tabs = hasSrc ? `<div class="tabs">${[["practice","Practice"], ...srcsOf(VIEW.cid)].map(([k,l]) => `<button data-src="${k}" class="${src===k?"on":""}">${l}${k!=="practice" && (ch[k]||[]).length ? ` (${ch[k].length})` : ""}</button>`).join("")}</div>` : "";
+  const hasSrc = !!(COURSE[VIEW.cid].ncert || COURSE[VIEW.cid].srcs); const src = "practice"; // past papers and books now live inside Practice
+  const tabs = "";
   let body;
   if (src !== "practice"){
     const list = ch[src] || [], mc = list.filter(q => !isW(q)).length, wr = list.length - mc;
@@ -3580,52 +3652,49 @@ Views.chapter = () => { const u = me(); const ch = chapterOf(VIEW.cid, VIEW.chid
         </div>
         <p class="muted small" style="margin-top:12px">Written answers have no timer: write your answer in your notebook, tap Show answer, then mark Got it or Didn't get it honestly.</p>`
       : `<p class="muted">${SRCNAME[src]} questions for this chapter are coming soon.</p>`}</div>`;
-  } else if (!ch.qs.length){
+  } else if (!ch.qs.length && !chSrcs(ch, VIEW.cid).length){
     body = `<div class="card"><p class="muted">ACE POINT practice questions for this chapter are coming soon.${hasSrc ? " Try the other tabs above." : ""}</p></div>`;
   } else {
-    const topic = tSel(VIEW.topics); const pool = ch.qs.filter(q => hasT(q, topic));
-    const n = l => pool.filter(q => q.level === l).length; const tn = testSize(ch); const hp = hardProgress(u, VIEW.cid, ch);
-    body = `<div class="card">
-    <p class="muted" style="margin-top:0">${ch.qs.length} practice questions across ${liveTopics(ch).length} topics</p>
-    <h2 style="margin-top:6px">▶️ Start here</h2>
-    <div class="grid">
-${ch.ladder ? (() => { const st = ladState(u, VIEW.cid, ch.id), d = ch.ladder.filter(x => ladCleared(ch, st, x.c)).length;
-      return `<button class="tile" id="goLad"><div class="t">🪜 Ladder: climb concept by concept <span class="badge live">New</span></div>
-      <div class="d">${ch.ladder.length} concepts, each with steps from easy to hard. Answer every question in a step to unlock the next.</div>
-      <div class="progress"><div style="width:${Math.round(d/ch.ladder.length*100)}%"></div></div><div class="d" style="margin-top:6px"><b>${d} of ${ch.ladder.length} concepts cleared</b></div></button>`; })() : `<button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
-        <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>`}</div>
-    <details class="more" ${VIEW.more ? "open" : ""}><summary>More ways to practise</summary>
-    <h3 style="margin:14px 0 6px">🎯 Practise by topic or level</h3>
-    <label>Which topics?</label>
-    <p class="muted small" style="margin:2px 0 6px">Tick one or more topics. Tick none to practise the whole chapter.</p>
-    <div id="topicSel" class="tpick">${liveTopics(ch).map(t => `<label class="chk"><input type="checkbox" data-tp="${esc(t)}" ${topic.includes(t)?"checked":""}> ${esc(t)}</label>`).join("")}</div>
-    <p class="small" style="margin:6px 0 0"><b id="tpInfo"></b> <button class="linkbtn" id="tpClear" type="button">Clear</button></p>
-    <div class="grid" style="margin-top:12px">
-      ${ch.ladder ? `<button class="tile" data-m="adaptive"><div class="t">🚀 Adaptive quiz <span class="badge live">Recommended</span></div>
-        <div class="d">Starts Easy. <b>5 right in a row</b> unlocks Medium. <b>10 right in a row</b> on Medium unlocks Hard.</div></button>` : ""}
-      <button class="tile" data-m="easy" ${n("easy")?"":"disabled"}><div class="t">🟢 All Easy questions</div><div class="d"><span data-n="easy">${n("easy")}</span> questions</div></button>
-      <button class="tile" data-m="medium" ${n("medium")?"":"disabled"}><div class="t">🟠 All Medium questions</div><div class="d"><span data-n="medium">${n("medium")}</span> questions</div></button>
-      <button class="tile" data-m="hard" ${n("hard")?"":"disabled"}><div class="t">🔴 All Hard questions</div><div class="d"><span data-n="hard">${n("hard")}</span> questions</div></button>
+    const tops = liveTopics(ch), tn = testSize(ch), hp = hardProgress(u, VIEW.cid, ch), testOpen = tn && hp.done >= hp.total;
+    const lst = ch.ladder ? ladState(u, VIEW.cid, ch.id) : null, cleared = ch.ladder ? ch.ladder.filter(x => ladCleared(ch, lst, x.c)).length : 0;
+    const CT = chCont(u, VIEW.cid, ch), SR = chSrcs(ch, VIEW.cid), MS = mistakesOf(u, VIEW.cid, ch.id);
+    const cnt = k => tops.filter(t => topicChip(ts[t])[0] === k).length, started = tops.filter(t => ts[t] && ts[t].n).length;
+    const weak = tops.filter(t => topicChip(ts[t])[0] === "weak").sort((x, y) => ts[x].r/ts[x].n - ts[y].r/ts[y].n)[0];
+    const sd = SR.reduce((n, [k]) => n + srcDone(u, VIEW.cid, ch, k), 0), sn = SR.reduce((n, [k]) => n + ch[k].length, 0);
+    const box = (id, ic, nm, sub, pct) => `<button class="box4" id="${id}"><span class="bi">${ic}</span><b>${nm}</b><small>${sub}</small>${pct == null ? "" : `<div class="progress"><div style="width:${pct}%"></div></div>`}</button>`;
+    body = `
+    ${CT ? `<button class="cont" id="goNext"><div class="t">▶ ${CT.resume ? "Continue where you left off" : "Start here"}</div><div class="d">${esc(CT.t)}<br>${esc(CT.n)}</div><span class="go">→</span></button>`
+      : `<div class="cont"><div class="t">🏆 All done here</div><div class="d">You've seen every question in this chapter. Revise by topic or take the chapter test.</div></div>`}
+    ${weak ? `<button class="needs" data-tc="${esc(weak)}">⚠️ <b>Needs work:</b> ${esc(weak)} <span>Practise ›</span></button>` : ""}
+    <div class="grid4">
+      ${ch.ladder ? box("bLad", "🪜", "Ladder", `${cleared} of ${ch.ladder.length} concepts`, Math.round(cleared/ch.ladder.length*100)) : ch.qs.length ? box("bSmart", "🚀", "Smart practice", "Whole chapter · starts easy", null) : ""}
+      ${ch.qs.length ? box("bTop", "🎯", "Topics", started ? `<span class="dot ok"></span>${cnt("ok")} strong · <span class="dot weak"></span>${cnt("weak")} need work` : `${tops.length} topics · tap to choose`, null) : ""}
+      ${SR.length ? box("bPyq", "📜", SR.every(([k]) => PYQ_PFX[k]) ? "PYQs" : "Books & PYQs", `${sd} of ${sn} done`, Math.round(sd/sn*100)) : ""}
+      ${tn ? box("bTest", testOpen ? "📝" : "🔒", "Chapter test", testOpen ? `Open · ${tn} questions` : `Hard questions ${hp.done} of ${hp.total}`, testOpen ? null : Math.round(hp.done/hp.total*100)) : ""}
     </div>
-    <h3 style="margin:16px 0 6px">📝 Chapter test</h3>
-    ${!tn ? `<button class="tile" disabled><div class="t">Chapter test <span class="badge soon">Coming soon</span></div><div class="d">Test questions for this chapter are being added.</div></button>`
-      : hp.done < hp.total ? `<button class="tile" disabled style="opacity:1"><div class="t">🔒 Chapter test <span class="badge soon">Locked</span></div>
-        <div class="d">Unlocks when you have answered <b>every Hard question</b> in this chapter, right or wrong.</div>
-        <div class="progress"><div style="width:${Math.round(hp.done/hp.total*100)}%"></div></div>
-        <div class="d" style="margin-top:6px"><b>Hard questions done: ${hp.done} of ${hp.total}</b>${Object.keys(hp.left).length ? " · Still to do: " + Object.entries(hp.left).map(([t,n]) => `${esc(t)} (${n})`).join(", ") : ""}</div>
-        <div class="d">Take your time: answers given in under 10 seconds (20 for calculations) or left unanswered don't count.</div></button>`
-      : `<button class="tile" id="chTest"><div class="t">Chapter test (exam style) <span class="badge own">${tn} questions · ${Math.round(tn*pace(VIEW.cid)/60)} min</span></div>
-      <div class="d">New questions you haven't seen in practice, about a third Easy, Medium and Hard. One timer for the whole test; jump between questions, change answers, mark for review. Answers at the end.</div></button>`}
-    </details>
-    <p class="muted small" style="margin-top:12px">Practice: 45 seconds per question, 1 minute for calculations. After a wrong answer, pick why it happened before going on. The quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning, and 3 warnings submits the quiz.</p>
-  </div>`;
+    ${MS.length ? `<button class="mbar" id="bMis"><span>❌</span><div><b>My mistakes</b><small>${MS.length} question${MS.length === 1 ? "" : "s"} to fix · whole chapter or by topic</small></div><span class="tarr">›</span></button>` : ""}
+    ${ch.qs.length ? "" : `<p class="muted small">ACE POINT practice questions for this chapter are coming soon.</p>`}
+    <div id="tsheet" class="tsheet" hidden></div>`;
   }
-  const tps = allTopics(ch);
+  const tps = allTopics(ch), prac = src === "practice" && (ch.qs.length || chSrcs(ch, VIEW.cid).length);
+  let hdrX = "";
+  if (prac){ const TD0 = chSeen(u, VIEW.cid, ch), p = TD0.n ? Math.round(TD0.d/TD0.n*100) : 0;
+    hdrX = `<div class="muted small" style="margin-top:6px">${TD0.n} questions · <b>${TD0.d} done (${p}%)</b></div><div class="progress"><div style="width:${p}%"></div></div>
+    <details class="hiw"><summary>ⓘ How it works</summary><ul>
+      ${ch.ladder ? "<li><b>Ladder:</b> one concept at a time. Each step is a short quiz; answer every question to open the next step.</li>" : ""}
+      <li><b>Smart practice:</b> starts Easy. 5 right in a row unlocks Medium; 10 right in a row on Medium unlocks Hard.</li>
+      <li><b>Topics:</b> each topic shows its strength (green strong, amber okay, red needs work) after 10 answers. Tap a topic, then pick Smart practice or one level. “Mix several topics” combines topics.</li>
+      <li><b>My mistakes:</b> questions you got wrong, for the whole chapter or one topic. A question leaves the list once you answer it right.</li>
+      ${chSrcs(ch, VIEW.cid).length ? "<li><b>Past-year questions:</b> practise the whole chapter's PYQs in order. “Continue” picks up at the next one you haven't done.</li>" : ""}
+      <li><b>Chapter test:</b> opens when every Hard question is answered. Answers given in under 10 seconds (20 for calculations) don't count.</li>
+      <li><b>Timing:</b> 45 seconds per question, 1 minute for calculations. After a wrong answer, pick why it happened before going on.</li>
+      <li><b>Fair play:</b> the quiz goes fullscreen; leaving it, switching tabs or apps, or split screen gives a warning. 3 warnings submits the quiz.</li>
+    </ul></details>`; }
   return `
   <button class="back" id="bk">← ${esc(COURSE[VIEW.cid].name)}</button>
-  <div class="card"><h1>${ch.unit ? `Unit ${ch.unit} · ` : ""}${esc(ch.name)}</h1>${ch.old ? '<span class="badge old">Not in 2026 syllabus</span> <span class="muted small">Asked in earlier NEET papers; practise it for past PYQs.</span>' : ""}</div>
+  <div class="card"><h1>${ch.unit ? `Unit ${ch.unit} · ` : ""}${esc(ch.name)}</h1>${ch.old ? '<span class="badge old">Not in 2026 syllabus</span> <span class="muted small">Asked in earlier NEET papers; practise it for past PYQs.</span>' : ""}${hdrX}</div>
   ${tabs}${body}
-  ${tps.length ? `<div class="card"><h3>Your topics in this chapter</h3>
+  ${tps.length && !prac ? `<div class="card"><h3>Your topics in this chapter</h3>
     <table><tr><th>Topic</th><th>Answered</th><th>Strength</th></tr>
     ${tps.map(t => `<tr><td>${esc(t)}</td><td>${ts[t]?ts[t].n:0}</td><td>${strengthTag(ts[t])}</td></tr>`).join("")}</table></div>` : ""}`; };
 Views.chapter.after = () => {
@@ -3635,23 +3704,85 @@ Views.chapter.after = () => {
   document.querySelectorAll(".tile[data-sk]").forEach(t => t.onclick = () => { const src = VIEW.src, k = t.dataset.sk;
     const list = (ch[src]||[]).filter(q => k === "all" || (k === "written") === isW(q));
     startQuiz({cid, chid, mode:src, list, title: ch.name + " · " + SRCNAME[src] + (k === "mcq" ? " MCQs" : k === "written" ? " written answers" : "")}); });
-  if (!$("topicSel")) return;
-  if ($("chTest")) $("chTest").onclick = () => startChapterTest(cid, chid);
-  if ($("goLad")) $("goLad").onclick = () => go("ladder", {cid, chid});
-  const md = document.querySelector("details.more"); if (md) md.ontoggle = () => { VIEW.more = md.open; };
-  const picked = () => [...document.querySelectorAll("[data-tp]:checked")].map(b => b.dataset.tp);
-  const upd = () => { const tp = picked(); VIEW.topics = tp; const pool = ch.qs.filter(q => hasT(q, tp));
-    $("tpInfo").textContent = tp.length ? `${tp.length} topic${tp.length>1?"s":""} ticked · ${pool.length} questions` : `Whole chapter · ${pool.length} questions`;
-    $("tpClear").style.display = tp.length ? "" : "none";
-    ["easy","medium","hard"].forEach(l => { const k = pool.filter(q => q.level === l).length; const sp = document.querySelector(`[data-n="${l}"]`); if (sp){ sp.textContent = k; sp.closest(".tile").disabled = !k; } }); };
-  document.querySelectorAll("[data-tp]").forEach(b => b.onchange = upd);
-  $("tpClear").onclick = () => { document.querySelectorAll("[data-tp]").forEach(b => b.checked = false); upd(); };
-  upd();
-  document.querySelectorAll(".tile[data-m]").forEach(t => t.onclick = () => {
-    const topic = picked(), m = t.dataset.m;
-    if (m === "adaptive") return startQuiz({cid, chid, topic, mode:m});
-    startQuiz({cid, chid, topic, mode:m, list: shuffle(ch.qs.filter(q => hasT(q, topic) && q.level === m))});
-  });
+  if (!$("tsheet")) return;
+  const sh = $("tsheet"), U = me();
+  const open = () => { sh.hidden = false; document.body.classList.add("noscroll"); };
+  const close = () => { sh.hidden = true; document.body.classList.remove("noscroll"); };
+  sh.onclick = e => { if (e.target === sh) close(); };
+  const head = (kick, title, sub) => `<button class="shx" id="shX" aria-label="Close">✕</button><div class="muted small">${kick}</div><h2>${esc(title)}</h2>${sub ? `<div class="muted small">${sub}</div>` : ""}`;
+  const show = html => { sh.innerHTML = `<div class="sh">${html}</div>`; $("shX").onclick = close; open(); };
+  const strTxt = st => !st || !st.n ? "Not started" : st.n < 10 ? `${st.n} answered · ${10 - st.n} more for a strength score` : `${Math.round(st.r/st.n*100)}% correct`;
+  // level choice for one topic, several topics or the whole chapter
+  const levels = (sel, mix) => {
+    const ts = topicStats(attemptsFor(U, cid), ch.id), pool = ch.qs.filter(q => hasT(q, sel)), n = l => pool.filter(q => q.level === l).length, TD = topicDone(U, cid, ch);
+    const title = !sel.length ? (mix ? "Pick topics" : "Whole chapter") : sel.length === 1 ? sel[0] : sel.length + " topics";
+    const sub = sel.length === 1 && !mix ? `${TD.per[sel[0]].d} of ${pool.length} done · ${strTxt(ts[sel[0]])}` : `${pool.length} questions`;
+    show(`${head(mix ? "Mix several topics" : sel.length ? "Topic" : "Chapter", title, esc(sub))}
+      ${mix ? `<div class="shlist">${liveTopics(ch).map(t => `<label class="chk"><input type="checkbox" data-mx="${esc(t)}" ${sel.includes(t) ? "checked" : ""}> ${esc(t)}</label>`).join("")}</div>` : ""}
+      ${mix && !sel.length ? `<p class="small" style="margin-top:10px"><b>Tick one or more topics.</b></p>` : `
+      <button class="sopt rec" data-lv="adaptive"><span class="e">🚀</span><div><b>Smart practice (recommended)</b><small>Starts easy and gets harder as you get them right</small></div></button>
+      ${[["easy","🟢","Easy"],["medium","🟠","Medium"],["hard","🔴","Hard"]].map(([l, e, nm]) => `<button class="sopt" data-lv="${l}" ${n(l) ? "" : "disabled"}><span class="e">${e}</span><div><b>${nm} only</b><small>${n(l)} question${n(l) === 1 ? "" : "s"}</small></div></button>`).join("")}`}
+      ${mix ? "" : `<button class="sopt dash" id="shBack"><span class="e">←</span><div><b>All topics</b><small>Back to the topic list</small></div></button>`}`);
+    if ($("shBack")) $("shBack").onclick = () => topicsList();
+    sh.querySelectorAll("[data-mx]").forEach(b => b.onchange = () => { const y = sh.querySelector(".shlist").scrollTop; levels([...sh.querySelectorAll("[data-mx]:checked")].map(x => x.dataset.mx), true); sh.querySelector(".shlist").scrollTop = y; });
+    sh.querySelectorAll("[data-lv]").forEach(b => b.onclick = () => { const m = b.dataset.lv; close();
+      if (m === "adaptive") return startQuiz({cid, chid, topic:sel, mode:m});
+      startQuiz({cid, chid, topic:sel, mode:m, list: shuffle(pool.filter(q => q.level === m))}); });
+  };
+  // the topic list with strengths
+  const topicsList = () => {
+    const ts = topicStats(attemptsFor(U, cid), ch.id), TD = topicDone(U, cid, ch), tops = liveTopics(ch).slice();
+    const tot = Object.values(ts).reduce((a, x) => ({r:a.r + x.r, n:a.n + x.n}), {r:0, n:0}), all = ch.qs.length;
+    const rank = t => { const st = ts[t]; return !st || st.n < 10 ? 2 : st.r/st.n; };
+    if (VIEW.weakFirst) tops.sort((x, y) => rank(x) - rank(y));
+    const row = (t, nm, st, d, n, k) => `<button class="tcard ${k}" data-tl="${esc(t)}"><span class="dot ${k}"></span><div class="tn"><b>${nm}</b><span class="muted small">${d} of ${n} done · ${strTxt(st)}</span></div><span class="tarr">›</span></button>`;
+    show(`${head("Chapter", "Topics", `${tops.length} topics`)}
+      <div class="legend"><span><i class="dot ok"></i>Strong</span><span><i class="dot mid"></i>Okay</span><span><i class="dot weak"></i>Needs work</span><span><i class="dot new"></i>Not started / under 10</span></div>
+      <label class="chk wf"><input type="checkbox" id="wf" ${VIEW.weakFirst ? "checked" : ""}> Weakest first</label>
+      ${row("", "📚 Whole chapter", tot, TD.all, all, topicChip(tot)[0] === "go" ? "new" : topicChip(tot)[0])}
+      <button class="tcard mixb" id="mixB"><span class="dot"></span><div class="tn"><b>➕ Mix several topics</b><span class="muted small">Tick topics for one quiz</span></div><span class="tarr">›</span></button>
+      ${tops.map(t => { const k = topicChip(ts[t])[0]; return row(t, esc(t), ts[t], TD.per[t].d, TD.per[t].n, k === "go" ? "new" : k); }).join("")}`);
+    $("wf").onchange = () => { VIEW.weakFirst = $("wf").checked; const y = sh.querySelector(".sh").scrollTop; topicsList(); sh.querySelector(".sh").scrollTop = y; };
+    $("mixB").onclick = () => levels([], true);
+    sh.querySelectorAll("[data-tl]").forEach(b => b.onclick = () => levels(b.dataset.tl ? [b.dataset.tl] : [], false));
+  };
+  const renderSrc = k => { const list = ch[k] || [], seen = seenIds(U, cid, ch.id), left = list.filter(q => !seen.has(q.id)), mc = list.filter(q => !isW(q)).length, wr = list.length - mc, part = left.length && left.length < list.length;
+    show(`${head("Whole chapter", SRCNAME[k], `${list.length - left.length} of ${list.length} done`)}
+      ${part ? `<button class="sopt rec" data-sq="left"><span class="e">▶</span><div><b>Continue</b><small>${left.length} not done yet, in order</small></div></button>` : ""}
+      <button class="sopt ${part ? "" : "rec"}" data-sq="all"><span class="e">📚</span><div><b>All ${list.length} questions</b><small>In order</small></div></button>
+      ${mc && wr ? `<button class="sopt" data-sq="mcq"><span class="e">🔘</span><div><b>${list.some(isSel) ? "Auto-checked only" : "MCQs only"}</b><small>${mc} questions</small></div></button>
+      <button class="sopt" data-sq="written"><span class="e">✍️</span><div><b>Written answers only</b><small>${wr} questions · no timer, mark yourself</small></div></button>` : ""}`);
+    sh.querySelectorAll("[data-sq]").forEach(b => b.onclick = () => { const m = b.dataset.sq; close();
+      startQuiz({cid, chid, mode:k, list: m === "left" ? left : m === "all" ? list : list.filter(q => (m === "written") === isW(q)), title: ch.name + " · " + SRCNAME[k] + (m === "mcq" ? " MCQs" : m === "written" ? " written answers" : "")}); });
+  };
+  const srcList = () => { const SR = chSrcs(ch, cid); if (SR.length === 1) return renderSrc(SR[0][0]);
+    show(`${head("Whole chapter", "Books & PYQs", "")}${SR.map(([k, l]) => `<button class="sopt" data-sl="${k}"><span class="e">📜</span><div><b>${esc(l)}</b><small>${srcDone(U, cid, ch, k)} of ${ch[k].length} done</small></div></button>`).join("")}`);
+    sh.querySelectorAll("[data-sl]").forEach(b => b.onclick = () => renderSrc(b.dataset.sl)); };
+  const misList = () => { const ms = mistakesOf(U, cid, chid).map(r => qOf(cid, r.x.id)).filter(Boolean), by = {};
+    ms.forEach(q => (by[q.topic] = by[q.topic] || []).push(q));
+    const go4 = (list, t) => { close(); startQuiz({cid, chid, mode:"mistakes", list: shuffle(list), title: "My Mistakes · " + ch.name + (t ? " · " + t : "")}); };
+    show(`${head("Chapter", "My mistakes", `${ms.length} question${ms.length === 1 ? "" : "s"} to fix. A question leaves this list once you answer it right.`)}
+      <button class="sopt rec" id="msAll2"><span class="e">❌</span><div><b>Fix all ${ms.length}</b><small>Whole chapter, mixed</small></div></button>
+      <h3 class="sech" style="margin-top:14px">By topic</h3>
+      ${Object.entries(by).sort((x, y) => y[1].length - x[1].length).map(([t, l]) => `<button class="sopt" data-mt="${esc(t)}"><span class="e cnt">${l.length}</span><div><b>${esc(t)}</b><small>${l.length} to fix</small></div></button>`).join("")}`);
+    $("msAll2").onclick = () => go4(ms);
+    sh.querySelectorAll("[data-mt]").forEach(b => b.onclick = () => go4(by[b.dataset.mt], b.dataset.mt)); };
+  const testInfo = () => { const tn = testSize(ch), hp = hardProgress(U, cid, ch);
+    if (hp.done >= hp.total) return startChapterTest(cid, chid);
+    show(`${head("Chapter", "🔒 Chapter test", "")}
+      <p class="small" style="margin-top:8px">${tn} new questions you haven't seen in practice, exam style, one timer. It opens when you have answered <b>every Hard question</b> in this chapter, right or wrong.</p>
+      <div class="progress"><div style="width:${Math.round(hp.done/hp.total*100)}%"></div></div><p class="small"><b>Hard questions: ${hp.done} of ${hp.total}</b></p>
+      ${Object.keys(hp.left).length ? `<p class="muted small">Still to do: ${Object.entries(hp.left).map(([t, n]) => `${esc(t)} (${n})`).join(", ")}</p>` : ""}
+      <button class="sopt rec" id="hardGo"><span class="e">🔴</span><div><b>Practise Hard questions</b><small>Whole chapter</small></div></button>`);
+    $("hardGo").onclick = () => { close(); startQuiz({cid, chid, topic:[], mode:"hard", list: shuffle(ch.qs.filter(q => q.level === "hard"))}); }; };
+  if ($("goNext")) $("goNext").onclick = () => runCont(cid, ch, chCont(U, cid, ch));
+  if ($("bLad")) $("bLad").onclick = () => go("ladder", {cid, chid});
+  if ($("bSmart")) $("bSmart").onclick = () => startQuiz({cid, chid, topic:[], mode:"adaptive"});
+  if ($("bTop")) $("bTop").onclick = topicsList;
+  if ($("bPyq")) $("bPyq").onclick = srcList;
+  if ($("bTest")) $("bTest").onclick = testInfo;
+  if ($("bMis")) $("bMis").onclick = misList;
+  document.querySelectorAll(".needs[data-tc]").forEach(b => b.onclick = () => levels([b.dataset.tc], false));
 };
 
 /* ---------- Quiz starters ---------- */
@@ -4339,8 +4470,7 @@ Views.ladder = () => { const u = me(), {cid, chid} = VIEW, ch = chapterOf(cid, c
   const oth = ch.ladOther ? LAD_SHORT[ch.ladOther.cid] : "";
   return `<button class="back" id="bk">← ${esc(ch.name)}</button>
   <div class="card"><h1>🪜 Ladder</h1>
-    <p class="muted" style="margin-top:0">Climb one concept at a time. Each step is a short quiz of 2–3 questions: <b>answer every question</b> to open the next step (right or wrong — read the solutions for any you miss). Finish all the steps of a concept to open the next concept.</p>
-    ${ch.ladPair ? `<p class="small">One ladder for JEE: steps L1–L3 are in JEE Main and L4–L5 in JEE Advanced (concepts asked only in JEE Advanced have all their steps there). Your progress is shared, so you never see a question twice.</p>` : ""}
+    <details class="hiw" style="margin:0 0 8px"><summary>ⓘ How the ladder works</summary><p class="small">Climb one concept at a time. Each step is a short quiz of 2–3 questions: <b>answer every question</b> to open the next step (right or wrong — read the solutions for any you miss). Finish all the steps of a concept to open the next concept.</p>${ch.ladPair ? `<p class="small">One ladder for JEE: steps L1–L3 are in JEE Main and L4–L5 in JEE Advanced (concepts asked only in JEE Advanced have all their steps there). Your progress is shared, so you never see a question twice.</p>` : ""}</details>
     <div class="progress"><div style="width:${Math.round(done/L.length*100)}%"></div></div>
     <p class="small"><b>${done} of ${L.length} concepts cleared</b></p>
     ${nx ? `<button class="btn" id="ladGo">▶ Next step: ${esc(nx.name)} · Step ${nx.r+1}${nx.here ? "" : ` (in ${oth})`}</button>` : `<p><b>🏆 You have cleared every concept in this ladder!</b></p>`}</div>
