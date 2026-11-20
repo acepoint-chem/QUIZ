@@ -375,6 +375,7 @@ body.examon main{max-width:1120px}
 </div></div>
 <div id="toast" class="toast"></div>
 
+<script src="data/jeem-pyq.js"></script>
 <script>
 /* =====================================================================
    1. CONTENT: courses, chapters, questions
@@ -3303,6 +3304,8 @@ const SRC = [["ncert","NCERT"],["exemplar","NCERT Exemplar"],["pyq","CBSE PYQs"]
 const srcsOf = cid => (COURSE[cid].srcs || ["ncert","exemplar","pyq"]).map(k => [k, SRCNAME[k]]);
 const PYQ_PFX = {pyq:"CBSE ", npyq:"NEET ", jpyq:"JEE "};
 const allQs = ch => [...ch.qs, ...SRC.flatMap(([k]) => ch[k] || [])];
+// JEE Main PYQs 2019–2025 live in data/jeem-pyq.js (kept out of this file for size); add them to each chapter
+try { if (window.JEEM_PYQ_EXTRA) (CHAPTERS.jeem || []).forEach(ch => { const x = window.JEEM_PYQ_EXTRA[ch.id]; if (x) { const have = new Set((ch.jpyq || []).map(q => q.id)); ch.jpyq = [...(ch.jpyq || []), ...x.filter(q => !have.has(q.id))]; } }); } catch (e) { console.warn("JEE Main PYQ data", e); }
 Object.entries(CHAPTERS).forEach(([cid, chs]) => { QIDX[cid] = {}; chs.forEach(ch => {
   // Questions marked test:true are kept only for the chapter test and never appear in practice
   ch.tq = ch.qs.filter(q => q.test); ch.qs = ch.qs.filter(q => !q.test);
